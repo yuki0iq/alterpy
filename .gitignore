@@ -1,3 +1,5 @@
 /telethon_config.toml
 log/
 .git/
+*.session
+*.session-journal
