@@ -20,12 +20,13 @@ async def advice():
 
 handlers.append(
     util.get_handler_simple_reply(
-        msg='/?(adv)|(совет)',
+        msg='advice',
         ans=advice,
         author='@yuki_the_girl',
         version=1,
         help_message=
             "Fucking great advice from fucking-great-advice.ru\n" +
-            "Based on: github.com/Catware-Foundation/Catpy-Software/blob/main/advice.py"
+            "Based on: github.com/Catware-Foundation/Catpy-Software/blob/main/advice.py",
+        pattern='/?adv|совет'
     )
 )

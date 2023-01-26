@@ -1,3 +1,5 @@
+import re
+import copy
 import pytomlpp
 import logging
 import traceback
@@ -29,6 +31,21 @@ def list_files(path):
     """list files in given folder"""
     # https://stackoverflow.com/a/3207973
     return [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+
+
+def change_layout(s):
+    """alternate between QWERTY and JCUKEN"""
+    en = r"""`~!@#$^&qwertyuiop[]\QWERTYUIOP{}|asdfghjkl;'ASDFGHJKL:"zxcvbnm,./ZXCVBNM<>?"""
+    ru = r"""ёЁ!"№;:?йцукенгшщзхъ\ЙЦУКЕНГШЩЗХЪ/фывапролджэФЫВАПРОЛДЖЭячсмитьбю.ЯЧСМИТЬБЮ,"""
+    fr, to = en + ru, ru + en
+
+    res = []
+    for c in s:
+        if c in fr:
+            res.append(to[fr.index(c)])
+        else:
+            res.append(c)
+    return ''.join(res)
 
 
 logging_formatter = logging.Formatter("%(asctime)s: %(name)s [%(levelname)s]:  %(message)s")
@@ -95,7 +112,7 @@ class User:
 
 class CommandMessage(typing.NamedTuple):
     arg: str  # message text
-    arg_rep: str  # message text with reply attached
+    rep: str  # message text with reply attached
     media: typing.Any  # media if exist
     time: datetime.datetime  # UTC time when sent
     local_time: datetime.datetime  # UTC time wher recv
@@ -104,6 +121,13 @@ class CommandMessage(typing.NamedTuple):
     # chat: Chat  # chat object --- unneeded for now
     int_cur: MessageInteractor  # for current message
     int_prev: MessageInteractor  # for attached reply
+
+
+def cm_apply(cm: CommandMessage, pattern: re.Pattern):
+    arg = re.sub(pattern, '', cm.arg)
+    if not len(arg):
+        arg = cm.rep
+    return cm._replace(arg=arg)
 
 
 async def to_command_message(event: telethon.events.NewMessage):
@@ -115,7 +139,7 @@ async def to_command_message(event: telethon.events.NewMessage):
 
     # TODO handle replies PROPERLY --- should media and text from replies be taken and when
     arg = msg_cur.message
-    arg_rep = f"{msg_cur.message}\n{msg_prev.message}" if has_reply else arg
+    rep = f"{msg_prev.message}" if has_reply else None
     media = None  # event.message.get_media TODO
     time = msg_cur.date
     local_time = datetime.datetime.now(datetime.timezone.utc)
@@ -125,21 +149,24 @@ async def to_command_message(event: telethon.events.NewMessage):
     int_cur = MessageInteractor(msg_cur)
     int_prev = MessageInteractor(msg_prev) if has_reply else None
 
-    return CommandMessage(arg, arg_rep, media, time, local_time, sender, reply_sender, int_cur, int_prev)
+    return CommandMessage(arg, rep, media, time, local_time, sender, reply_sender, int_cur, int_prev)
 
 
 class CommandHandler(typing.NamedTuple):
     name: str  # command name
-    pattern: str  # regex pattern
+    pattern: re.Pattern  # regex pattern
     help_message: str  # short help about command
     author: str
     version: int
     handler_impl: typing.Callable[[CommandMessage], typing.Awaitable]
-    is_elevated: bool = True  # should a command be invoked only if user is admin
+    is_prefix: bool = False  # should a command be deleted from its message when passed to handler
+    is_elevated: bool = False  # should a command be invoked only if user is admin
 
     async def invoke(self, cm: CommandMessage):
         if not self.is_elevated or cm.sender.is_admin():
             await self.handler_impl(cm)
+        else:
+            await cm.int_cur.reply("Only bot admins can run elevated commands")  # TODO fix text
 
 
 def get_handler_simple_reply(
@@ -148,12 +175,15 @@ def get_handler_simple_reply(
     author: str,
     version: int,
     help_message: str = "Simple reply command",
-    pattern: str = ""
+    pattern: typing.Any = ""
 ) -> CommandHandler:
     """
     Simple reply handler. [In]msg -> [Out]ans
+
     ans: str -- simple replier
     ans: Callable[[], Awaitable] -- call before reply
+
+    pattern: str OR re.Pattern
     """
 
     if type(ans) == str:
@@ -165,6 +195,8 @@ def get_handler_simple_reply(
 
     if pattern is None or not len(pattern):
         pattern = re_pat_starts_with(msg)
+    if type(pattern) == str:
+        pattern = re.compile(pattern)
     return CommandHandler(
         name=msg,
         pattern=pattern,

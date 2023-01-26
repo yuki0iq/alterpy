@@ -29,7 +29,7 @@ async def command_version(cm: util.CommandMessage):
 
 append_handler(
     name='ver',
-    pattern=util.re_pat_starts_with('/ver'),
+    pattern=re.compile(util.re_pat_starts_with('/ver')),
     help_message='Show AlterPy version',
     author='@yuki_the_girl',
     version=1,
@@ -58,7 +58,9 @@ async def event_handler(event: telethon.events.NewMessage):
     ))
     if len(filtered_handlers):
         await asyncio.wait([
-            asyncio.create_task(handler.invoke(cm))
+            asyncio.create_task(handler.invoke(
+                util.cm_apply(cm, handler.pattern) if handler.is_prefix else cm
+            ))
             for handler in filtered_handlers
         ])
 

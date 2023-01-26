@@ -1,6 +1,7 @@
 import util
 
 import datetime
+import re
 
 handlers = []
 
@@ -12,7 +13,7 @@ async def on_ping(cm: util.CommandMessage):
 
 handlers.append(util.CommandHandler(
     name='ping',
-    pattern=util.re_pat_starts_with('/?(ping|пинг)'),
+    pattern=re.compile(util.re_pat_starts_with('/?ping|пинг')),
     help_message='Measure ping',
     author='@yuki_the_girl',
     version=1,
