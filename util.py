@@ -140,3 +140,25 @@ class CommandHandler(typing.NamedTuple):
     async def invoke(self, cm: CommandMessage):
         if not self.is_elevated or cm.sender.is_admin():
             await self.handler_impl(cm)
+
+
+def get_handler_simple_reply(
+    msg: str,
+    ans: str,
+    author: str,
+    version: int,
+    help_message: str = "Simple reply command",
+    pattern: str = ""
+) -> CommandHandler:
+    """Simple reply handler. [In]msg -> [Out]ans"""
+    async def on_simple_reply(cm: CommandMessage):
+        await cm.int_cur.reply(ans)
+    return CommandHandler(
+        name=msg,
+        pattern=re_pat_starts_with(msg) if len(pattern) else pattern,
+        help_message=help_message,
+        author=author,
+        version=version,
+        handler_impl=on_simple_reply,
+        is_elevated=False
+    )
