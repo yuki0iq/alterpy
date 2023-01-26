@@ -4,6 +4,7 @@ import traceback
 # import time
 import datetime
 import typing
+import os
 
 import telethon.tl.custom
 import telethon.events
@@ -22,6 +23,12 @@ def set_config(name, conf):
 def re_pat_starts_with(s):
     """wrap regex pattern into "Case insensitive; Starts with and ends with whitespace or end of string\""""
     return f"(?i)({s})($|\\s)"
+
+
+def list_files(path):
+    """list files in given folder"""
+    # https://stackoverflow.com/a/3207973
+    return [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
 
 
 logging_formatter = logging.Formatter("%(asctime)s: %(name)s [%(levelname)s]:  %(message)s")
