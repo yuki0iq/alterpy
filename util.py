@@ -24,7 +24,7 @@ def set_config(name, conf):
 
 def re_pat_starts_with(s):
     """wrap regex pattern into "Case insensitive; Starts with and ends with whitespace or end of string\""""
-    return f"(?i)({s})($|\\s)"
+    return f"(?i)^({s})($|\\s)"
 
 
 def list_files(path):
@@ -204,5 +204,6 @@ def get_handler_simple_reply(
         author=author,
         version=version,
         handler_impl=on_simple_reply,
+        is_prefix=False,
         is_elevated=False
     )
