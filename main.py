@@ -23,7 +23,7 @@ def append_handler(*args, **kwargs):
 
 
 async def command_version(cm: util.CommandMessage):
-    await cm.int_cur.respond("AlterPy 1 on Jan 26 of 2023 by Yuki the girl")
+    await cm.int_cur.reply("AlterPy 1 on Jan 26 of 2023 by Yuki the girl")
 
 
 append_handler(
@@ -37,10 +37,10 @@ append_handler(
 )
 
 
-commands_filenames = filter(lambda filename: filename[-3:] == ".py", sorted(util.list_files("commands/")))
-log.info(f"commands: {list(commands_filenames)}")
+commands_filenames = list(filter(lambda filename: filename[-3:] == ".py", sorted(util.list_files("commands/"))))
+log.info(f"commands: {commands_filenames}")
 for filename in commands_filenames:
-    with open(filename, "r") as file:
+    with open("commands/" + filename, "r") as file:
         code = file.read()
         exec(code)
 
@@ -48,15 +48,17 @@ for filename in commands_filenames:
 @client.on(telethon.events.NewMessage)
 async def event_handler(event: telethon.events.NewMessage):
     cm = await util.to_command_message(event)
-    await asyncio.wait([
-        handler.invoke(cm)
-        for handler
-        in filter(
-            lambda handler:
+    filtered_handlers = list(filter(
+        lambda handler:
             bool(re.search(handler.pattern, cm.arg)),
-            handlers
-        )
-    ])
+        handlers
+    ))
+    if len(filtered_handlers):
+        await asyncio.wait([
+            handler.invoke(cm)
+            for handler
+            in filtered_handlers
+        ])
 
 
 log.info("Started!")
