@@ -55,9 +55,8 @@ async def event_handler(event: telethon.events.NewMessage):
     ))
     if len(filtered_handlers):
         await asyncio.wait([
-            handler.invoke(cm)
-            for handler
-            in filtered_handlers
+            asyncio.create_task(handler.invoke(cm))
+            for handler in filtered_handlers
         ])
 
 
