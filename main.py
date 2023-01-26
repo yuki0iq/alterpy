@@ -41,8 +41,11 @@ append_handler(
 commands_filenames = list(filter(lambda filename: filename[-3:] == ".py", sorted(util.list_files("commands/"))))
 log.info(f"commands: {commands_filenames}")
 for filename in commands_filenames:
-    mod = importlib.import_module(f"commands.{filename[:-3]}")
-    handlers.extend(mod.handlers)
+    try:
+        mod = importlib.import_module(f"commands.{filename[:-3]}")
+        handlers.extend(mod.handlers)
+    except:
+        util.log_fail(log, f"Loading {filename} failed")
 
 
 @client.on(telethon.events.NewMessage)

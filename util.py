@@ -64,21 +64,21 @@ class MessageInteractor(typing.NamedTuple):
         """Reply to message"""
         try:
             await self.message.reply(text, file=media)
-        except Exception as e:
+        except:
             log_fail(get_log("telethon message interactor"), "Could not reply")
 
     async def respond(self, text, media=None):
         """Respond to message (without replying)"""
         try:
             await self.message.respond(text, file=media)
-        except Exception as e:
+        except:
             log_fail(get_log("telethon message interactor"), "Could not respond")
 
     async def delete(self):
         """Delete the message"""
         try:
             await self.message.delete()
-        except Exception as e:
+        except:
             await self.reply(f"Error occurred:\n```\n{traceback.format_exc()}\n```")  # TODO fix message
 
 
@@ -144,18 +144,30 @@ class CommandHandler(typing.NamedTuple):
 
 def get_handler_simple_reply(
     msg: str,
-    ans: str,
+    ans: typing.Any,
     author: str,
     version: int,
     help_message: str = "Simple reply command",
     pattern: str = ""
 ) -> CommandHandler:
-    """Simple reply handler. [In]msg -> [Out]ans"""
-    async def on_simple_reply(cm: CommandMessage):
-        await cm.int_cur.reply(ans)
+    """
+    Simple reply handler. [In]msg -> [Out]ans
+    ans: str -- simple replier
+    ans: Callable[[], Awaitable] -- call before reply
+    """
+
+    if type(ans) == str:
+        async def on_simple_reply(cm: CommandMessage):
+            await cm.int_cur.reply(ans)
+    else:
+        async def on_simple_reply(cm: CommandMessage):
+            await cm.int_cur.reply(await ans())
+
+    if pattern is None or not len(pattern):
+        pattern = re_pat_starts_with(msg)
     return CommandHandler(
         name=msg,
-        pattern=re_pat_starts_with(msg) if len(pattern) else pattern,
+        pattern=pattern,
         help_message=help_message,
         author=author,
         version=version,
