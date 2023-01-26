@@ -25,7 +25,7 @@ def re_pat_starts_with(s):
 
 
 logging_formatter = logging.Formatter("%(asctime)s: %(name)s [%(levelname)s]:  %(message)s")
-logging.basicConfig(format="%(asctime)s: %(name)s [%(levelname)s]:  %(message)s", level=logging.DEBUG)
+logging.basicConfig(format="%(asctime)s: %(name)s [%(levelname)s]:  %(message)s", level=logging.INFO)
 
 
 def get_log(name="unknown"):
@@ -98,24 +98,27 @@ class CommandMessage(typing.NamedTuple):
     int_cur: MessageInteractor  # for current message
     int_prev: MessageInteractor  # for attached reply
 
-    async def CommandMessage(self, event: telethon.events.NewMessage):
-        """Construct CommandMessage from telethon NewMessage event"""
 
-        msg_cur = event.message
-        msg_prev = await msg_cur.get_reply_message()
-        has_reply = msg_prev is not None
+async def to_command_message(event: telethon.events.NewMessage):
+    """Construct CommandMessage from telethon NewMessage event"""
 
-        # TODO handle replies PROPERLY --- should media and text from replies be taken and when
-        self.arg = msg_cur.message
-        self.arg_rep = f"{msg_cur.message}\n{msg_prev.message}" if has_reply else self.arg
-        self.media = None  # event.message.get_media TODO
-        self.time = msg_cur.date
-        self.local_time = datetime.datetime.now(datetime.timezone.utc)
-        self.sender = None  # User(event.message.get_sender)
-        self.reply_sender = None  # User(event.message.reply.get_sender)
-        # self.chat = Chat(??)
-        self.int_cur = MessageInteractor(msg_cur)
-        self.int_prev = MessageInteractor(msg_prev) if has_reply else None
+    msg_cur = event.message
+    msg_prev = await msg_cur.get_reply_message()
+    has_reply = msg_prev is not None
+
+    # TODO handle replies PROPERLY --- should media and text from replies be taken and when
+    arg = msg_cur.message
+    arg_rep = f"{msg_cur.message}\n{msg_prev.message}" if has_reply else arg
+    media = None  # event.message.get_media TODO
+    time = msg_cur.date
+    local_time = datetime.datetime.now(datetime.timezone.utc)
+    sender = None  # User(event.message.get_sender)
+    reply_sender = None  # User(event.message.reply.get_sender)
+    # self.chat = Chat(??)
+    int_cur = MessageInteractor(msg_cur)
+    int_prev = MessageInteractor(msg_prev) if has_reply else None
+
+    return CommandMessage(arg, arg_rep, media, time, local_time, sender, reply_sender, int_cur, int_prev)
 
 
 class CommandHandler(typing.NamedTuple):

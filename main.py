@@ -19,7 +19,7 @@ handlers = []
 
 
 async def command_version(cm: util.CommandMessage):
-    await cm.int_cur.reply("AlterPy 1 on Jan 26 of 2023 by Yuki the girl")
+    await cm.int_cur.respond("AlterPy 1 on Jan 26 of 2023 by Yuki the girl")
 
 
 handlers.append(
@@ -38,7 +38,7 @@ handlers.append(
 
 @client.on(telethon.events.NewMessage)
 async def event_handler(event: telethon.events.NewMessage):
-    cm = util.CommandMessage(event)
+    cm = await util.to_command_message(event)
     await asyncio.wait([
         handler.invoke(cm)
         for handler
@@ -48,3 +48,8 @@ async def event_handler(event: telethon.events.NewMessage):
             handlers
         )
     ])
+
+
+log.info("Started!")
+with client:
+    client.run_until_disconnected()
