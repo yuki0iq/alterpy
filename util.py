@@ -77,7 +77,7 @@ class MessageInteractor(typing.NamedTuple):
 
 class User:
     def is_admin(self):  # check if in admins list
-        pass  # TODO
+        return False  # TODO
 
     async def get_displayname(self):
         pass  # TODO
@@ -112,7 +112,7 @@ async def to_command_message(event: telethon.events.NewMessage):
     media = None  # event.message.get_media TODO
     time = msg_cur.date
     local_time = datetime.datetime.now(datetime.timezone.utc)
-    sender = None  # User(event.message.get_sender)
+    sender = User()  # User(event.message.get_sender)
     reply_sender = None  # User(event.message.reply.get_sender)
     # self.chat = Chat(??)
     int_cur = MessageInteractor(msg_cur)
@@ -129,7 +129,7 @@ class CommandHandler(typing.NamedTuple):
     version: int
     handler_impl: typing.Callable[[CommandMessage], typing.Awaitable]
     is_elevated: bool = True  # should a command be invoked only if user is admin
-    is_replaceable: bool = False  # should a matched command pattern be replaced with nothing
 
     async def invoke(self, cm: CommandMessage):
-        await self.handler_impl(cm)
+        if not self.is_elevated or cm.sender.is_admin():
+            await self.handler_impl(cm)

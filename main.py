@@ -30,8 +30,7 @@ handlers.append(
         author='@yuki_the_girl',
         version=1,
         handler_impl=command_version,
-        is_elevated=False,
-        is_replaceable=False
+        is_elevated=False
     )
 )
 
