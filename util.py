@@ -186,7 +186,7 @@ def get_handler_simple_reply(
     Simple reply handler. [In]msg -> [Out]ans
 
     ans: str -- simple replier
-    ans: Callable[[], Awaitable] -- call before reply
+    ans: Callable[[], maybe Awaitable str] -- call before reply
 
     pattern: str OR re.Pattern
     """
