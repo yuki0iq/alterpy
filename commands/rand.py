@@ -50,8 +50,7 @@ handlers.append(util.CommandHandler(
     help_message='Найти вероятность события (случайная!)',
     author='@yuki_the_girl',
     version=1,
-    handler_impl=on_prob_ru,
-    is_elevated=False
+    handler_impl=on_prob_ru
 ))
 
 handlers.append(util.CommandHandler(
@@ -60,8 +59,7 @@ handlers.append(util.CommandHandler(
     help_message='Find probability of given string (random!)',
     author='@yuki_the_girl',
     version=1,
-    handler_impl=on_prob_en,
-    is_elevated=False
+    handler_impl=on_prob_en
 ))
 
 handlers.append(util.CommandHandler(
@@ -71,7 +69,7 @@ handlers.append(util.CommandHandler(
     author='@yuki_the_girl',
     version=1,
     handler_impl=on_choose_ru,
-    is_elevated=False
+    is_prefix=True
 ))
 
 handlers.append(util.CommandHandler(
@@ -81,5 +79,5 @@ handlers.append(util.CommandHandler(
     author='@yuki_the_girl',
     version=1,
     handler_impl=on_choose_en,
-    is_elevated=False
+    is_prefix=True
 ))
