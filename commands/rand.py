@@ -35,12 +35,12 @@ async def on_prob_en(cm: util.CommandMessage):
 
 
 async def on_choose_ru(cm: util.CommandMessage):
-    opts = re.split('(?i)(or|или)($|\\s)', cm.arg)[::3]
+    opts = re.split('(?i)(^|\\s)(or|или)($|\\s)', cm.arg)[::4]
     await cm.int_cur.reply(f"{random.choice(prefs_ru)} {random.choice(opts).strip()}")
 
 
 async def on_choose_en(cm: util.CommandMessage):
-    opts = re.split('(?i)(or|или)($|\\s)', cm.arg)[::3]
+    opts = re.split('(?i)(^|\\s)(or|или)($|\\s)', cm.arg)[::4]
     await cm.int_cur.reply(f"{random.choice(prefs_en)} {random.choice(opts).strip()}")
 
 
