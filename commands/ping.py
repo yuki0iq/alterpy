@@ -8,7 +8,10 @@ handlers = []
 
 async def on_ping(cm: util.CommandMessage):
     cur_time = datetime.datetime.now(datetime.timezone.utc)
-    await cm.int_cur.reply(f"PONG.\nPing: {str(cm.local_time - cm.time)}\nHandle: {str(cur_time - cm.local_time)}")
+    await cm.int_cur.reply(f"PONG.\n"
+                           + f"Ping: {str(cm.local_time - cm.time)}\n"
+                           + f"Handle: {str(cur_time - cm.local_time)}\n"
+                           + f"UTC time: {str(cur_time)}")
 
 
 handlers.append(util.CommandHandler(
