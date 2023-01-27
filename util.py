@@ -1,5 +1,6 @@
+import inspect
 import re
-import copy
+import random
 import pytomlpp
 import logging
 import traceback
@@ -31,6 +32,10 @@ def list_files(path):
     """list files in given folder"""
     # https://stackoverflow.com/a/3207973
     return [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+
+
+def rand_or_null_fun(s: str, p: int, q: int):
+    return lambda: (s if random.randint(1, q) <= p else '')
 
 
 def change_layout(s):
@@ -82,14 +87,14 @@ class MessageInteractor(typing.NamedTuple):
         try:
             await self.message.reply(text, file=media)
         except:
-            log_fail(get_log("telethon message interactor"), "Could not reply")
+            log_fail(get_log("telethon"), "Could not reply")
 
     async def respond(self, text, media=None):
         """Respond to message (without replying)"""
         try:
             await self.message.respond(text, file=media)
         except:
-            log_fail(get_log("telethon message interactor"), "Could not respond")
+            log_fail(get_log("telethon"), "Could not respond")
 
     async def delete(self):
         """Delete the message"""
@@ -187,11 +192,25 @@ def get_handler_simple_reply(
     """
 
     if type(ans) == str:
-        async def on_simple_reply(cm: CommandMessage):
+        async def on_simple_reply_str(cm: CommandMessage):
             await cm.int_cur.reply(ans)
+        on_simple_reply = on_simple_reply_str
+    elif inspect.iscoroutinefunction(ans):
+        async def on_simple_reply_async(cm: CommandMessage):
+            ret = await ans()
+            if ret:
+                await cm.int_cur.reply(ret)
+        on_simple_reply = on_simple_reply_async
+    elif inspect.isfunction(ans):
+        async def on_simple_reply_fun(cm: CommandMessage):
+            ret = ans()
+            if ret:
+                await cm.int_cur.reply(ret)
+        on_simple_reply = on_simple_reply_fun
     else:
         async def on_simple_reply(cm: CommandMessage):
-            await cm.int_cur.reply(await ans())
+            await cm.int_cur.reply("Broken handler!")
+        log_fail(get_log("handler"), "Wrong reply answer passed")
 
     if pattern is None or not len(pattern):
         pattern = re_pat_starts_with(msg)
