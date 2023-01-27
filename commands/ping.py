@@ -27,9 +27,9 @@ handlers.append(util.CommandHandler(
 handlers.extend(
     util.get_handler_simple_reply(msg, ans, '@yuki_the_girl', 1, 'Simple ping replier', pat)
     for msg, ans, pat in [
-        ("bot", "I'm here!", "bot$"),
-        ("бот", "На месте!", "бот$"),
-        ("ты где", "Я тут", "(ты где)|(где ты)$"),
-        ("сдох", "Ты тоже.", "сдох\\?$")
+        ("bot", "I'm here!", util.re_pat_starts_with("bot$")),
+        ("бот", "На месте!", util.re_pat_starts_with("бот$")),
+        ("ты где", "Я тут", util.re_pat_starts_with("(ты где)|(где ты)$")),
+        ("сдох", "Ты тоже.", util.re_pat_starts_with("сдох\\?$"))
     ]
 )
