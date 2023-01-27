@@ -16,7 +16,7 @@ async def on_ping(cm: util.CommandMessage):
 
 handlers.append(util.CommandHandler(
     name='ping',
-    pattern=re.compile(util.re_pat_starts_with('/?(ping|пинг)')),
+    pattern=re.compile(util.re_pat_starts_with('/?(ping|пинг)$')),
     help_message='Measure ping',
     author='@yuki_the_girl',
     version=1,
@@ -25,12 +25,11 @@ handlers.append(util.CommandHandler(
 ))
 
 handlers.extend(
-    util.get_handler_simple_reply(msg, ans, '@yuki_the_girl', 1, 'Simple ping replier')
-    for msg, ans in [
-        ("bot$", "I'm here!"),
-        ("бот$", "На месте!"),
-        ("ты где", "Я тут"),
-        ("где ты", "Я тут"),
-        ("сдох\\?$", "Ты тоже.")
+    util.get_handler_simple_reply(msg, ans, '@yuki_the_girl', 1, 'Simple ping replier', pat)
+    for msg, ans, pat in [
+        ("bot", "I'm here!", "bot$"),
+        ("бот", "На месте!", "бот$"),
+        ("ты где", "Я тут", "(ты где)|(где ты)$"),
+        ("сдох", "Ты тоже.", "сдох\\?$")
     ]
 )
