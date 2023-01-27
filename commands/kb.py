@@ -11,7 +11,7 @@ async def on_layout(cm: util.CommandMessage):
 
 handlers.append(util.CommandHandler(
     name='layout',
-    pattern=re.compile(util.re_pat_starts_with('/?kb|ли|layout|дфнщге|раскладка|hfcrkflrf|рас|hfc')),
+    pattern=re.compile(util.re_pat_starts_with('/?(kb|ли|layout|дфнщге|раскладка|hfcrkflrf|рас|hfc)')),
     help_message='Change keyboard layout (qwerty <-> йцукен)',
     author='@yuki_the_girl',
     version=1,
