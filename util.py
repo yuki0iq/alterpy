@@ -61,7 +61,7 @@ def get_log(name="unknown"):
     """create log with given name"""
     log = logging.getLogger(name)
     # TODO log.setLevel(logging.DEBUG if bot_debug else logging.INFO)
-    log.setLevel(logging.DEBUG)
+    log.setLevel(logging.INFO)
 
     # ti = time.ctime().replace(":", " ").replace("  ", " ")
     # ti = ti.split(" ")
