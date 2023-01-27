@@ -27,6 +27,6 @@ handlers.append(
         help_message=
             "Fucking great advice from fucking-great-advice.ru\n" +
             "Based on: github.com/Catware-Foundation/Catpy-Software/blob/main/advice.py",
-        pattern='/?adv|совет'
+        pattern= util.re_pat_starts_with('/?(adv|совет)')
     )
 )
