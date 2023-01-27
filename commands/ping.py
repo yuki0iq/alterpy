@@ -27,10 +27,10 @@ handlers.append(util.CommandHandler(
 handlers.extend(
     util.get_handler_simple_reply(msg, ans, '@yuki_the_girl', 1, 'Simple ping replier')
     for msg, ans in [
-        ("bot", "I'm here!"),
-        ("бот", "На месте!"),
+        ("bot$", "I'm here!"),
+        ("бот$", "На месте!"),
         ("ты где", "Я тут"),
         ("где ты", "Я тут"),
-        ("сдох?", "Ты тоже.")
+        ("сдох\\?$", "Ты тоже.")
     ]
 )
