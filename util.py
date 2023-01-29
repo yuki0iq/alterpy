@@ -4,11 +4,9 @@ import random
 import pytomlpp
 import logging
 import traceback
-# import time
 import datetime
 import typing
 import os
-
 import telethon.tl.custom
 import telethon.events
 
