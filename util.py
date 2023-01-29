@@ -59,17 +59,22 @@ def timedelta_to_str(d: datetime.timedelta, short=False):
         (ms, 'ms', 'milliseconds')
     ]
 
-    is_not_null = lambda cnt, short_name, name: cnt != 0
-    stringify = lambda cnt, short_name, name: f"{cnt}{short_name}" if short else f"{cnt} {name}"
+    def is_not_null(el: typing.Tuple[int, str, str]):
+        cnt, _, _ = el
+        return cnt != 0
+
+    def stringify(el: typing.Tuple[int, str, str]):
+        cnt, short_name, name = el
+        return f"{cnt}{short_name}" if short else f"{cnt} {name}"
 
     idx = 0
-    while idx < len(arr) - 1 and not is_not_null(*arr[idx]):
+    while idx < len(arr) - 1 and not is_not_null(arr[idx]):
         idx += 1
 
     arr = arr[idx:idx + 3]
-    arr = list(filter(lambda el: is_not_null(*el), arr))
+    arr = list(filter(is_not_null, arr))
 
-    return ' '.join(map(lambda el: stringify(*el), arr))
+    return ' '.join(map(stringify, arr))
 
 
 def change_layout(s):
