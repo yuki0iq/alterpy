@@ -8,6 +8,7 @@ import datetime
 import typing
 import os
 import telethon.tl.custom
+import telethon.tl.types
 import telethon.events
 
 
@@ -141,15 +142,28 @@ class MessageInteractor(typing.NamedTuple):
             await self.reply(f"Error occurred:\n```\n{traceback.format_exc()}\n```")  # TODO fix message
 
 
-class User:
+class User(typing.NamedTuple):
+    sender: typing.Union[telethon.tl.types.User, telethon.tl.types.Channel, telethon.tl.types.Chat]
+
     def is_admin(self):  # check if in admins list
         return False  # TODO
 
-    async def get_displayname(self):
-        pass  # TODO
+    async def get_display_name(self):
+        if type(self.sender) == telethon.tl.types.Channel:
+            return self.sender.title
+        try:
+            return self.sender.first_name
+        except:
+            return 'null'
 
-    def get_mention(self):
-        pass  # TODO
+    async def get_mention(self):
+        return f"[{await self.get_display_name()}](tg://user?id={self.sender.id})"
+
+
+def to_user(user: typing.Union[telethon.tl.types.User, telethon.tl.types.Channel], chat: telethon.tl.types.Chat):
+    if user is not None:
+        return User(user)
+    return User(chat)
 
 
 class CommandMessage(typing.NamedTuple):
@@ -178,6 +192,7 @@ async def to_command_message(event: telethon.events.NewMessage):
     msg_cur = event.message
     msg_prev = await msg_cur.get_reply_message()
     has_reply = msg_prev is not None
+    chat_obj = await msg_cur.get_chat()
 
     # TODO handle replies PROPERLY --- should media and text from replies be taken and when
     arg = msg_cur.message
@@ -185,8 +200,8 @@ async def to_command_message(event: telethon.events.NewMessage):
     media = None  # event.message.get_media TODO
     time = msg_cur.date
     local_time = datetime.datetime.now(datetime.timezone.utc)
-    sender = User()  # User(event.message.get_sender)
-    reply_sender = None  # User(event.message.reply.get_sender)
+    sender = to_user(await msg_cur.get_sender(), chat_obj)
+    reply_sender = to_user(await msg_prev.get_sender(), chat_obj) if has_reply else None
     # self.chat = Chat(??)
     int_cur = MessageInteractor(msg_cur)
     int_prev = MessageInteractor(msg_prev) if has_reply else None
@@ -216,12 +231,12 @@ class CommandHandler(typing.NamedTuple):
 
 
 def get_handler_simple_reply(
-        msg: str,
-        ans: typing.Any,
-        author: str,
-        version: int,
-        help_message: str = "Simple reply command",
-        pattern: typing.Any = ""
+    msg: str,
+    ans: typing.Union[str, typing.Callable[[], typing.Union[typing.Awaitable, str]]],
+    author: str,
+    version: int,
+    help_message: str = "Simple reply command",
+    pattern: typing.Union[str, re.Pattern] = ""
 ) -> CommandHandler:
     """
     Simple reply handler. [In]msg -> [Out]ans
