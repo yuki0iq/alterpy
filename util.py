@@ -124,14 +124,14 @@ class MessageInteractor(typing.NamedTuple):
     async def reply(self, text, media=None):
         """Reply to message"""
         try:
-            await self.message.reply(text, file=media)
+            return MessageInteractor(await self.message.reply(text, file=media))
         except:
             log_fail(get_log("telethon"), "Could not reply")
 
     async def respond(self, text, media=None):
         """Respond to message (without replying)"""
         try:
-            await self.message.respond(text, file=media)
+            return MessageInteractor(await self.message.respond(text, file=media))
         except:
             log_fail(get_log("telethon"), "Could not respond")
 
