@@ -46,7 +46,7 @@ handlers.extend(
         ("бот", "На месте!", util.re_pat_starts_with("бот$")),
         ("ты где", "Я тут", util.re_pat_starts_with("(ты где)|(где ты)$")),
         ("сдох", "Ты тоже.", util.re_pat_starts_with("сдох\\?$")),
-        ("слава партии", "Слава Партии!", util.re_pat_starts_with("слава партии[!]")),
+        ("слава партии", "Слава Партии!", util.re_pat_starts_with("слава партии[?!]*")),
         ("кто здесь власть", "ПАРТИЯ!", util.re_pat_starts_with("кто здесь власть")),
     ]
 )
