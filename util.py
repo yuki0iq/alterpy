@@ -199,8 +199,8 @@ async def to_command_message(event: telethon.events.NewMessage):
     chat_obj = await msg_cur.get_chat()
 
     # TODO handle replies PROPERLY --- should media and text from replies be taken and when
-    arg = msg_cur.message
-    rep = f"{msg_prev.message}" if has_reply else None
+    arg = msg_cur.text
+    rep = f"{msg_prev.text}" if has_reply else None
     media = None  # event.message.get_media TODO
     time = msg_cur.date
     sender = to_user(await msg_cur.get_sender(), chat_obj)
