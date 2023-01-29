@@ -5,13 +5,17 @@ import re
 
 handlers = []
 
+start_time = datetime.datetime.now(datetime.timezone.utc)
+
 
 async def on_ping(cm: util.CommandMessage):
     cur_time = datetime.datetime.now(datetime.timezone.utc)
     await cm.int_cur.reply(f"PONG.\n"
                            + f"Ping: {str(cm.local_time - cm.time)}\n"
                            + f"Handle: {str(cur_time - cm.local_time)}\n"
-                           + f"UTC time: {str(cur_time)}")
+                           + f"Up: {str(cur_time - start_time)}\n"
+                           + f"UTC time: {str(cur_time)}\n"
+                           + f"Started at: {str(start_time)}\n")
 
 
 handlers.append(util.CommandHandler(
