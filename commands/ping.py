@@ -1,13 +1,17 @@
 import util
 
 import datetime
+import zoneinfo
 import re
 
 handlers = []
 
 start_time = datetime.datetime.now(datetime.timezone.utc)
-tzMSK = datetime.timezone(datetime.timedelta(seconds=3 * 3600))
-tzMSK4 = datetime.timezone(datetime.timedelta(seconds=7 * 3600))
+
+tzMSK = zoneinfo.ZoneInfo("Europe/Moscow")
+tzMSK4 = zoneinfo.ZoneInfo("Asia/Krasnoyarsk")
+
+time_format = "(%Z) %Y-%m-%d, %H:%M:%S"
 
 
 async def on_ping(cm: util.CommandMessage):
@@ -17,8 +21,8 @@ async def on_ping(cm: util.CommandMessage):
     handle = cur_time - cm.local_time
     up = cur_time - start_time
 
-    ping_s = util.timedelta_to_str(ping, short=True)
-    handle_s = util.timedelta_to_str(handle, short=True)
+    ping_s = util.timedelta_to_str(ping, is_short=True)
+    handle_s = util.timedelta_to_str(handle, is_short=True)
     up_s = util.timedelta_to_str(up)
 
     await cm.int_cur.reply(
@@ -26,11 +30,11 @@ async def on_ping(cm: util.CommandMessage):
         + f"Up for {up_s}\n"
         + f"\n"
         + f"__Current time is__\n"
-        + f"(MSK+0) {cur_time.astimezone(tzMSK).strftime('%Y-%m-%d, %H:%M:%S')}\n"
-        + f"(MSK+4) {cur_time.astimezone(tzMSK4).strftime('%Y-%m-%d, %H:%M:%S')}\n"
+        + f"{cur_time.astimezone(tzMSK).strftime(time_format)}\n"
+        + f"{cur_time.astimezone(tzMSK4).strftime(time_format)}\n"
         + f"__Started at__\n"
-        + f"(MSK+0) {start_time.astimezone(tzMSK).strftime('%Y-%m-%d, %H:%M:%S')}\n"
-        + f"(MSK+4) {start_time.astimezone(tzMSK4).strftime('%Y-%m-%d, %H:%M:%S')}\n"
+        + f"{start_time.astimezone(tzMSK).strftime(time_format)}\n"
+        + f"{start_time.astimezone(tzMSK4).strftime(time_format)}\n"
     )
 
 

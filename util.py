@@ -12,35 +12,37 @@ import telethon.tl.types
 import telethon.events
 
 
-def get_config(name):
+def get_config(name: str) -> typing.Dict[typing.Any, typing.Any]:
     """get config by filename"""
     return pytomlpp.load(name)
 
 
-def set_config(name, conf):
+def set_config(name: str, conf: typing.Dict[typing.Any, typing.Any]) -> None:
     """save config by filename"""
     pytomlpp.dump(conf, name)
 
 
-def re_pat_starts_with(s):
-    """wrap regex pattern into "Case insensitive; Starts with and ends with whitespace or end of string\""""
+def re_pat_starts_with(s: str) -> str:
+    """
+    wrap regex pattern into "Case insensitive; Starts with and ends with whitespace or end of string"
+    """
     return f"(?i)^({s})($|\\s)"
 
 
-def list_files(path):
+def list_files(path: str) -> typing.List[str]:
     """list files in given folder"""
     # https://stackoverflow.com/a/3207973
     return [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
 
 
-def rand_or_null_fun(s: str, p: int, q: int, s2: str = ""):
+def rand_or_null_fun(s: str, p: int, q: int, s2: str = "") -> typing.Callable[[], str]:
     return lambda: (s if random.randint(1, q) <= p else s2)
 
 
-def timedelta_to_str(d: datetime.timedelta, short=False):
+def timedelta_to_str(d: datetime.timedelta, is_short: bool=False) -> str:
     """
-    15 weeks 4 days 10 hours 45 minutes 37 seconds 487.5 milliseconds, (short=False|default)
-    15w 4d 10h 45m 37s 487.5ms, (short=True)
+    15 weeks 4 days 10 hours 45 minutes 37 seconds 487.5 milliseconds, (is_short=False|default)
+    15w 4d 10h 45m 37s 487.5ms, (is_short=True)
     but no more than three highest
     """
 
@@ -58,13 +60,13 @@ def timedelta_to_str(d: datetime.timedelta, short=False):
         (ms, 'ms', 'milliseconds')
     ]
 
-    def is_not_null(el: typing.Tuple[int, str, str]):
+    def is_not_null(el: typing.Tuple[int, str, str]) -> bool:
         cnt, _, _ = el
         return cnt != 0
 
-    def stringify(el: typing.Tuple[int, str, str]):
+    def stringify(el: typing.Tuple[int, str, str]) -> str:
         cnt, short_name, name = el
-        return f"{cnt}{short_name}" if short else f"{cnt} {name}"
+        return f"{cnt}{short_name}" if is_short else f"{cnt} {name}"
 
     idx = 0
     while idx < len(arr) - 1 and not is_not_null(arr[idx]):
@@ -76,11 +78,11 @@ def timedelta_to_str(d: datetime.timedelta, short=False):
     return ' '.join(map(stringify, arr))
 
 
-def wrap(val):
+def wrap(val: typing.Any) -> typing.Callable[[], typing.Any]:
     return lambda: val
 
 
-def change_layout(s):
+def change_layout(s: str) -> str:
     """alternate between QWERTY and JCUKEN"""
     en = r"""`~!@#$^&qwertyuiop[]\QWERTYUIOP{}|asdfghjkl;'ASDFGHJKL:"zxcvbnm,./ZXCVBNM<>?"""
     ru = r"""ёЁ!"№;:?йцукенгшщзхъ\ЙЦУКЕНГШЩЗХЪ/фывапролджэФЫВАПРОЛДЖЭячсмитьбю.ЯЧСМИТЬБЮ,"""
@@ -99,7 +101,7 @@ logging_formatter = logging.Formatter("%(asctime)s: %(name)s [%(levelname)s]:  %
 logging.basicConfig(format="%(asctime)s: %(name)s [%(levelname)s]:  %(message)s", level=logging.INFO)
 
 
-def get_log(name="unknown"):
+def get_log(name="unknown") -> logging.Logger:
     """create log with given name"""
     log = logging.getLogger(name)
     # TODO log.setLevel(logging.DEBUG if bot_debug else logging.INFO)
@@ -117,7 +119,7 @@ def get_log(name="unknown"):
     return log
 
 
-def log_fail(log, text):
+def log_fail(log: logging.Logger, text: str) -> None:
     log.error(f"{text}\n{traceback.format_exc()}")
 
 
@@ -138,7 +140,7 @@ class MessageInteractor(typing.NamedTuple):
         except:
             log_fail(get_log("telethon"), "Could not respond")
 
-    async def delete(self):
+    async def delete(self) -> None:
         """Delete the message"""
         try:
             await self.message.delete()
@@ -149,10 +151,10 @@ class MessageInteractor(typing.NamedTuple):
 class User(typing.NamedTuple):
     sender: typing.Union[telethon.tl.types.User, telethon.tl.types.Channel, telethon.tl.types.Chat]
 
-    def is_admin(self):  # check if in admins list
+    def is_admin(self) -> bool:  # check if in admins list
         return False  # TODO
 
-    async def get_display_name(self):
+    async def get_display_name(self) -> str:
         if type(self.sender) == telethon.tl.types.Channel:
             return self.sender.title
         try:
@@ -160,11 +162,11 @@ class User(typing.NamedTuple):
         except:
             return 'null'
 
-    async def get_mention(self):
+    async def get_mention(self) -> str:
         return f"[{await self.get_display_name()}](tg://user?id={self.sender.id})"
 
 
-def to_user(user: typing.Union[telethon.tl.types.User, telethon.tl.types.Channel], chat: telethon.tl.types.Chat):
+def to_user(user: typing.Union[telethon.tl.types.User, telethon.tl.types.Channel], chat: telethon.tl.types.Chat) -> User:
     if user is not None:
         return User(user)
     return User(chat)
@@ -183,14 +185,14 @@ class CommandMessage(typing.NamedTuple):
     int_prev: MessageInteractor  # for attached reply
 
 
-def cm_apply(cm: CommandMessage, pattern: re.Pattern):
+def cm_apply(cm: CommandMessage, pattern: re.Pattern) -> CommandMessage:
     arg = re.sub(pattern, '', cm.arg)
     if not len(arg):
         arg = cm.rep
     return cm._replace(arg=arg)
 
 
-async def to_command_message(event: telethon.events.NewMessage):
+async def to_command_message(event: telethon.events.NewMessage) -> CommandMessage:
     """Construct CommandMessage from telethon NewMessage event"""
 
     msg_cur = event.message
@@ -223,7 +225,7 @@ class CommandHandler(typing.NamedTuple):
     is_prefix: bool = False  # should a command be deleted from its message when passed to handler
     is_elevated: bool = False  # should a command be invoked only if user is admin
 
-    async def invoke(self, cm: CommandMessage):
+    async def invoke(self, cm: CommandMessage) -> None:
         if not self.is_elevated or cm.sender.is_admin():
             try:
                 await self.handler_impl(cm)
@@ -251,26 +253,26 @@ def get_handler_simple_reply(
     """
 
     if type(ans) == str:
-        async def on_simple_reply_str(cm: CommandMessage):
+        async def on_simple_reply_str(cm: CommandMessage) -> None:
             await cm.int_cur.reply(ans)
 
         on_simple_reply = on_simple_reply_str
     elif inspect.iscoroutinefunction(ans):
-        async def on_simple_reply_async(cm: CommandMessage):
+        async def on_simple_reply_async(cm: CommandMessage) -> None:
             ret = await ans()
             if ret:
                 await cm.int_cur.reply(ret)
 
         on_simple_reply = on_simple_reply_async
     elif inspect.isfunction(ans):
-        async def on_simple_reply_fun(cm: CommandMessage):
+        async def on_simple_reply_fun(cm: CommandMessage) -> None:
             ret = ans()
             if ret:
                 await cm.int_cur.reply(ret)
 
         on_simple_reply = on_simple_reply_fun
     else:
-        async def on_simple_reply(cm: CommandMessage):
+        async def on_simple_reply(cm: CommandMessage) -> None:
             await cm.int_cur.reply("Broken handler!")
 
         log_fail(get_log("handler"), "Wrong reply answer passed")
