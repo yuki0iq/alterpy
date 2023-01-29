@@ -38,6 +38,40 @@ def rand_or_null_fun(s: str, p: int, q: int):
     return lambda: (s if random.randint(1, q) <= p else '')
 
 
+def timedelta_to_str(d: datetime.timedelta, short=False):
+    """
+    15 weeks 4 days 10 hours 45 minutes 37 seconds 487.5 milliseconds, (short=False|default)
+    15w 4d 10h 45m 37s 487.5ms, (short=True)
+    but no more than three highest
+    """
+
+    weeks, days = divmod(d.days, 7)
+    minutes, seconds = divmod(d.seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    ms = (d.microseconds // 100) / 10
+
+    arr = [
+        (weeks, 'w', 'weeks'),
+        (days, 'd', 'days'),
+        (hours, 'h', 'hours'),
+        (minutes, 'm', 'minutes'),
+        (seconds, 's', 'seconds'),
+        (ms, 'ms', 'milliseconds')
+    ]
+
+    is_not_null = lambda cnt, short_name, name: cnt != 0
+    stringify = lambda cnt, short_name, name: f"{cnt}{short_name}" if short else f"{cnt} {name}"
+
+    idx = 0
+    while idx < len(arr) - 1 and not is_not_null(*arr[idx]):
+        idx += 1
+
+    arr = arr[idx:idx + 3]
+    arr = list(filter(lambda el: is_not_null(*el), arr))
+
+    return ' '.join(map(lambda el: stringify(*el), arr))
+
+
 def change_layout(s):
     """alternate between QWERTY and JCUKEN"""
     en = r"""`~!@#$^&qwertyuiop[]\QWERTYUIOP{}|asdfghjkl;'ASDFGHJKL:"zxcvbnm,./ZXCVBNM<>?"""
@@ -169,18 +203,22 @@ class CommandHandler(typing.NamedTuple):
 
     async def invoke(self, cm: CommandMessage):
         if not self.is_elevated or cm.sender.is_admin():
-            await self.handler_impl(cm)
+            try:
+                await self.handler_impl(cm)
+            except:
+                await cm.int_cur.reply(f"Exception occurred.\n{traceback.format_exc()}")
+                log_fail(get_log("handler"), "invoke exception")
         else:
             await cm.int_cur.reply("Only bot admins can run elevated commands")  # TODO fix text
 
 
 def get_handler_simple_reply(
-    msg: str,
-    ans: typing.Any,
-    author: str,
-    version: int,
-    help_message: str = "Simple reply command",
-    pattern: typing.Any = ""
+        msg: str,
+        ans: typing.Any,
+        author: str,
+        version: int,
+        help_message: str = "Simple reply command",
+        pattern: typing.Any = ""
 ) -> CommandHandler:
     """
     Simple reply handler. [In]msg -> [Out]ans
@@ -194,22 +232,26 @@ def get_handler_simple_reply(
     if type(ans) == str:
         async def on_simple_reply_str(cm: CommandMessage):
             await cm.int_cur.reply(ans)
+
         on_simple_reply = on_simple_reply_str
     elif inspect.iscoroutinefunction(ans):
         async def on_simple_reply_async(cm: CommandMessage):
             ret = await ans()
             if ret:
                 await cm.int_cur.reply(ret)
+
         on_simple_reply = on_simple_reply_async
     elif inspect.isfunction(ans):
         async def on_simple_reply_fun(cm: CommandMessage):
             ret = ans()
             if ret:
                 await cm.int_cur.reply(ret)
+
         on_simple_reply = on_simple_reply_fun
     else:
         async def on_simple_reply(cm: CommandMessage):
             await cm.int_cur.reply("Broken handler!")
+
         log_fail(get_log("handler"), "Wrong reply answer passed")
 
     if pattern is None or not len(pattern):
