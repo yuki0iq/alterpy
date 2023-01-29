@@ -16,6 +16,8 @@ client = telethon.TelegramClient("alterpy", api_id, api_hash)
 client.start(bot_token=bot_token)
 log.info("Started telethon instance")
 
+the_bot_id = int(bot_token.split(':')[0])
+
 
 handlers = []
 
@@ -47,19 +49,22 @@ for filename in commands_filenames:
 
 @client.on(telethon.events.NewMessage)
 async def event_handler(event: telethon.events.NewMessage):
+    if event.message.sender_id == the_bot_id:  # Ignore messages from self
+        return
+
     cm = await util.to_command_message(event)
-    filtered_handlers = list(filter(
-        lambda handler:
-            bool(re.search(handler.pattern, cm.arg)),
-        handlers
-    ))
-    if len(filtered_handlers):
-        await asyncio.wait([
-            asyncio.create_task(handler.invoke(
-                util.cm_apply(cm, handler.pattern) if handler.is_prefix else cm
-            ))
-            for handler in filtered_handlers
-        ])
+    tasks = [
+        asyncio.create_task(handler.invoke(
+            util.cm_apply(cm, handler.pattern) if handler.is_prefix else cm
+        ))
+        for handler in filter(
+            lambda handler:
+                bool(re.search(handler.pattern, cm.arg)),
+            handlers
+        )
+    ]
+    if tasks:
+        await asyncio.wait(tasks)
 
 
 log.info("Started!")
