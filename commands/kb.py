@@ -14,7 +14,6 @@ handlers.append(util.CommandHandler(
     pattern=re.compile(util.re_pat_starts_with('/?(kb|ли|layout|дфнщге|раскладка|hfcrkflrf|рас|hfc)')),
     help_message='Change keyboard layout (qwerty <-> йцукен)',
     author='@yuki_the_girl',
-    version=1,
     handler_impl=on_layout,
     is_prefix=True
 ))

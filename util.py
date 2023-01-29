@@ -33,8 +33,8 @@ def list_files(path):
     return [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
 
 
-def rand_or_null_fun(s: str, p: int, q: int):
-    return lambda: (s if random.randint(1, q) <= p else '')
+def rand_or_null_fun(s: str, p: int, q: int, s2: str = ""):
+    return lambda: (s if random.randint(1, q) <= p else s2)
 
 
 def timedelta_to_str(d: datetime.timedelta, short=False):
@@ -74,6 +74,10 @@ def timedelta_to_str(d: datetime.timedelta, short=False):
     arr = list(filter(is_not_null, arr))
 
     return ' '.join(map(stringify, arr))
+
+
+def wrap(val):
+    return lambda: val
 
 
 def change_layout(s):
@@ -199,12 +203,13 @@ async def to_command_message(event: telethon.events.NewMessage):
     rep = f"{msg_prev.message}" if has_reply else None
     media = None  # event.message.get_media TODO
     time = msg_cur.date
-    local_time = datetime.datetime.now(datetime.timezone.utc)
     sender = to_user(await msg_cur.get_sender(), chat_obj)
     reply_sender = to_user(await msg_prev.get_sender(), chat_obj) if has_reply else None
     # self.chat = Chat(??)
     int_cur = MessageInteractor(msg_cur)
     int_prev = MessageInteractor(msg_prev) if has_reply else None
+
+    local_time = datetime.datetime.now(datetime.timezone.utc)
 
     return CommandMessage(arg, rep, media, time, local_time, sender, reply_sender, int_cur, int_prev)
 
