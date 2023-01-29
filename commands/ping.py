@@ -34,13 +34,12 @@ handlers.append(util.CommandHandler(
     pattern=re.compile(util.re_pat_starts_with('/?(ping|пинг)$')),
     help_message='Measure ping',
     author='@yuki_the_girl',
-    version=1,
     handler_impl=on_ping,
     is_elevated=False
 ))
 
 handlers.extend(
-    util.get_handler_simple_reply(msg, ans, '@yuki_the_girl', 1, 'Simple ping replier', pat)
+    util.get_handler_simple_reply(msg, ans, '@yuki_the_girl', 'Simple ping replier', pat)
     for msg, ans, pat in [
         ("bot", "I'm here!", util.re_pat_starts_with("bot$")),
         ("бот", "На месте!", util.re_pat_starts_with("бот$")),

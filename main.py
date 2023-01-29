@@ -31,7 +31,6 @@ handlers.append(util.CommandHandler(
     pattern=re.compile(util.re_pat_starts_with('/ver')),
     help_message='Show AlterPy version',
     author='@yuki_the_girl',
-    version=1,
     handler_impl=command_version,
     is_elevated=False
 ))

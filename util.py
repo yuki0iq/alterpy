@@ -214,7 +214,6 @@ class CommandHandler(typing.NamedTuple):
     pattern: re.Pattern  # regex pattern
     help_message: str  # short help about command
     author: str
-    version: int
     handler_impl: typing.Callable[[CommandMessage], typing.Awaitable]
     is_prefix: bool = False  # should a command be deleted from its message when passed to handler
     is_elevated: bool = False  # should a command be invoked only if user is admin
@@ -234,7 +233,6 @@ def get_handler_simple_reply(
     msg: str,
     ans: typing.Union[str, typing.Callable[[], typing.Union[typing.Awaitable, str]]],
     author: str,
-    version: int,
     help_message: str = "Simple reply command",
     pattern: typing.Union[str, re.Pattern] = ""
 ) -> CommandHandler:
@@ -281,7 +279,6 @@ def get_handler_simple_reply(
         pattern=pattern,
         help_message=help_message,
         author=author,
-        version=version,
         handler_impl=on_simple_reply,
         is_prefix=False,
         is_elevated=False

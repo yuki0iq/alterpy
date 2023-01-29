@@ -11,7 +11,6 @@ handlers = [util.get_handler_simple_reply(
     "\n" +
     "В разработке принимали участие: t.me/yuki_the_girl",
     "@yuki_the_girl",
-    1,
     "Start message",
     util.re_pat_starts_with("/start")
 )]
