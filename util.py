@@ -39,7 +39,7 @@ def rand_or_null_fun(s: str, p: int, q: int, s2: str = "") -> typing.Callable[[]
     return lambda: (s if random.randint(1, q) <= p else s2)
 
 
-def timedelta_to_str(d: datetime.timedelta, is_short: bool=False) -> str:
+def timedelta_to_str(d: datetime.timedelta, is_short: bool = False) -> str:
     """
     15 weeks 4 days 10 hours 45 minutes 37 seconds 487.5 milliseconds, (is_short=False|default)
     15w 4d 10h 45m 37s 487.5ms, (is_short=True)
@@ -149,7 +149,7 @@ class MessageInteractor(typing.NamedTuple):
 
 
 class User(typing.NamedTuple):
-    sender: typing.Union[telethon.tl.types.User, telethon.tl.types.Channel, telethon.tl.types.Chat]
+    sender: telethon.tl.types.User | telethon.tl.types.Channel | telethon.tl.types.Chat
 
     def is_admin(self) -> bool:  # check if in admins list
         return False  # TODO
@@ -166,7 +166,7 @@ class User(typing.NamedTuple):
         return f"[{await self.get_display_name()}](tg://user?id={self.sender.id})"
 
 
-def to_user(user: typing.Union[telethon.tl.types.User, telethon.tl.types.Channel], chat: telethon.tl.types.Chat) -> User:
+def to_user(user: telethon.tl.types.User | telethon.tl.types.Channel, chat: telethon.tl.types.Chat) -> User:
     if user is not None:
         return User(user)
     return User(chat)
@@ -238,7 +238,7 @@ class CommandHandler(typing.NamedTuple):
 
 def get_handler_simple_reply(
     msg: str,
-    ans: typing.Union[str, typing.Callable[[], typing.Union[typing.Awaitable, str]]],
+    ans: typing.Union[str, typing.Callable[[], typing.Awaitable | str]],
     author: str,
     help_message: str = "Simple reply command",
     pattern: typing.Union[str, re.Pattern] = ""
