@@ -19,15 +19,11 @@ log.info("Started telethon instance")
 handlers = []
 
 
-def append_handler(*args, **kwargs):
-    handlers.append(util.CommandHandler(*args, **kwargs))
-
-
 async def command_version(cm: util.CommandMessage):
     await cm.int_cur.reply("AlterPy 1 on Jan 26 of 2023 by Yuki the girl")
 
 
-append_handler(
+handlers.append(util.CommandHandler(
     name='ver',
     pattern=re.compile(util.re_pat_starts_with('/ver')),
     help_message='Show AlterPy version',
@@ -35,7 +31,7 @@ append_handler(
     version=1,
     handler_impl=command_version,
     is_elevated=False
-)
+))
 
 
 commands_filenames = list(filter(lambda filename: filename[-3:] == ".py", sorted(util.list_files("commands/"))))
