@@ -6,6 +6,8 @@ import re
 handlers = []
 
 start_time = datetime.datetime.now(datetime.timezone.utc)
+tzMSK = datetime.timezone(datetime.timedelta(seconds=3 * 3600))
+tzMSK4 = datetime.timezone(datetime.timedelta(seconds=7 * 3600))
 
 
 async def on_ping(cm: util.CommandMessage):
@@ -20,12 +22,15 @@ async def on_ping(cm: util.CommandMessage):
     up_s = util.timedelta_to_str(up)
 
     await cm.int_cur.reply(
-        f"PONG.\n"
-        + f"Ping: {ping_s}\n"
-        + f"Handle: {handle_s}\n"
-        + f"Up: {up_s}\n"
-        + f"UTC time: {cur_time.strftime('%Y-%m-%d, %H:%M:%S')}\n"
-        + f"Started at: {start_time.strftime('%Y-%m-%d, %H:%M:%S')}\n"
+        f"**PONG**. Ping is {ping_s}, handled in {handle_s}\n"
+        + f"Up for {up_s}\n"
+        + f"\n"
+        + f"__Current time is__\n"
+        + f"(MSK+0) {cur_time.astimezone(tzMSK).strftime('%Y-%m-%d, %H:%M:%S')}\n"
+        + f"(MSK+4) {cur_time.astimezone(tzMSK4).strftime('%Y-%m-%d, %H:%M:%S')}\n"
+        + f"__Started at__\n"
+        + f"(MSK+0) {start_time.astimezone(tzMSK).strftime('%Y-%m-%d, %H:%M:%S')}\n"
+        + f"(MSK+4) {start_time.astimezone(tzMSK4).strftime('%Y-%m-%d, %H:%M:%S')}\n"
     )
 
 
