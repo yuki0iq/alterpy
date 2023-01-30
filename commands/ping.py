@@ -39,6 +39,7 @@ def on_ping_wrapper(rep: str):
         )
     return on_ping
 
+
 handlers.extend(
     util.CommandHandler(
         name=msg,
