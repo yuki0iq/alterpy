@@ -7,7 +7,9 @@ import re
 def on_tts_wrapper(lang: str):
     async def on_tts(cm: util.CommandMessage):
         filename = f"{util.temp_filename()}.mp3"
-        if len(cm.arg) > 200:
+        if cm.arg is None:
+            cm.arg = ""
+        if len(cm.arg) > 250:
             await cm.int_cur.reply("Please wait while message is being processed...")
         try:
             gtts.gTTS(cm.arg, lang=lang).save(filename)
