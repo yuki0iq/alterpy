@@ -19,6 +19,12 @@ def on_tts_wrapper(lang: str):
 
 
 handlers = [
-    util.CommandHandler("tts-en", re.compile(util.re_pat_starts_with("/?(say|tts)")), "Say message in English", "@yuki_the_girl", on_tts_wrapper("en"), is_prefix=True),
-    util.CommandHandler("tts-ru", re.compile(util.re_pat_starts_with("/?(скажи)")), "Сказать голосом на русском", "@yuki_the_girl", on_tts_wrapper("ru"), is_prefix=True)
+    util.CommandHandler("tts-en", re.compile(util.re_pat_starts_with("/?(say|tts)")),
+                        "Say message in English", "@yuki_the_girl", on_tts_wrapper("en"), is_prefix=True),
+    util.CommandHandler("tts-ru", re.compile(util.re_pat_starts_with("/?(скажи)")),
+                        "Сказать голосом на русском", "@yuki_the_girl", on_tts_wrapper("ru"), is_prefix=True),
+    util.CommandHandler("tts-jp", re.compile(util.re_pat_starts_with("/?(vnsay)")),
+                        "Say message in Japanese", "@yuki_the_girl", on_tts_wrapper("ja"), is_prefix=True),
+    util.CommandHandler("tts-zh", re.compile(util.re_pat_starts_with("/?(sayccp)")),
+                        "Say message in Chinese", "@yuki_the_girl", on_tts_wrapper("zh"), is_prefix=True)
 ]
