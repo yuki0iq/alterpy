@@ -22,7 +22,7 @@ the_bot_id = int(bot_token.split(':')[0])
 handlers = []
 
 
-async def command_version(cm: util.CommandMessage) -> None:
+async def command_version(cm: util.CommandMessage):
     await cm.int_cur.reply("AlterPy 1 on Jan 26 of 2023 by Yuki the girl")
 
 
@@ -47,7 +47,7 @@ for filename in commands_filenames:
 
 
 @client.on(telethon.events.NewMessage)
-async def event_handler(event: telethon.events.NewMessage) -> None:
+async def event_handler(event: telethon.events.NewMessage):
     if event.message.sender_id == the_bot_id:  # Ignore messages from self
         return
 

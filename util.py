@@ -17,7 +17,7 @@ def get_config(name: str) -> typing.Dict[typing.Any, typing.Any]:
     return pytomlpp.load(name)
 
 
-def set_config(name: str, conf: typing.Dict[typing.Any, typing.Any]) -> None:
+def set_config(name: str, conf: typing.Dict[typing.Any, typing.Any]):
     """save config by filename"""
     pytomlpp.dump(conf, name)
 
@@ -140,7 +140,7 @@ class MessageInteractor(typing.NamedTuple):
         except:
             log_fail(get_log("telethon"), "Could not respond")
 
-    async def delete(self) -> None:
+    async def delete(self):
         """Delete the message"""
         try:
             await self.message.delete()
@@ -225,7 +225,7 @@ class CommandHandler(typing.NamedTuple):
     is_prefix: bool = False  # should a command be deleted from its message when passed to handler
     is_elevated: bool = False  # should a command be invoked only if user is admin
 
-    async def invoke(self, cm: CommandMessage) -> None:
+    async def invoke(self, cm: CommandMessage):
         if not self.is_elevated or cm.sender.is_admin():
             try:
                 await self.handler_impl(cm)
@@ -253,26 +253,26 @@ def get_handler_simple_reply(
     """
 
     if type(ans) == str:
-        async def on_simple_reply_str(cm: CommandMessage) -> None:
+        async def on_simple_reply_str(cm: CommandMessage):
             await cm.int_cur.reply(ans)
 
         on_simple_reply = on_simple_reply_str
     elif inspect.iscoroutinefunction(ans):
-        async def on_simple_reply_async(cm: CommandMessage) -> None:
+        async def on_simple_reply_async(cm: CommandMessage):
             ret = await ans()
             if ret:
                 await cm.int_cur.reply(ret)
 
         on_simple_reply = on_simple_reply_async
     elif inspect.isfunction(ans):
-        async def on_simple_reply_fun(cm: CommandMessage) -> None:
+        async def on_simple_reply_fun(cm: CommandMessage):
             ret = ans()
             if ret:
                 await cm.int_cur.reply(ret)
 
         on_simple_reply = on_simple_reply_fun
     else:
-        async def on_simple_reply(cm: CommandMessage) -> None:
+        async def on_simple_reply(cm: CommandMessage):
             await cm.int_cur.reply("Broken handler!")
 
         log_fail(get_log("handler"), "Wrong reply answer passed")
