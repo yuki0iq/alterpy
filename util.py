@@ -97,6 +97,14 @@ def change_layout(s: str) -> str:
     return ''.join(res)
 
 
+def random_printable(n: int = 10, chars="qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890") -> str:
+    return ''.join(random.choice(chars) for _ in range(n))
+
+
+def temp_filename() -> str:
+    return f"/tmp/alterpy-{random_printable()}"
+
+
 logging_formatter = logging.Formatter("%(asctime)s: %(name)s [%(levelname)s]:  %(message)s")
 logging.basicConfig(format="%(asctime)s: %(name)s [%(levelname)s]:  %(message)s", level=logging.INFO)
 
@@ -126,19 +134,37 @@ def log_fail(log: logging.Logger, text: str) -> None:
 class MessageInteractor(typing.NamedTuple):
     message: telethon.tl.custom.message.Message
 
-    async def reply(self, text, media=None):
+    async def reply(self, text, file=None):
         """Reply to message"""
         try:
-            return MessageInteractor(await self.message.reply(text, file=media))
+            return MessageInteractor(await self.message.reply(text, file=file))
         except:
+            try: await self.message.reply(f"```{traceback.format_exc()}```")
+            except: pass
             log_fail(get_log("telethon"), "Could not reply")
 
-    async def respond(self, text, media=None):
+    async def respond(self, text, file=None):
         """Respond to message (without replying)"""
         try:
-            return MessageInteractor(await self.message.respond(text, file=media))
+            return MessageInteractor(await self.message.respond(text, file=file))
         except:
+            try: await self.message.reply(f"```{traceback.format_exc()}```")
+            except: pass
             log_fail(get_log("telethon"), "Could not respond")
+
+    async def send_file(self, file, as_reply=False, **kwargs):
+        """Send file with special parameters (for example as voice note)"""
+        try:
+            return MessageInteractor(await self.message.client.send_file(
+                await self.message.get_input_chat(),
+                file,
+                reply_to=(self.message if as_reply else None),
+                **kwargs
+            ))
+        except:
+            try: await self.message.reply(f"```{traceback.format_exc()}```")
+            except: pass
+            log_fail(get_log("telethon"), "Could not send file")
 
     async def delete(self):
         """Delete the message"""
