@@ -25,5 +25,7 @@ handlers = [
     util.CommandHandler("tts-jp", re.compile(util.re_pat_starts_with("/?(vnsay)")),
                         "Say message in Japanese", "@yuki_the_girl", on_tts_wrapper("ja"), is_prefix=True),
     util.CommandHandler("tts-zh", re.compile(util.re_pat_starts_with("/?(sayccp)")),
-                        "Say message in Chinese", "@yuki_the_girl", on_tts_wrapper("zh"), is_prefix=True)
+                        "Say message in Chinese", "@yuki_the_girl", on_tts_wrapper("zh"), is_prefix=True),
+    util.CommandHandler("tts-ko", re.compile(util.re_pat_starts_with("/?(kosay)")),
+                        "Say message in Korean", "@yuki_the_girl", on_tts_wrapper("ko"), is_prefix=True)
 ]
