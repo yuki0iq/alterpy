@@ -21,11 +21,11 @@ class RP2Handler(typing.NamedTuple):
 
 
 rp1handlers = [
-    RP1Handler(util.re_pat_starts_with("задолбало"), util.rand_or_null_fun("{0} успешно выпилился(ась) {1}", 1, 6, "{0} не смог(ла) выпилиться {1}"))
+    RP1Handler(re.compile(util.re_pat_starts_with("задолбало")), util.rand_or_null_fun("{0} успешно выпилился(ась) {1}", 1, 6, "{0} не смог(ла) выпилиться {1}"))
 ]
 
 rp2handlers = [
-    RP2Handler(util.re_pat_starts_with("обнять"), util.wrap("{0} обнял(а) {1} {2}"))
+    RP2Handler(re.compile(util.re_pat_starts_with("обнять")), util.wrap("{0} обнял(а) {1} {2}"))
 ]
 
 mention_pattern = re.compile(r'''\[.+\]\(tg://user\?id=\d+\)|@\w+''')
