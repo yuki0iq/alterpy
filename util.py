@@ -178,7 +178,7 @@ class User(typing.NamedTuple):
     sender: telethon.tl.types.User | telethon.tl.types.Channel | telethon.tl.types.Chat
 
     def is_admin(self) -> bool:  # check if in admins list
-        return False  # TODO
+        return self.sender.id in get_config("config.toml")["admins"]
 
     async def get_display_name(self) -> str:
         if type(self.sender) == telethon.tl.types.Channel:
