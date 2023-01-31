@@ -11,7 +11,8 @@ async def on_layout(cm: util.CommandMessage):
 
 
 async def on_trl(cm: util.CommandMessage):
-    await cm.int_cur.reply(iuliia.translate(cm.arg, iuliia.WIKIPEDIA))
+    if cm.arg:
+        await cm.int_cur.reply(iuliia.translate(cm.arg, iuliia.WIKIPEDIA))
 
 
 handlers.append(util.CommandHandler(

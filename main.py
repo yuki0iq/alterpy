@@ -4,6 +4,7 @@ import asyncio
 import re
 import telethon
 import importlib
+import traceback
 
 log = util.get_log("main")
 log.info("AlterPy")
@@ -22,7 +23,7 @@ the_bot_id = int(bot_token.split(':')[0])
 handlers = []
 
 
-async def command_version(cm: util.CommandMessage):
+async def on_command_version(cm: util.CommandMessage):
     await cm.int_cur.reply("AlterPy 1 on Jan 26 of 2023 by Yuki the girl")
 
 
@@ -31,8 +32,52 @@ handlers.append(util.CommandHandler(
     pattern=re.compile(util.re_pat_starts_with('/ver')),
     help_message='Show AlterPy version',
     author='@yuki_the_girl',
-    handler_impl=command_version,
+    handler_impl=on_command_version,
     is_elevated=False
+))
+
+
+async def on_list_commands(cm: util.CommandMessage):
+    await cm.int_cur.reply("Available command handlers:\n" + ', '.join(f"`{handler.name}`" for handler in handlers))
+
+
+handlers.append(util.CommandHandler(
+    name='handler-list',
+    pattern=re.compile(util.re_pat_starts_with('/hl')),
+    help_message='Show all handlers',
+    author='@yuki_the_girl',
+    handler_impl=on_list_commands,
+    is_elevated=True
+))
+
+
+async def on_exec(cm: util.CommandMessage):
+    try:
+        shifted_arg = cm.arg.replace('\n', '\n    ')
+        code = '\n'.join([
+            f"import asyncio",
+            f"async def func():",
+            f"    {shifted_arg}",
+            f"task = asyncio.get_event_loop().create_task(func())",
+            f"asyncio.wait(task)"
+        ])
+        exec(code, globals() | locals())
+    except:
+        await cm.int_cur.reply(f"```{traceback.format_exc()}```")
+        if 'code' in locals():
+            code_lines = code.split('\n')
+            lined_code = '\n'.join(f"{i+1}  {code_lines[i]}" for i in range(len(code_lines)))
+            await cm.int_cur.reply(f"While executing following code:\n```{lined_code}```")
+
+
+handlers.append(util.CommandHandler(
+    name="exec",
+    pattern=re.compile(util.re_pat_starts_with("/?(exec)")),
+    help_message="Execute python code",
+    author="@yuki_the_girl",
+    handler_impl=on_exec,
+    is_prefix=True,
+    is_elevated=True
 ))
 
 
