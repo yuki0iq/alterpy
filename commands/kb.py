@@ -7,7 +7,8 @@ handlers = []
 
 
 async def on_layout(cm: util.CommandMessage):
-    await cm.int_cur.reply(util.change_layout(cm.arg))
+    if cm.arg:
+        await cm.int_cur.reply(util.change_layout(cm.arg))
 
 
 async def on_trl(cm: util.CommandMessage):
