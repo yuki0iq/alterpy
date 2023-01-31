@@ -121,7 +121,6 @@ logging.basicConfig(format="%(asctime)s: %(name)s [%(levelname)s]:  %(message)s"
 def get_log(name="unknown") -> logging.Logger:
     """create log with given name"""
     log = logging.getLogger(name)
-    # TODO log.setLevel(logging.DEBUG if bot_debug else logging.INFO)
     log.setLevel(logging.INFO)
 
     # ti = time.ctime().replace(":", " ").replace("  ", " ")
@@ -186,7 +185,7 @@ class MessageInteractor(typing.NamedTuple):
         try:
             await self.message.delete()
         except:
-            await self.reply(f"Error occurred:\n```\n{traceback.format_exc()}\n```")  # TODO fix message
+            await self.reply(f"Error occurred:\n```\n{traceback.format_exc()}\n```")  # TODO really need to send??
 
 
 default_user_config = {
@@ -335,7 +334,7 @@ class CommandHandler(typing.NamedTuple):
                 await cm.int_cur.reply(f"Exception occurred.\n{traceback.format_exc()}")
                 log_fail(get_log("handler"), "invoke exception")
         else:
-            await cm.int_cur.reply("Only bot admins can run elevated commands")  # TODO fix text
+            await cm.int_cur.reply("Only bot admins can run elevated commands")
 
 
 def get_handler_simple_reply(
