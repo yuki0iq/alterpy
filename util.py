@@ -42,6 +42,10 @@ def rand_or_null_fun(s: str, p: int, q: int, s2: str = "") -> typing.Callable[[]
     return lambda: (s if random.randint(1, q) <= p else s2)
 
 
+def one_of_in(a: typing.Iterable, x: typing.Container | typing.Iterable):
+    return any(map(lambda el: el in x, a))
+
+
 def timedelta_to_str(d: datetime.timedelta, is_short: bool = False) -> str:
     """
     15 weeks 4 days 10 hours 45 minutes 37 seconds 487.5 milliseconds, (is_short=False|default)
@@ -189,6 +193,23 @@ default_user_config = {
     'name': '',
     'gender': 0
 }
+
+
+def gender_to_str_ru(gender: int) -> str:
+    return ["нейтральный", "мужской", "женский"][gender]
+
+
+def gender_to_str_en(gender: int) -> str:
+    return ["neutral", "male", "female"][gender]
+
+
+def str_to_gender(s: str) -> int:
+    s = s.lower()
+    if one_of_in(["fem", "wom", "жен", "дев", "фем", "gi"], s) or s in list('2fжд'):
+        return 2
+    if one_of_in(["mas", "mal", "муж", "пар", "мас", "gu"], s) or s in list('1mмп'):
+        return 1
+    return 0
 
 
 class User(typing.NamedTuple):
