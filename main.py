@@ -58,7 +58,7 @@ async def on_exec(cm: util.CommandMessage):
             f"async def func():",
             f"    {shifted_arg}",
             f"task = asyncio.get_event_loop().create_task(func())",
-            f"asyncio.wait(task)"
+            # f"asyncio.wait(task)"
         ])
         exec(code, globals() | locals())
     except:
@@ -79,15 +79,23 @@ handlers.append(util.CommandHandler(
     is_elevated=True
 ))
 
+initial_handlers = handlers[:]
 
-commands_filenames = list(filter(lambda filename: filename[-3:] == ".py", sorted(util.list_files("commands/"))))
-log.info(f"commands: {commands_filenames}")
-for filename in commands_filenames:
-    try:
-        mod = importlib.import_module(f"commands.{filename[:-3]}")
-        handlers.extend(mod.handlers)
-    except:
-        util.log_fail(log, f"Loading {filename} failed")
+
+def load_commands():
+    global handlers
+    handlers = initial_handlers[:]
+    commands_filenames = list(filter(lambda filename: filename[-3:] == ".py", sorted(util.list_files("commands/"))))
+    log.info(f"commands: {commands_filenames}")
+    for filename in commands_filenames:
+        try:
+            mod = importlib.import_module(f"commands.{filename[:-3]}")
+            handlers.extend(mod.handlers)
+        except:
+            util.log_fail(log, f"Loading {filename} failed")
+
+
+load_commands()
 
 
 @client.on(telethon.events.NewMessage)
