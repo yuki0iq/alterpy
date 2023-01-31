@@ -229,8 +229,22 @@ class User(typing.NamedTuple):
     def reset_param(self, param):
         self.set_param(param, default_user_config[param])
 
-    def get_gender(self):
+    def get_gender(self) -> int:
         return self.get_param('gender')
+
+    def set_gender(self, gender: int):
+        if not 0 <= gender <= 2:
+            raise ValueError("Wrong gender passed")
+        self.set_param('gender', gender)
+
+    def get_name(self) -> str:
+        return self.get_param('name')
+
+    def set_name(self, name: str):
+        self.set_param('name', name)
+
+    def reset_name(self):
+        self.reset_param('name')
 
 
 def to_user(user: telethon.tl.types.User | telethon.tl.types.Channel, chat: telethon.tl.types.Chat) -> User:
