@@ -14,6 +14,9 @@ import telethon.events
 
 def get_config(name: str) -> typing.Dict[typing.Any, typing.Any]:
     """get config by filename"""
+    if not os.path.exists(name):
+        f = open(name, "w")
+        f.close()
     return pytomlpp.load(name)
 
 
@@ -45,6 +48,8 @@ def timedelta_to_str(d: datetime.timedelta, is_short: bool = False) -> str:
     15w 4d 10h 45m 37s 487.5ms, (is_short=True)
     but no more than three highest
     """
+
+    d = d + datetime.timedelta(microseconds=50)
 
     weeks, days = divmod(d.days, 7)
     minutes, seconds = divmod(d.seconds, 60)
@@ -139,8 +144,10 @@ class MessageInteractor(typing.NamedTuple):
         try:
             return MessageInteractor(await self.message.reply(text, file=file))
         except:
-            try: await self.message.reply(f"```{traceback.format_exc()}```")
-            except: pass
+            try:
+                await self.message.reply(f"```{traceback.format_exc()}```")
+            except:
+                pass
             log_fail(get_log("telethon"), "Could not reply")
 
     async def respond(self, text, file=None):
@@ -148,8 +155,10 @@ class MessageInteractor(typing.NamedTuple):
         try:
             return MessageInteractor(await self.message.respond(text, file=file))
         except:
-            try: await self.message.reply(f"```{traceback.format_exc()}```")
-            except: pass
+            try:
+                await self.message.reply(f"```{traceback.format_exc()}```")
+            except:
+                pass
             log_fail(get_log("telethon"), "Could not respond")
 
     async def send_file(self, file, as_reply=False, **kwargs):
@@ -162,8 +171,10 @@ class MessageInteractor(typing.NamedTuple):
                 **kwargs
             ))
         except:
-            try: await self.message.reply(f"```{traceback.format_exc()}```")
-            except: pass
+            try:
+                await self.message.reply(f"```{traceback.format_exc()}```")
+            except:
+                pass
             log_fail(get_log("telethon"), "Could not send file")
 
     async def delete(self):
@@ -174,6 +185,12 @@ class MessageInteractor(typing.NamedTuple):
             await self.reply(f"Error occurred:\n```\n{traceback.format_exc()}\n```")  # TODO fix message
 
 
+default_user_config = {
+    'name': '',
+    'gender': 0
+}
+
+
 class User(typing.NamedTuple):
     sender: telethon.tl.types.User | telethon.tl.types.Channel | telethon.tl.types.Chat
 
@@ -181,6 +198,9 @@ class User(typing.NamedTuple):
         return self.sender.id in get_config("config.toml")["admins"]
 
     async def get_display_name(self) -> str:
+        display_name = self.get_param('name')
+        if display_name:
+            return display_name
         if type(self.sender) == telethon.tl.types.Channel:
             return self.sender.title
         try:
@@ -190,6 +210,27 @@ class User(typing.NamedTuple):
 
     async def get_mention(self) -> str:
         return f"[{await self.get_display_name()}](tg://user?id={self.sender.id})"
+
+    def config_name(self) -> str:
+        return f"user/{self.sender.id}.toml"
+
+    def load_user_config(self):
+        return default_user_config | get_config(self.config_name())
+
+    def save_user_config(self, conf):
+        set_config(self.config_name(), conf)
+
+    def get_param(self, param):
+        return self.load_user_config()[param]
+
+    def set_param(self, param, val):
+        self.save_user_config(self.load_user_config() | {param: val})
+
+    def reset_param(self, param):
+        self.set_param(param, default_user_config[param])
+
+    def get_gender(self):
+        return self.get_param('gender')
 
 
 def to_user(user: telethon.tl.types.User | telethon.tl.types.Channel, chat: telethon.tl.types.Chat) -> User:
@@ -263,11 +304,11 @@ class CommandHandler(typing.NamedTuple):
 
 
 def get_handler_simple_reply(
-    msg: str,
-    ans: typing.Union[str, typing.Callable[[], typing.Awaitable | str]],
-    author: str,
-    help_message: str = "Simple reply command",
-    pattern: typing.Union[str, re.Pattern] = ""
+        msg: str,
+        ans: typing.Union[str, typing.Callable[[], typing.Awaitable | str]],
+        author: str,
+        help_message: str = "Simple reply command",
+        pattern: typing.Union[str, re.Pattern] = ""
 ) -> CommandHandler:
     """
     Simple reply handler. [In]msg -> [Out]ans

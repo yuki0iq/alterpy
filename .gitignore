@@ -1,5 +1,6 @@
 /telethon_config.toml
 log/
+user/
 .git/
 *.session
 *.session-journal
