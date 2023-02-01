@@ -2,7 +2,6 @@ import util
 
 import datetime
 import zoneinfo
-import re
 
 handlers = []
 
@@ -43,7 +42,7 @@ def on_ping_wrapper(rep: str):
 handlers.extend(
     util.CommandHandler(
         name=msg,
-        pattern=re.compile(util.re_pat_starts_with(f'/?{msg}$')),
+        pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + f'{msg}$')),
         help_message='Measure ping',
         author='@yuki_the_girl',
         handler_impl=on_ping_wrapper(ans),
@@ -57,7 +56,7 @@ handlers.extend(
 )
 
 handlers.extend(
-    util.get_handler_simple_reply(msg, ans, '@yuki_the_girl', 'Simple ping replier', pat)
+    util.get_handler_simple_reply(msg, ans, '@yuki_the_girl', 'Simple ping replier', util.re_ignore_case(pat))
     for msg, ans, pat in [
         ("bot", "I'm here!", util.re_pat_starts_with("bot$")),
         ("бот", "На месте!", util.re_pat_starts_with("бот$")),

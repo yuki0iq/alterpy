@@ -1,5 +1,3 @@
-import re
-
 import util
 
 handlers = []
@@ -59,11 +57,43 @@ async def on_reset_gender_ru(cm: util.CommandMessage):
     await cm.int_cur.reply("Гендер сброшен")
 
 
-handlers.append(util.CommandHandler("+name", re.compile(util.re_pat_starts_with("\\+?name")), "Set or show name", "@yuki_the_girl", on_set_name_en, is_prefix=True))
-handlers.append(util.CommandHandler("+имя", re.compile(util.re_pat_starts_with("\\+?имя")), "Изменить или показать имя", "@yuki_the_girl", on_set_name_ru, is_prefix=True))
-handlers.append(util.CommandHandler("-name", re.compile(util.re_pat_starts_with("-name")), "Reset name", "@yuki_the_girl", on_reset_name_en))
-handlers.append(util.CommandHandler("-имя", re.compile(util.re_pat_starts_with("-имя")), "Сбросить имя", "@yuki_the_girl", on_reset_name_ru))
-handlers.append(util.CommandHandler("+gender", re.compile(util.re_pat_starts_with("\\+?gen(der){0,1}")), "Set or show gender", "@yuki_the_girl", on_set_gender_en, is_prefix=True))
-handlers.append(util.CommandHandler("+гендер", re.compile(util.re_pat_starts_with("\\+?ген(дер){0,1}")), "Изменить или показать гендер", "@yuki_the_girl", on_set_gender_ru, is_prefix=True))
-handlers.append(util.CommandHandler("-gender", re.compile(util.re_pat_starts_with("-gen(der){0,1}")), "Reset gender", "@yuki_the_girl", on_reset_gender_en))
-handlers.append(util.CommandHandler("-гендер", re.compile(util.re_pat_starts_with("-ген(дер){0,1}")), "Сбросить гендер", "@yuki_the_girl", on_reset_gender_ru))
+handlers.append(util.CommandHandler(
+    "+name",
+    util.re_ignore_case(util.re_pat_starts_with("\\+name")),
+    "Set or show name", "@yuki_the_girl", on_set_name_en, is_prefix=True
+))
+handlers.append(util.CommandHandler(
+    "+имя",
+    util.re_ignore_case(util.re_pat_starts_with("\\+имя")),
+    "Изменить или показать имя", "@yuki_the_girl", on_set_name_ru, is_prefix=True
+))
+handlers.append(util.CommandHandler(
+    "-name",
+    util.re_ignore_case(util.re_pat_starts_with("-name")),
+    "Reset name", "@yuki_the_girl", on_reset_name_en
+))
+handlers.append(util.CommandHandler(
+    "-имя",
+    util.re_ignore_case(util.re_pat_starts_with("-имя")),
+    "Сбросить имя", "@yuki_the_girl", on_reset_name_ru
+))
+handlers.append(util.CommandHandler(
+    "+gender",
+    util.re_ignore_case(util.re_pat_starts_with("\\+gen" + util.re_optional("der"))),
+    "Set or show gender", "@yuki_the_girl", on_set_gender_en, is_prefix=True
+))
+handlers.append(util.CommandHandler(
+    "+гендер",
+    util.re_ignore_case(util.re_pat_starts_with("\\+ген" + util.re_optional("дер"))),
+    "Изменить или показать гендер", "@yuki_the_girl", on_set_gender_ru, is_prefix=True
+))
+handlers.append(util.CommandHandler(
+    "-gender",
+    util.re_ignore_case(util.re_pat_starts_with("-gen" + util.re_optional("der"))),
+    "Reset gender", "@yuki_the_girl", on_reset_gender_en
+))
+handlers.append(util.CommandHandler(
+    "-гендер",
+    util.re_ignore_case(util.re_pat_starts_with("-ген" + util.re_optional("дер"))),
+    "Сбросить гендер", "@yuki_the_girl", on_reset_gender_ru
+))

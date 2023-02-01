@@ -1,7 +1,6 @@
 import util
 
 import gtts
-import re
 
 
 def on_tts_wrapper(lang: str):
@@ -18,14 +17,14 @@ def on_tts_wrapper(lang: str):
 
 
 handlers = [
-    util.CommandHandler("tts-en", re.compile(util.re_pat_starts_with("/?(say|tts)")),
+    util.CommandHandler("tts-en", util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + "tts")),
                         "Say message in English", "@yuki_the_girl", on_tts_wrapper("en"), is_prefix=True),
-    util.CommandHandler("tts-ru", re.compile(util.re_pat_starts_with("/?(скажи)")),
+    util.CommandHandler("tts-ru", util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + "озвучь")),
                         "Сказать голосом на русском", "@yuki_the_girl", on_tts_wrapper("ru"), is_prefix=True),
-    util.CommandHandler("tts-jp", re.compile(util.re_pat_starts_with("/?(vnsay)")),
+    util.CommandHandler("tts-jp", util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + "vnsay")),
                         "Say message in Japanese", "@yuki_the_girl", on_tts_wrapper("ja"), is_prefix=True),
-    util.CommandHandler("tts-zh", re.compile(util.re_pat_starts_with("/?(sayccp)")),
+    util.CommandHandler("tts-zh", util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + "sayccp")),
                         "Say message in Chinese", "@yuki_the_girl", on_tts_wrapper("zh"), is_prefix=True),
-    util.CommandHandler("tts-ko", re.compile(util.re_pat_starts_with("/?(kosay)")),
+    util.CommandHandler("tts-ko", util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + "kosay")),
                         "Say message in Korean", "@yuki_the_girl", on_tts_wrapper("ko"), is_prefix=True)
 ]

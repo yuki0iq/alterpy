@@ -58,7 +58,9 @@ async def on_choose_en(cm: util.CommandMessage):
 
 handlers.append(util.CommandHandler(
     name='шанс',
-    pattern=re.compile(util.re_pat_starts_with('/?(инфа|шанс(ы){0,1}|вер(оятность){0,1})')),
+    pattern=util.re_ignore_case(util.re_pat_starts_with(
+        util.re_prefix() + util.re_unite('инфа', 'шанс', 'вер' + util.re_optional('оятность'))
+    )),
     help_message='Найти вероятность события (случайная!)',
     author='@yuki_the_girl',
     handler_impl=on_prob_ru
@@ -66,7 +68,7 @@ handlers.append(util.CommandHandler(
 
 handlers.append(util.CommandHandler(
     name='prob',
-    pattern=re.compile(util.re_pat_starts_with('/?(prob|chance)')),
+    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('prob', 'chance'))),
     help_message='Find probability of given string (random!)',
     author='@yuki_the_girl',
     handler_impl=on_prob_en
@@ -74,7 +76,7 @@ handlers.append(util.CommandHandler(
 
 handlers.append(util.CommandHandler(
     name='выбери',
-    pattern=re.compile(util.re_pat_starts_with('/?(выбери)')),
+    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + 'выбери')),
     help_message='Выбрать что-нибудь случайное из "или"-разделенного списка',
     author='@yuki_the_girl',
     handler_impl=on_choose_ru,
@@ -83,7 +85,7 @@ handlers.append(util.CommandHandler(
 
 handlers.append(util.CommandHandler(
     name='choose',
-    pattern=re.compile(util.re_pat_starts_with('/?(choose|select)')),
+    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('choose', 'select'))),
     help_message='Choose something random from "or"-separated list',
     author='@yuki_the_girl',
     handler_impl=on_choose_en,

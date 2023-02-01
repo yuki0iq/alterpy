@@ -1,6 +1,5 @@
 import util
 
-import re
 import iuliia
 
 handlers = []
@@ -16,9 +15,21 @@ async def on_trl(cm: util.CommandMessage):
         await cm.int_cur.reply(iuliia.translate(cm.arg, iuliia.WIKIPEDIA))
 
 
+async def on_me(cm: util.CommandMessage):
+    if cm.arg:
+        msg = f"* __{await cm.sender.get_display_name()} {cm.arg}__"
+        if cm.int_prev:
+            await cm.int_prev.reply(msg)
+        else:
+            await cm.int_cur.respond(msg)
+        await cm.int_cur.delete()
+
+
 handlers.append(util.CommandHandler(
     name='layout',
-    pattern=re.compile(util.re_pat_starts_with('/?(kb|ли|layout|дфнщге|раскладка|hfcrkflrf|рас|hfc)')),
+    pattern=util.re_ignore_case(util.re_pat_starts_with(
+        util.re_prefix() + util.re_unite('kb', 'ли', 'layout', 'дфнщге', 'раскладка', 'hfcrkflrf', 'рас', 'hfc')
+    )),
     help_message='Change keyboard layout (qwerty <-> йцукен)',
     author='@yuki_the_girl',
     handler_impl=on_layout,
@@ -27,9 +38,20 @@ handlers.append(util.CommandHandler(
 
 handlers.append(util.CommandHandler(
     name='iuliia',
-    pattern=re.compile(util.re_pat_starts_with('/?(trl|translit|iuliia|трл|транслит|йуля)')),
+    pattern=util.re_ignore_case(util.re_pat_starts_with(
+        util.re_prefix() + util.re_unite('trl', 'translit', 'iuliia', 'трл', 'транслит', 'йуля')
+    )),
     help_message='wikipedia-style iuliia transliterate (привет -> privet), habr.com/post/499574',
     author='@yuki_the_girl',
     handler_impl=on_trl,
+    is_prefix=True
+))
+
+handlers.append(util.CommandHandler(
+    name="me",
+    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_only_prefix() + util.re_unite('me', 'я'))),
+    help_message="IRC-style me command",
+    author="@yuki_the_girl",
+    handler_impl=on_me,
     is_prefix=True
 ))

@@ -29,7 +29,33 @@ def re_pat_starts_with(s: str) -> str:
     """
     wrap regex pattern into "Case insensitive; Starts with and ends with whitespace or end of string"
     """
-    return f"(?i)^({s})($|\\s)"
+    return f"^({s})($|\\s)"
+
+
+def re_ignore_case(pat: str) -> re.Pattern:
+    return re.compile(f"(?i)({pat})")
+
+
+def re_only_prefix() -> str:
+    """regex pattern for command prefix"""
+    return re_unite('/', '\\!', '•', '\\.', 'альтер(\\b\\s*)')
+
+
+def re_prefix() -> str:
+    """regex pattern for optional prefix"""
+    return re_optional(re_only_prefix())
+
+
+def re_union(a) -> str:
+    return '(' + '|'.join(map(str, a)) + ')'
+
+
+def re_unite(*args) -> str:
+    return re_union(args)
+
+
+def re_optional(a: str) -> str:
+    return f"({a})?"
 
 
 def list_files(path: str) -> typing.List[str]:
@@ -378,10 +404,10 @@ def get_handler_simple_reply(
 
         log_fail(get_log("handler"), "Wrong reply answer passed")
 
-    if pattern is None or not len(pattern):
+    if not pattern:
         pattern = re_pat_starts_with(msg)
     if type(pattern) == str:
-        pattern = re.compile(pattern)
+        pattern = re_ignore_case(pattern)
     return CommandHandler(
         name=msg,
         pattern=pattern,

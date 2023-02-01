@@ -23,12 +23,12 @@ handlers = []
 
 
 async def on_command_version(cm: util.CommandMessage):
-    await cm.int_cur.reply("AlterPy 1 on Jan 26 of 2023 by Yuki the girl")
+    await cm.int_cur.reply("AlterPy on Feb 1 of 2023 by Yuki the girl")
 
 
 handlers.append(util.CommandHandler(
     name='ver',
-    pattern=re.compile(util.re_pat_starts_with('/ver')),
+    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_only_prefix() + 'ver')),
     help_message='Show AlterPy version',
     author='@yuki_the_girl',
     handler_impl=on_command_version,
@@ -42,7 +42,7 @@ async def on_list_commands(cm: util.CommandMessage):
 
 handlers.append(util.CommandHandler(
     name='handler-list',
-    pattern=re.compile(util.re_pat_starts_with('/hl')),
+    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_only_prefix() + 'hl')),
     help_message='Show all handlers',
     author='@yuki_the_girl',
     handler_impl=on_list_commands,
@@ -71,7 +71,7 @@ async def on_exec(cm: util.CommandMessage):
 
 handlers.append(util.CommandHandler(
     name="exec",
-    pattern=re.compile(util.re_pat_starts_with("/?(exec)")),
+    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + "exec")),
     help_message="Execute python code",
     author="@yuki_the_girl",
     handler_impl=on_exec,
