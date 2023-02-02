@@ -57,10 +57,11 @@ async def on_exec(cm: util.CommandMessage):
             f"import asyncio",
             f"async def func():",
             f"    {shifted_arg}",
-            f"task = asyncio.get_event_loop().create_task(func())",
-            # f"asyncio.wait(task)"
+            f"task = asyncio.create_task(func())",
         ])
-        exec(code, globals() | locals())
+        code_locals = dict()
+        exec(code, globals() | locals(), code_locals)
+        await asyncio.wait([code_locals['task']])
     except:
         await cm.int_cur.reply(f"```{traceback.format_exc()}```")
         if 'code' in locals():
@@ -95,6 +96,21 @@ def load_commands():
             util.log_fail(log, f"Loading {filename} failed")
 
 
+async def process_command_message(cm: util.CommandMessage):
+    tasks = [
+        asyncio.create_task(handler.invoke(
+            util.cm_apply(cm, handler.pattern) if handler.is_prefix else cm
+        ))
+        for handler in filter(
+            lambda handler:
+            bool(re.search(handler.pattern, cm.arg)),
+            handlers
+        )
+    ]
+    if tasks:
+        await asyncio.wait(tasks)
+
+
 load_commands()
 
 
@@ -104,18 +120,7 @@ async def event_handler(event: telethon.events.NewMessage):
         return
 
     cm = await util.to_command_message(event)
-    tasks = [
-        asyncio.create_task(handler.invoke(
-            util.cm_apply(cm, handler.pattern) if handler.is_prefix else cm
-        ))
-        for handler in filter(
-            lambda handler:
-                bool(re.search(handler.pattern, cm.arg)),
-            handlers
-        )
-    ]
-    if tasks:
-        await asyncio.wait(tasks)
+    await process_command_message(cm)
 
 
 log.info("Started!")

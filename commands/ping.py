@@ -13,30 +13,46 @@ tzMSK4 = zoneinfo.ZoneInfo("Asia/Krasnoyarsk")
 time_format = "(%Z) %Y-%m-%d, %H:%M:%S"
 
 
+def get_ping_times(cm: util.CommandMessage):
+    """return ping, handle and up formatted times"""
+    cur_time = datetime.datetime.now(datetime.timezone.utc)
+
+    ping = cm.local_time - cm.time
+    handle = cur_time - cm.local_time
+    up = cur_time - start_time
+
+    ping_s = util.timedelta_to_str(ping, is_short=True)
+    handle_s = util.timedelta_to_str(handle, is_short=True)
+    up_s = util.timedelta_to_str(up)
+    return ping_s, handle_s, up_s
+
+
 def on_ping_wrapper(rep: str):
     async def on_ping(cm: util.CommandMessage):
-        cur_time = datetime.datetime.now(datetime.timezone.utc)
-
-        ping = cm.local_time - cm.time
-        handle = cur_time - cm.local_time
-        up = cur_time - start_time
-
-        ping_s = util.timedelta_to_str(ping, is_short=True)
-        handle_s = util.timedelta_to_str(handle, is_short=True)
-        up_s = util.timedelta_to_str(up)
-
-        await cm.int_cur.reply(
-            f"**{rep}**. Ping is {ping_s}, handled in {handle_s}\n"
-            + f"Up for {up_s}\n"
-            + f"\n"
-            + f"__Current time is__\n"
-            + f"{cur_time.astimezone(tzMSK).strftime(time_format)}\n"
-            + f"{cur_time.astimezone(tzMSK4).strftime(time_format)}\n"
-            + f"__Started at__\n"
-            + f"{start_time.astimezone(tzMSK).strftime(time_format)}\n"
-            + f"{start_time.astimezone(tzMSK4).strftime(time_format)}\n"
-        )
+        ping, handle, up = get_ping_times(cm)
+        await cm.int_cur.reply(f"**{rep}**. Ping is {ping}, handled in {handle}\nUp for {up}")
     return on_ping
+
+
+async def on_stat(cm: util.CommandMessage):
+    cur_time = datetime.datetime.now(datetime.timezone.utc)
+    ping, handle, up = get_ping_times(cm)
+    speed = util.perf_test_compute()
+    system_info = util.system_info()
+
+    await cm.int_cur.reply('\n'.join([
+        f'AlterPy is running on {system_info}',
+        f'Ping is {ping}, handled in {handle}',
+        f'Up for {up}',
+        f'Compute speed is {speed}M operations per second',
+        f'',
+        f'__Current time is__',
+        f'{cur_time.astimezone(tzMSK).strftime(time_format)}',
+        f'{cur_time.astimezone(tzMSK4).strftime(time_format)}',
+        f'__Started at__',
+        f'{start_time.astimezone(tzMSK).strftime(time_format)}',
+        f'{start_time.astimezone(tzMSK4).strftime(time_format)}',
+    ]))
 
 
 handlers.extend(
@@ -54,6 +70,14 @@ handlers.extend(
         ("тест", "ПРОЙДЕН")
     ]
 )
+
+handlers.append(util.CommandHandler(
+    name='stat',
+    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('stat', 'стат'))),
+    help_message='System info and bot statistics',
+    author='@yuki_the_girl',
+    handler_impl=on_stat
+))
 
 handlers.extend(
     util.get_handler_simple_reply(msg, ans, '@yuki_the_girl', 'Simple ping replier', util.re_ignore_case(pat))
