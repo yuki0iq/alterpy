@@ -375,7 +375,7 @@ class CommandHandler(typing.NamedTuple):
     handler_impl: typing.Callable[[CommandMessage], typing.Awaitable]
     is_prefix: bool = False  # should a command be deleted from its message when passed to handler
     is_elevated: bool = False  # should a command be invoked only if user is admin
-    required_media_type: typing.Set[str] = {''}
+    required_media_type: typing.Set[str] = {}
 
     async def invoke(self, cm: CommandMessage):
         if not self.is_elevated or cm.sender.is_admin():
@@ -457,3 +457,23 @@ def perf_test_compute() -> float:
 
 def system_info() -> str:
     return f"{platform.python_implementation()} {platform.python_version()} on {platform.system()} {platform.machine()}"
+
+
+def to_async(func):
+    async def to_async_impl(*args, **kwargs):
+        return func(*args, **kwargs)
+    return to_async_impl
+
+
+def to_int(val: typing.Any, default: int = 0) -> int:
+    try:
+        return int(val)
+    except:
+        return default
+
+
+def to_float(val: typing.Any, default: float = 0) -> float:
+    try:
+        return float(val)
+    except:
+        return default
