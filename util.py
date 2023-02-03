@@ -1,4 +1,5 @@
 import inspect
+import io
 import re
 import random
 import pytomlpp
@@ -300,6 +301,28 @@ def to_user(user: telethon.tl.types.User | telethon.tl.types.Channel, chat: tele
     return User(chat)
 
 
+class Media(typing.NamedTuple):
+    message: telethon.tl.custom.message.Message
+
+    async def get(self) -> io.BytesIO:
+        file = io.BytesIO()
+        if self.message:
+            await self.message.download_media(file)
+            file.seek(0)
+            return file
+
+    def type(self) -> str:
+        if not (self.message and self.message.media): return ""
+        if self.message.photo: return "photo"
+        if self.message.video: return "video"
+        if self.message.video_note: return "round"
+        if self.message.audio: return "audio"
+        if self.message.voice: return "voice"
+        if self.message.gif: return "gif"
+        if self.message.file: return "file"
+        return "unknown"
+
+
 class CommandMessage(typing.NamedTuple):
     arg: str  # message text
     rep: str  # message text with reply attached
@@ -331,7 +354,7 @@ async def to_command_message(event: telethon.events.NewMessage) -> CommandMessag
     # TODO handle replies PROPERLY --- should media and text from replies be taken and when
     arg = msg_cur.text
     rep = f"{msg_prev.text}" if has_reply else None
-    media = None  # event.message.get_media TODO
+    media = Media(msg_cur) if msg_cur.media else Media(msg_prev)  # if no media is given then Media(None)
     time = msg_cur.date
     sender = to_user(await msg_cur.get_sender(), chat_obj)
     reply_sender = to_user(await msg_prev.get_sender(), chat_obj) if has_reply else None
@@ -352,6 +375,7 @@ class CommandHandler(typing.NamedTuple):
     handler_impl: typing.Callable[[CommandMessage], typing.Awaitable]
     is_prefix: bool = False  # should a command be deleted from its message when passed to handler
     is_elevated: bool = False  # should a command be invoked only if user is admin
+    required_media_type: typing.Set[str] = {''}
 
     async def invoke(self, cm: CommandMessage):
         if not self.is_elevated or cm.sender.is_admin():

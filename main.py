@@ -103,7 +103,7 @@ async def process_command_message(cm: util.CommandMessage):
         ))
         for handler in filter(
             lambda handler:
-            bool(re.search(handler.pattern, cm.arg)),
+            bool(re.search(handler.pattern, cm.arg)) and cm.media.type() in handler.required_media_type,
             handlers
         )
     ]
