@@ -51,23 +51,20 @@ handlers.append(util.CommandHandler(
 
 
 async def on_exec(cm: util.CommandMessage):
+    shifted_arg = cm.arg.strip().strip('`').replace('\n', '\n    ')
+    code = '\n'.join([
+        f"async def func():",
+        f"    {shifted_arg}",
+    ])
     try:
-        shifted_arg = cm.arg.strip().strip('`').replace('\n', '\n    ')
-        code = '\n'.join([
-            f"import asyncio",
-            f"async def func():",
-            f"    {shifted_arg}",
-            f"task = asyncio.create_task(func())",
-        ])
         code_locals = dict()
         exec(code, globals() | locals(), code_locals)
-        await asyncio.wait([code_locals['task']])
+        await code_locals['func']()
     except:
         await cm.int_cur.reply(f"```{traceback.format_exc()}```")
-        if 'code' in locals():
-            code_lines = code.split('\n')
-            lined_code = '\n'.join(f"{i+1}  {code_lines[i]}" for i in range(len(code_lines)))
-            await cm.int_cur.reply(f"While executing following code:\n```{lined_code}```")
+        code_lines = code.split('\n')
+        lined_code = '\n'.join(f"{i+1}  {code_lines[i]}" for i in range(len(code_lines)))
+        await cm.int_cur.reply(f"While executing following code:\n```{lined_code}```")
 
 
 handlers.append(util.CommandHandler(
