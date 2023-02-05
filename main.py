@@ -52,7 +52,7 @@ handlers.append(util.CommandHandler(
 
 async def on_exec(cm: util.CommandMessage):
     try:
-        shifted_arg = cm.arg.strip('`').replace('\n', '\n    ')
+        shifted_arg = cm.arg.strip().strip('`').replace('\n', '\n    ')
         code = '\n'.join([
             f"import asyncio",
             f"async def func():",

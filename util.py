@@ -210,10 +210,10 @@ class MessageInteractor(typing.NamedTuple):
 
     async def delete(self):
         """Delete the message"""
-        try:
-            await self.message.delete()
-        except:
-            await self.reply(f"Error occurred:\n```\n{traceback.format_exc()}\n```")  # TODO really need to send??
+        # try:
+        await self.message.delete()
+        # except:
+        #    await self.reply(f"Error occurred:\n```\n{traceback.format_exc()}\n```")  # TODO really need to send??
 
 
 default_user_config = {
@@ -354,7 +354,7 @@ async def to_command_message(event: telethon.events.NewMessage) -> CommandMessag
 
     # TODO handle markdownv2 properly
     def unmd2(s: str) -> str:
-        return s.replace('\\\\', '').replace('\\_', '_').replace('\\(', '(').replace('\\)', ')').replace('\\|', '|')
+        return s.replace('\\\\', '').replace('\\_', '_').replace('\\(', '(').replace('\\)', ')').replace('\\|', '|').replace('\\!', '!').replace('\\.', '.')
 
     # TODO handle replies PROPERLY --- should media and text from replies be taken and when
     arg = unmd2(msg_cur.text)

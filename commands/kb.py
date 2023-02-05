@@ -17,12 +17,15 @@ async def on_trl(cm: util.CommandMessage):
 
 async def on_me(cm: util.CommandMessage):
     if cm.arg:
-        msg = f"* _{await cm.sender.get_display_name()} {cm.arg}_"
+        msg = f"\* _{await cm.sender.get_display_name()} {cm.arg}_"
         if cm.int_prev:
             await cm.int_prev.reply(msg)
         else:
             await cm.int_cur.respond(msg)
-        await cm.int_cur.delete()
+        try:
+            await cm.int_cur.delete()
+        except:
+            await cm.int_cur.reply("Can't delete message — no permission")
 
 
 handlers.append(util.CommandHandler(
