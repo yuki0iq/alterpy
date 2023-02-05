@@ -21,7 +21,7 @@ class RP2Handler(typing.NamedTuple):
     ans_fem: typing.Callable[[], str]
 
     def invoke(self, user, gender, mention, comment):
-        return [self.ans, self.ans_masc, self.ans_fem][gender]().format(user, mention, comment).strip()
+        return [self.ans, self.ans_masc, self.ans_fem][gender]().format(user, mention, comment).strip().replace('  ', ' ', 1)
 
 
 rp1handlers = [
@@ -169,8 +169,8 @@ async def on_rp(cm: util.CommandMessage):
                 if match:
                     cur_mention, arg = match[0], arg[len(match[0]):]
                     # FIX cur_mention IFF id is specified
-                if cur_mention is not None:
-                    res.append(handler.invoke(user, gender, cur_mention, arg))
+                if cur_mention is not None or arg is not None:
+                    res.append(handler.invoke(user, gender, cur_mention or '', arg))
                 else:
                     res.append("RP-2 commands can't be executed without second user mention")
     if res:
