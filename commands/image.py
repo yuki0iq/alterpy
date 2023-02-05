@@ -5,6 +5,7 @@ import typing
 import io
 import PIL.Image
 import PIL.ImageFilter
+import PIL.ImageOps
 
 
 class ImageHandler(typing.NamedTuple):
@@ -79,40 +80,11 @@ async def image_denoiser(im: PIL.Image.Image, _: str) -> PIL.Image.Image:
     return ans
 
 
-async def image_contrast(im: PIL.Image.Image, _: str) -> PIL.Image.Image:
-    def find_a_b(arr):
-        n, sm, frac = len(arr), sum(arr), 20
-        sum1, a = arr[0], 0
-        while sum1 * frac < sm:
-            sum1, a = sum1 + arr[a + 1], a + 1
-        sum2, b = arr[-1], n - 1
-        while sum2 * frac < sm:
-            sum2, b = sum2 + arr[b - 1], b - 1
-        return a, b
-
-    ans = PIL.Image.new("RGB", im.size, "black")
-    pix = im.load()
-    pix_ans = ans.load()
-    for i in range(3):
-        c = [0] * 256
-        for row in range(im.height):
-            for col in range(im.width):
-                c[pix[col, row][i]] += 1
-        a, b = find_a_b(c)
-
-        for row in range(im.height):
-            for col in range(im.width):
-                c = list(pix_ans[col, row])
-                c[i] = (pix[col, row][i] - a) * 255 // (b - a)
-                pix_ans[col, row] = tuple(c)
-    return ans
-
-
 image_handlers = [
     ImageHandler(util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('copy', 'вновь'))),
                  util.to_async(lambda im, _: im)),
     ImageHandler(util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('grey', 'серым'))),
-                 util.to_async(lambda im, _: im.convert("L"))),
+                 util.to_async(lambda im, _: PIL.ImageOps.grayscale(im))),
     ImageHandler(util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('spread', 'точками'))),
                  util.to_async(lambda im, arg: im.effect_spread(util.to_int(arg, 10)))),
     ImageHandler(util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('blur', 'мыло'))),
@@ -138,7 +110,7 @@ image_handlers = [
     ImageHandler(util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('denoise', 'антишум'))),
                  image_denoiser),
     ImageHandler(util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('contrast', 'контраст'))),
-                 image_contrast),
+                 util.to_async(lambda im, _: PIL.ImageOps.autocontrast(im, 5))),
     ImageHandler(util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('median', 'медиана'))),
                  util.to_async(lambda im, _: im.filter(PIL.ImageFilter.MedianFilter()))),
 ]
