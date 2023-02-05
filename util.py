@@ -354,7 +354,7 @@ async def to_command_message(event: telethon.events.NewMessage) -> CommandMessag
 
     # TODO handle markdownv2 properly
     def unmd2(s: str) -> str:
-        return s.replace('\\_', '_').replace('\\(', '(').replace('\\)', ')').replace('\\|', '|')
+        return s.replace('\\\\', '').replace('\\_', '_').replace('\\(', '(').replace('\\)', ')').replace('\\|', '|')
 
     # TODO handle replies PROPERLY --- should media and text from replies be taken and when
     arg = unmd2(msg_cur.text)

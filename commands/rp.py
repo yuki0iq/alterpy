@@ -167,7 +167,7 @@ async def on_rp(cm: util.CommandMessage):
                 cur_mention = mention
                 match = re.search(mention_pattern, arg)
                 if match:
-                    cur_mention, arg = match[0], arg[len(match[0]):]
+                    cur_mention, arg = match[0].replace('_', '\\_'), arg[len(match[0]):]
                     # FIX cur_mention IFF id is specified
                 if cur_mention is not None or arg is not None:
                     res.append(handler.invoke(user, gender, cur_mention or '', arg))
