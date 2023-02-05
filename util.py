@@ -388,7 +388,7 @@ class CommandHandler(typing.NamedTuple):
             try:
                 await self.handler_impl(cm)
             except:
-                await cm.int_cur.reply(f"Exception occurred.\n{traceback.format_exc()}")
+                await cm.int_cur.reply(f"Exception occurred.\n```{traceback.format_exc()}```")
                 log_fail(get_log("handler"), "invoke exception")
         else:
             await cm.int_cur.reply("Only bot admins can run elevated commands")
