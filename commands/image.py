@@ -56,6 +56,29 @@ async def image_white_balancer(im: PIL.Image.Image, _: str) -> PIL.Image.Image:
     return im
 
 
+async def image_denoiser(im: PIL.Image.Image, _: str) -> PIL.Image.Image:
+    im.convert("RGB")
+    ans = im.copy()
+    pix = im.load()
+    pix_ans = ans.load()
+    for row in range(1, im.height - 1):
+        for col in range(1, im.width - 1):
+            a = [[] for i in range(3)]
+            for i in range(3):
+                for d_row in [-1, 0, 1]:
+                    for d_col in [-1, 0, 1]:
+                        a[i].append(pix[col + d_col, row + d_row][i])
+            a = list(map(sorted, a))
+            c = list(pix[col, row])
+            for i in range(3):
+                if c[i] == a[i][0]:
+                    c[i] = a[i][1]
+                if c[i] == a[i][8]:
+                    c[i] = a[i][7]
+            pix_ans[col, row] = tuple(c)
+    return ans
+
+
 async def image_contrast(im: PIL.Image.Image, _: str) -> PIL.Image.Image:
     def find_a_b(arr):
         n, sm, frac = len(arr), sum(arr), 20
@@ -112,6 +135,8 @@ image_handlers = [
                  image_brightness_normalizer),
     ImageHandler(util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('white', 'белый'))),
                  image_white_balancer),
+    ImageHandler(util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('denoise', 'антишум'))),
+                 image_denoiser),
     ImageHandler(util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('contrast', 'контраст'))),
                  image_contrast),
     ImageHandler(util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('median', 'медиана'))),
@@ -121,16 +146,26 @@ image_handlers = [
 
 async def on_image(cm: util.CommandMessage):
     img = PIL.Image.open(await cm.media.get())
+    as_file = False
     for line in cm.arg.split('\n'):
+        if line.lower() in ['file', 'файлом']:
+            as_file = True
+        if line.lower() in ['image', 'картинкой']:
+            as_file = False
         for handler in image_handlers:
             match = re.search(handler.pattern, line)
             if match:
                 arg = line[len(match[0]):]
                 img = await handler.invoke(img, arg)
-    file = io.BytesIO()
-    img.save(file, "png")
-    file.seek(0)
-    await cm.int_cur.reply('', file)
+    if as_file:
+        filename = f"{util.temp_filename()}.png"
+        img.save(filename)
+        await cm.int_cur.send_file(filename, True, force_document=True)
+    else:
+        file = io.BytesIO()
+        img.save(file, "png")
+        file.seek(0)
+        await cm.int_cur.reply('', file)
 
 
 handlers = [util.CommandHandler(
@@ -140,5 +175,5 @@ handlers = [util.CommandHandler(
     author="@yuki_the_girl",
     handler_impl=on_image,
     is_prefix=True,
-    required_media_type={'photo'}
+    required_media_type={'photo', 'file'}
 )]
