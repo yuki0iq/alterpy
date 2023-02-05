@@ -5,6 +5,7 @@ import typing
 import io
 import PIL.Image
 import PIL.ImageFilter
+import PIL.ImageChops
 import PIL.ImageOps
 
 
@@ -14,6 +15,17 @@ class ImageHandler(typing.NamedTuple):
 
     async def invoke(self, img: PIL.Image.Image, arg: str = ''):
         return await self.handler_impl(img, arg)
+
+
+class ImageTwoHandler(typing.NamedTuple):
+    pattern: re.Pattern
+    handler_impl: typing.Callable[
+        [PIL.Image.Image, PIL.Image.Image, str],
+        typing.Awaitable[typing.Tuple[PIL.Image.Image, PIL.Image.Image]]
+    ]
+
+    async def invoke(self, img: PIL.Image.Image, prev: PIL.Image.Image, arg: str = ''):
+        return await self.handler_impl(img, prev, arg)
 
 
 async def image_scaler(im: PIL.Image.Image, arg: str) -> PIL.Image.Image:
@@ -113,31 +125,46 @@ image_handlers = [
                  util.to_async(lambda im, _: PIL.ImageOps.autocontrast(im, 5))),
     ImageHandler(util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('median', 'медиана'))),
                  util.to_async(lambda im, _: im.filter(PIL.ImageFilter.MedianFilter()))),
+    ImageTwoHandler(util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('overlay', 'наложить'))),
+                    util.to_async(lambda im, pr, _: (im.paste(pr, (0, 0)) or im, pr)))
 ]
 
 
 async def on_image(cm: util.CommandMessage):
     img = PIL.Image.open(await cm.media.get())
+    prev = PIL.Image.open(await cm.reply_media.get()) if cm.reply_media.type() != "" else None
+    text = []
     as_file = False
     for line in cm.arg.split('\n'):
         if line.lower() in ['file', 'файлом']:
             as_file = True
         if line.lower() in ['image', 'картинкой']:
             as_file = False
+        if line.lower() in ['swap', 'обменять']:
+            img, prev = prev, img
+        if line.lower() in ['size', 'размеры']:
+            text.append(f"{img.size}")
         for handler in image_handlers:
             match = re.search(handler.pattern, line)
             if match:
                 arg = line[len(match[0]):]
-                img = await handler.invoke(img, arg)
+                if type(handler) == ImageHandler:
+                    img = await handler.invoke(img, arg)
+                elif type(handler) == ImageTwoHandler:
+                    if prev is None:
+                        text.append(f"Can't use two image handler without second image specified, required for command {line}")
+                    else:
+                        img, prev = await handler.invoke(img, prev, arg)
+    text = '\n'.join(text)
     if as_file:
         filename = f"{util.temp_filename()}.png"
         img.save(filename)
-        await cm.int_cur.send_file(filename, True, force_document=True)
+        await cm.int_cur.send_file(filename, True, text=text, force_document=True)
     else:
         file = io.BytesIO()
         img.save(file, "png")
         file.seek(0)
-        await cm.int_cur.reply('', file)
+        await cm.int_cur.reply(text, file)
 
 
 handlers = [util.CommandHandler(
