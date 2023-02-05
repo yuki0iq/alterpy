@@ -327,6 +327,7 @@ class CommandMessage(typing.NamedTuple):
     arg: str  # message text
     rep: str  # message text with reply attached
     media: typing.Any  # media if exist
+    reply_media: typing.Any # reply media if exist
     time: datetime.datetime  # UTC time when sent
     local_time: datetime.datetime  # UTC time when recv
     sender: User  # sender
@@ -351,10 +352,15 @@ async def to_command_message(event: telethon.events.NewMessage) -> CommandMessag
     has_reply = msg_prev is not None
     chat_obj = await msg_cur.get_chat()
 
+    # TODO handle markdownv2 properly
+    def unmd2(s: str) -> str:
+        return s.replace('\\_', '_').replace('\\(', '(').replace('\\)', ')').replace('\\|', '|')
+
     # TODO handle replies PROPERLY --- should media and text from replies be taken and when
-    arg = msg_cur.text
-    rep = f"{msg_prev.text}" if has_reply else None
+    arg = unmd2(msg_cur.text)
+    rep = f"{unmd2(msg_prev.text)}" if has_reply else None
     media = Media(msg_cur) if msg_cur.media else Media(msg_prev)  # if no media is given then Media(None)
+    reply_media = Media(msg_prev)
     time = msg_cur.date
     sender = to_user(await msg_cur.get_sender(), chat_obj)
     reply_sender = to_user(await msg_prev.get_sender(), chat_obj) if has_reply else None
@@ -364,7 +370,7 @@ async def to_command_message(event: telethon.events.NewMessage) -> CommandMessag
 
     local_time = datetime.datetime.now(datetime.timezone.utc)
 
-    return CommandMessage(arg, rep, media, time, local_time, sender, reply_sender, int_cur, int_prev)
+    return CommandMessage(arg, rep, media, reply_media, time, local_time, sender, reply_sender, int_cur, int_prev)
 
 
 class CommandHandler(typing.NamedTuple):
