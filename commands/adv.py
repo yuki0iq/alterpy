@@ -26,7 +26,7 @@ async def advice(cm: util.CommandMessage):
 handlers.append(
     util.CommandHandler(
         name='advice',
-        pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('adv', 'совет'))),
+        pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_only_prefix() + util.re_unite('adv', 'совет'))),
         help_message=
                     "Fucking great advice from fucking-great-advice.ru\n" +
                     "Based on: github.com/Catware-Foundation/Catpy-Software/blob/main/advice.py",
