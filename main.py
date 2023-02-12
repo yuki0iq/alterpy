@@ -74,7 +74,7 @@ initial_handlers = handlers[:]
 
 def load_commands():
     global handlers
-    handlers = initial_handlers[:]
+    handlers[:] = initial_handlers[:]
     commands_filenames = list(filter(lambda filename: filename[-3:] == ".py", sorted(util.list_files("commands/"))))
     log.info(f"commands: {commands_filenames}")
     for filename in commands_filenames:
