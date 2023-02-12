@@ -177,4 +177,4 @@ async def on_rp(cm: util.CommandMessage):
         await cm.int_cur.reply('\n'.join(res))
 
 
-handlers = [util.CommandHandler("role", re.compile(""), "Roleplay commands", "@yuki_the_girl", on_rp)]
+handlers = [util.CommandHandler("role", re.compile(""), "Roleplay commands", on_rp)]

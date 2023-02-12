@@ -11,7 +11,6 @@ handlers = [util.get_handler_simple_reply(
     "Пинг до бота: `/ping`\n" +
     "\n" +
     "В разработке принимали участие: t.me/yuki_the_girl",
-    "@yuki_the_girl",
     "Start message",
     util.re_ignore_case(util.re_pat_starts_with("/start(@alterpy_bot)?"))
 )]

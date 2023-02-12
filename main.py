@@ -30,23 +30,8 @@ handlers.append(util.CommandHandler(
     name='ver',
     pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_only_prefix() + 'ver')),
     help_message='Show AlterPy version',
-    author='@yuki_the_girl',
     handler_impl=on_command_version,
     is_elevated=False
-))
-
-
-async def on_list_commands(cm: util.CommandMessage):
-    await cm.int_cur.reply("Available command handlers:\n" + ', '.join(f"`{handler.name}`" for handler in handlers))
-
-
-handlers.append(util.CommandHandler(
-    name='handler-list',
-    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_only_prefix() + 'hl')),
-    help_message='Show all handlers',
-    author='@yuki_the_girl',
-    handler_impl=on_list_commands,
-    is_elevated=True
 ))
 
 
@@ -71,10 +56,17 @@ handlers.append(util.CommandHandler(
     name="exec",
     pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + "exec")),
     help_message="Execute python code",
-    author="@yuki_the_girl",
     handler_impl=on_exec,
     is_prefix=True,
     is_elevated=True
+))
+
+handlers.append(util.CommandHandler(
+    name="help",
+    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite("help", "справка"))),
+    help_message="Show help",
+    handler_impl=util.help_handler([], handlers),  # TODO add help!
+    is_prefix=True
 ))
 
 initial_handlers = handlers[:]

@@ -18,13 +18,13 @@ def on_tts_wrapper(lang: str):
 
 handlers = [
     util.CommandHandler("tts-en", util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + "tts")),
-                        "Say message in English", "@yuki_the_girl", on_tts_wrapper("en"), is_prefix=True),
+                        "Say message in English", on_tts_wrapper("en"), is_prefix=True),
     util.CommandHandler("tts-ru", util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + "озвучь")),
-                        "Сказать голосом на русском", "@yuki_the_girl", on_tts_wrapper("ru"), is_prefix=True),
+                        "Сказать голосом на русском", on_tts_wrapper("ru"), is_prefix=True),
     util.CommandHandler("tts-jp", util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + "vnsay")),
-                        "Say message in Japanese", "@yuki_the_girl", on_tts_wrapper("ja"), is_prefix=True),
+                        "Say message in Japanese", on_tts_wrapper("ja"), is_prefix=True),
     util.CommandHandler("tts-zh", util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + "sayccp")),
-                        "Say message in Chinese", "@yuki_the_girl", on_tts_wrapper("zh"), is_prefix=True),
+                        "Say message in Chinese", on_tts_wrapper("zh"), is_prefix=True),
     util.CommandHandler("tts-ko", util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + "kosay")),
-                        "Say message in Korean", "@yuki_the_girl", on_tts_wrapper("ko"), is_prefix=True)
+                        "Say message in Korean", on_tts_wrapper("ko"), is_prefix=True)
 ]

@@ -62,7 +62,6 @@ handlers.append(util.CommandHandler(
         util.re_prefix() + util.re_unite('инфа', 'шанс', 'вер' + util.re_optional('оятность'))
     )),
     help_message='Найти вероятность события (случайная!)',
-    author='@yuki_the_girl',
     handler_impl=on_prob_ru
 ))
 
@@ -70,7 +69,6 @@ handlers.append(util.CommandHandler(
     name='prob',
     pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('prob', 'chance'))),
     help_message='Find probability of given string (random!)',
-    author='@yuki_the_girl',
     handler_impl=on_prob_en
 ))
 
@@ -78,7 +76,6 @@ handlers.append(util.CommandHandler(
     name='выбери',
     pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + 'выбери')),
     help_message='Выбрать что-нибудь случайное из "или"-разделенного списка',
-    author='@yuki_the_girl',
     handler_impl=on_choose_ru,
     is_prefix=True
 ))
@@ -87,7 +84,6 @@ handlers.append(util.CommandHandler(
     name='choose',
     pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('choose', 'select'))),
     help_message='Choose something random from "or"-separated list',
-    author='@yuki_the_girl',
     handler_impl=on_choose_en,
     is_prefix=True
 ))

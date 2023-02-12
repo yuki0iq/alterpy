@@ -30,7 +30,6 @@ handlers.append(
         help_message=
                     "Fucking great advice from fucking-great-advice.ru\n" +
                     "Based on: github.com/Catware-Foundation/Catpy-Software/blob/main/advice.py",
-        author='@yuki_the_girl',
         handler_impl=advice,
         is_prefix=True
     )
