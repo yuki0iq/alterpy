@@ -381,7 +381,9 @@ async def to_command_message(event: telethon.events.NewMessage) -> CommandMessag
 class CommandHandler(typing.NamedTuple):
     name: str  # command name
     pattern: re.Pattern  # regex pattern
-    help_message: str  # short help about command
+    help_message: str  # help message unlocalized, use if no localized is provided
+    help_message_en: str  # help in English
+    help_message_ru: str  # help in Russian
     handler_impl: typing.Callable[[CommandMessage], typing.Awaitable]
     is_prefix: bool = False  # should a command be deleted from its message when passed to handler
     is_elevated: bool = False  # should a command be invoked only if user is admin
@@ -401,7 +403,9 @@ class CommandHandler(typing.NamedTuple):
 def get_handler_simple_reply(
         msg: str,
         ans: typing.Union[str, typing.Callable[[], typing.Awaitable | str]],
-        help_message: str = "Simple reply command",
+        help_message_en: str = "Simple reply command",
+        help_message_ru: str = "Простой автоответчик",
+        help_message: str = "",
         pattern: typing.Union[str, re.Pattern] = ""
 ) -> CommandHandler:
     """
@@ -446,6 +450,8 @@ def get_handler_simple_reply(
         name=msg,
         pattern=pattern,
         help_message=help_message,
+        help_message_en=help_message_en,
+        help_message_ru=help_message_ru,
         handler_impl=on_simple_reply,
         is_prefix=False,
         is_elevated=False
@@ -495,7 +501,7 @@ def on_help_impl(arg: str, name: str, help_entries: typing.Any, general: str, is
         return header + ', '.join(sorted(f"`{entry.name}`" for entry in help_entries))
     for entry in help_entries:
         if arg == entry.name:
-            return entry.help_message
+            return (entry.help_message_en if is_eng else entry.help_message_ru) or entry.help_message
     return f"No help enrty for `{arg}` found" if is_eng else f"Справочная страница для `{arg}` не найдена"
 
 
@@ -523,7 +529,9 @@ def add_help_handler(handlers: typing.List,
     handlers.append(CommandHandler(
         name=f"help-{cname}-{'en' if is_eng else 'ru'}",
         pattern=re_ignore_case(re_pat_starts_with(re_prefix() + cname)),
-        help_message=(f"Show help for {name}" if is_eng else f"Показать справку для {name}"),
+        help_message="",
+        help_message_en=f"Show help for {name}",
+        help_message_ru=f"Показать справку для {name}",
         handler_impl=help_handler(help_entries, name, cname, general, is_eng),
         is_prefix=True
     ))

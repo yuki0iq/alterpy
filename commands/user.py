@@ -60,40 +60,40 @@ async def on_reset_gender_ru(cm: util.CommandMessage):
 handlers.append(util.CommandHandler(
     "+name",
     util.re_ignore_case(util.re_pat_starts_with("\\+name")),
-    "Set or show name", on_set_name_en, is_prefix=True
+    "Set or show name", "", "", on_set_name_en, is_prefix=True
 ))
 handlers.append(util.CommandHandler(
     "+имя",
     util.re_ignore_case(util.re_pat_starts_with("\\+имя")),
-    "Изменить или показать имя", on_set_name_ru, is_prefix=True
+    "Изменить или показать имя", "", "", on_set_name_ru, is_prefix=True
 ))
 handlers.append(util.CommandHandler(
     "-name",
     util.re_ignore_case(util.re_pat_starts_with("-name")),
-    "Reset name", on_reset_name_en
+    "Reset name", "", "", on_reset_name_en
 ))
 handlers.append(util.CommandHandler(
     "-имя",
     util.re_ignore_case(util.re_pat_starts_with("-имя")),
-    "Сбросить имя", on_reset_name_ru
+    "Сбросить имя", "", "", on_reset_name_ru
 ))
 handlers.append(util.CommandHandler(
     "+pn",
     util.re_ignore_case(util.re_pat_starts_with("\\+pn")),
-    "Set or show pronouns", on_set_gender_en, is_prefix=True
+    "Set or show pronouns", "", "", on_set_gender_en, is_prefix=True
 ))
 handlers.append(util.CommandHandler(
     "+мест",
     util.re_ignore_case(util.re_pat_starts_with("\\+мест")),
-    "Изменить или показать набор местоимений", on_set_gender_ru, is_prefix=True
+    "Изменить или показать набор местоимений", "", "", on_set_gender_ru, is_prefix=True
 ))
 handlers.append(util.CommandHandler(
     "-pn",
     util.re_ignore_case(util.re_pat_starts_with("-pn")),
-    "Reset pronouns", on_reset_gender_en
+    "Reset pronouns", "", "", on_reset_gender_en
 ))
 handlers.append(util.CommandHandler(
     "-мест",
     util.re_ignore_case(util.re_pat_starts_with("-мест")),
-    "Сбросить набор местоимений", on_reset_gender_ru
+    "Сбросить набор местоимений", "", "", on_reset_gender_ru
 ))

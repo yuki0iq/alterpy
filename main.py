@@ -23,13 +23,15 @@ handlers = []
 
 
 async def on_command_version(cm: util.CommandMessage):
-    await cm.int_cur.reply("AlterPy on Feb 1 of 2023 by Yuki the girl")
+    await cm.int_cur.reply("AlterPy on Feb 13 of 2023 by Yuki the girl")
 
 
 handlers.append(util.CommandHandler(
     name='ver',
     pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_only_prefix() + 'ver')),
-    help_message='Show AlterPy version',
+    help_message="",
+    help_message_en="Show AlterPy version",
+    help_message_ru="Показать версию Альтера",
     handler_impl=on_command_version,
     is_elevated=False
 ))
@@ -55,7 +57,9 @@ async def on_exec(cm: util.CommandMessage):
 handlers.append(util.CommandHandler(
     name="exec",
     pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + "exec")),
-    help_message="Execute python code",
+    help_message="",
+    help_message_en="Elevated command to execute python code",
+    help_message_ru="Команда с повышенными правами для исполнения python-кода",
     handler_impl=on_exec,
     is_prefix=True,
     is_elevated=True

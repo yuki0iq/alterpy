@@ -25,7 +25,9 @@ async def on_bmi(cm: util.CommandMessage):
 handlers.append(util.CommandHandler(
     name="bmi",
     pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('bmi', 'имт'))),
-    help_message="height (cm) weight (kg) -> BMI (body mass index)",
+    help_message="",
+    help_message_en="height (cm) weight (kg) -> BMI (body mass index)",
+    help_message_ru="Рассчитать ИМТ по росту (см) и массе (кг)",
     handler_impl=on_bmi,
     is_prefix=True
 ))
