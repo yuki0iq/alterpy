@@ -363,7 +363,7 @@ async def to_command_message(event: telethon.events.NewMessage) -> CommandMessag
 
     # TODO handle replies PROPERLY --- should media and text from replies be taken and when
     arg = unmd2(msg_cur.text)
-    rep = f"{unmd2(msg_prev.text)}" if has_reply else None
+    rep = f"{unmd2(msg_prev.text if msg_prev.message else '')}" if has_reply else None
     media = Media(msg_cur) if msg_cur.media else Media(msg_prev)  # if no media is given then Media(None)
     reply_media = Media(msg_prev)
     time = msg_cur.date
