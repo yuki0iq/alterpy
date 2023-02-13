@@ -218,23 +218,25 @@ class MessageInteractor(typing.NamedTuple):
 
 default_user_config = {
     'name': '',
-    'gender': 0
+    'pronoun_set': 0
 }
 
 
-def gender_to_str_ru(gender: int) -> str:
-    return ["нейтральный", "мужской", "женский"][gender]
+def pronouns_to_str_ru(pronoun_set: int) -> str:
+    return ["нейтральный", "он/его", "она/её"][pronoun_set]
 
 
-def gender_to_str_en(gender: int) -> str:
-    return ["neutral", "male", "female"][gender]
+def pronouns_to_str_en(pronoun_set: int) -> str:
+    return ["neutral they/them/themself", "he/him", "she/her"][pronoun_set]
 
 
-def str_to_gender(s: str) -> int:
+def str_to_pronouns(s: str) -> int:
     s = s.lower()
-    if one_of_in(["fem", "wom", "жен", "дев", "фем", "gi"], s) or s in list('2fжд'):
+    if one_of_in(["they", "them", "themsel", "оно", "они"], s):
+        return 0
+    if one_of_in(["fem", "wom", "жен", "дев", "фем", "gi", "she", "her", "она"], s) or s in list('2fжд'):
         return 2
-    if one_of_in(["mas", "mal", "муж", "пар", "мас", "gu"], s) or s in list('1mмп'):
+    if one_of_in(["mas", "mal", "муж", "пар", "мас", "gu", "he", "him", "his", "он"], s) or s in list('1mмп'):
         return 1
     return 0
 
@@ -277,13 +279,16 @@ class User(typing.NamedTuple):
     def reset_param(self, param):
         self.set_param(param, default_user_config[param])
 
-    def get_gender(self) -> int:
-        return self.get_param('gender')
+    def get_pronouns(self) -> int:
+        return self.get_param('pronoun_set')
 
-    def set_gender(self, gender: int):
-        if not 0 <= gender <= 2:
-            raise ValueError("Wrong gender passed")
-        self.set_param('gender', gender)
+    def set_pronouns(self, pronoun_set: int):
+        if not 0 <= pronoun_set <= 2:
+            raise ValueError("Wrong pronoun set number passed")
+        self.set_param('pronoun_set', pronoun_set)
+
+    def reset_pronouns(self):
+        self.reset_param('pronouns')
 
     def get_name(self) -> str:
         return self.get_param('name')

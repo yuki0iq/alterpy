@@ -10,8 +10,8 @@ class RP1Handler(typing.NamedTuple):
     ans_masc: typing.Callable[[], str]
     ans_fem: typing.Callable[[], str]
 
-    def invoke(self, user, gender, comment):
-        return [self.ans, self.ans_masc, self.ans_fem][gender]().format(user, comment).strip()
+    def invoke(self, user, pronouns, comment):
+        return [self.ans, self.ans_masc, self.ans_fem][pronouns]().format(user, comment).strip()
 
 
 class RP2Handler(typing.NamedTuple):
@@ -20,8 +20,8 @@ class RP2Handler(typing.NamedTuple):
     ans_masc: typing.Callable[[], str]
     ans_fem: typing.Callable[[], str]
 
-    def invoke(self, user, gender, mention, comment):
-        return [self.ans, self.ans_masc, self.ans_fem][gender]().format(user, mention, comment).strip().replace('  ', ' ', 1)
+    def invoke(self, user, pronouns, mention, comment):
+        return [self.ans, self.ans_masc, self.ans_fem][pronouns]().format(user, mention, comment).strip().replace('  ', ' ', 1)
 
 
 rp1handlers = [
@@ -149,7 +149,7 @@ mention_pattern = re.compile(r'''\[.+\]\(tg://user\?id=\d+\)|@\w+''')
 
 async def on_rp(cm: util.CommandMessage):
     user = await cm.sender.get_mention()
-    gender = cm.sender.get_gender()
+    pronoun_set = cm.sender.get_pronouns()
     mention = (await cm.reply_sender.get_mention()) if cm.reply_sender is not None else None
     res = []
     for line in cm.arg.split('\n')[:20]:  # technical limitation
@@ -158,7 +158,7 @@ async def on_rp(cm: util.CommandMessage):
             match = re.search(handler.pattern, line)
             if match:
                 arg = line[len(match[0]):]
-                res.append(handler.invoke(user, gender, arg))
+                res.append(handler.invoke(user, pronoun_set, arg))
         # try match to RP-2 as "RP-2 [mention] arg"
         for handler in rp2handlers:
             match = re.search(handler.pattern, line)
@@ -170,7 +170,7 @@ async def on_rp(cm: util.CommandMessage):
                     cur_mention, arg = match[0].replace('_', '\\_'), arg[len(match[0]):]
                     # FIX cur_mention IFF id is specified
                 if cur_mention is not None or arg is not None:
-                    res.append(handler.invoke(user, gender, cur_mention or '', arg))
+                    res.append(handler.invoke(user, pronoun_set, cur_mention or '', arg))
                 else:
                     res.append("RP-2 commands can't be executed without second user mention")
     if res:

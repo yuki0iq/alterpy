@@ -31,30 +31,30 @@ async def on_reset_name_ru(cm: util.CommandMessage):
 
 async def on_set_gender_en(cm: util.CommandMessage):
     if cm.arg:
-        g = util.str_to_gender(cm.arg)
-        cm.sender.set_gender(g)
-        await cm.int_cur.reply(f"Gender set to {util.gender_to_str_en(g)}")
+        g = util.str_to_pronouns(cm.arg)
+        cm.sender.set_pronouns(g)
+        await cm.int_cur.reply(f"Pronoun set is {util.pronouns_to_str_en(g)}")
     else:
-        await cm.int_cur.reply(f"Your gender is {util.gender_to_str_en(cm.sender.get_gender())}")
+        await cm.int_cur.reply(f"Your pronoun set is {util.pronouns_to_str_en(cm.sender.get_pronouns())}")
 
 
 async def on_set_gender_ru(cm: util.CommandMessage):
     if cm.arg:
-        g = util.str_to_gender(cm.arg)
-        cm.sender.set_gender(g)
-        await cm.int_cur.reply(f"Установлен гендер {util.gender_to_str_ru(g)}")
+        g = util.str_to_pronouns(cm.arg)
+        cm.sender.set_pronouns(g)
+        await cm.int_cur.reply(f"Установлен набор местоимений {util.pronouns_to_str_en(g)}")
     else:
-        await cm.int_cur.reply(f"Ваш гендер — {util.gender_to_str_ru(cm.sender.get_gender())}")
+        await cm.int_cur.reply(f"Ваш набор местоимений — {util.pronouns_to_str_ru(cm.sender.get_pronouns())}")
 
 
 async def on_reset_gender_en(cm: util.CommandMessage):
-    cm.sender.set_gender(0)
-    await cm.int_cur.reply("Gender is not set now")
+    cm.sender.reset_pronouns()
+    await cm.int_cur.reply("Prounon set is unset now")
 
 
 async def on_reset_gender_ru(cm: util.CommandMessage):
-    cm.sender.set_gender(0)
-    await cm.int_cur.reply("Гендер сброшен")
+    cm.sender.reset_pronouns()
+    await cm.int_cur.reply("Набор местоимений сброшен")
 
 
 handlers.append(util.CommandHandler(
@@ -78,22 +78,22 @@ handlers.append(util.CommandHandler(
     "Сбросить имя", on_reset_name_ru
 ))
 handlers.append(util.CommandHandler(
-    "+gender",
-    util.re_ignore_case(util.re_pat_starts_with("\\+gen" + util.re_optional("der"))),
-    "Set or show gender", on_set_gender_en, is_prefix=True
+    "+pn",
+    util.re_ignore_case(util.re_pat_starts_with("\\+pn")),
+    "Set or show pronouns", on_set_gender_en, is_prefix=True
 ))
 handlers.append(util.CommandHandler(
-    "+гендер",
-    util.re_ignore_case(util.re_pat_starts_with("\\+ген" + util.re_optional("дер"))),
-    "Изменить или показать гендер", on_set_gender_ru, is_prefix=True
+    "+мест",
+    util.re_ignore_case(util.re_pat_starts_with("\\+мест")),
+    "Изменить или показать набор местоимений", on_set_gender_ru, is_prefix=True
 ))
 handlers.append(util.CommandHandler(
-    "-gender",
-    util.re_ignore_case(util.re_pat_starts_with("-gen" + util.re_optional("der"))),
-    "Reset gender", on_reset_gender_en
+    "-pn",
+    util.re_ignore_case(util.re_pat_starts_with("-pn")),
+    "Reset pronouns", on_reset_gender_en
 ))
 handlers.append(util.CommandHandler(
-    "-гендер",
-    util.re_ignore_case(util.re_pat_starts_with("-ген" + util.re_optional("дер"))),
-    "Сбросить гендер", on_reset_gender_ru
+    "-мест",
+    util.re_ignore_case(util.re_pat_starts_with("-мест")),
+    "Сбросить набор местоимений", on_reset_gender_ru
 ))
