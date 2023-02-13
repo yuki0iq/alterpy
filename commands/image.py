@@ -546,11 +546,6 @@ handlers.append(util.CommandHandler(
     required_media_type={'photo', 'file'}
 ))
 
-handlers.append(util.CommandHandler(
-    name="help-pie",
-    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite("piehelp", "состав пирога"))),
-    help_message="Show help for PIE command",
-    handler_impl=util.help_handler([], image_prog_handlers),  # TODO add help
-    is_prefix=True
-))
+util.add_help_handler(handlers, image_prog_handlers, "PIE", "piehelp", is_eng=True)
+util.add_help_handler(handlers, image_prog_handlers, "PIE", "состав пирога", is_eng=False)
 

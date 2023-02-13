@@ -61,13 +61,9 @@ handlers.append(util.CommandHandler(
     is_elevated=True
 ))
 
-handlers.append(util.CommandHandler(
-    name="help",
-    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite("help", "справка"))),
-    help_message="Show help",
-    handler_impl=util.help_handler([], handlers),  # TODO add help!
-    is_prefix=True
-))
+util.add_help_handler(handlers, handlers, "Commands", "help", is_eng=True)
+util.add_help_handler(handlers, handlers, "Команды", "справка", is_eng=False)
+# TODO add "topics"
 
 initial_handlers = handlers[:]
 

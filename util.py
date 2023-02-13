@@ -487,21 +487,43 @@ def to_float(val: typing.Any, default: float = 0) -> float:
         return default
 
 
-def on_help_impl(arg: str, help_entries: typing.Any, handlers: typing.Any, general: str) -> str:
+def on_help_impl(arg: str, name: str, help_entries: typing.Any, general: str, is_eng: bool) -> str:
     if not arg:
         return general
-    entries = help_entries + handlers
     if arg in ['list', 'список']:
-        return "Available help entries:\n" + ', '.join(sorted(f"`{entry.name}`" for entry in entries))
-    for entry in entries:
+        header = f"Available help entries for {name}:\n" if is_eng else f"Доступные справочные страницы для {name}:\n"
+        return header + ', '.join(sorted(f"`{entry.name}`" for entry in help_entries))
+    for entry in help_entries:
         if arg == entry.name:
             return entry.help_message
-    return f"No help enrty for `{arg}` found"
+    return f"No help enrty for `{arg}` found" if is_eng else f"Справочная страница для `{arg}` не найдена"
 
 
 def help_handler(help_entries: typing.Any,
-                 handlers: typing.Any,
-                 general: str = "For list of available topics, type `help list`"):
+                 name: str = "Unnamed help",
+                 cname: str = "help",
+                 general: str = "For list of available topics, type `help list`",
+                 is_eng: bool = True):
+    if not general:
+        if is_eng:
+            general = f"For list of available topics, type `{cname} list`"
+        else:
+            general = f"Список доступных справочных страниц `{cname} список`"
     async def on_help(cm: CommandMessage):
-        await cm.int_cur.reply(on_help_impl(cm.arg, help_entries, handlers, general))
+        await cm.int_cur.reply(on_help_impl(cm.arg, name, help_entries, general, is_eng))
     return on_help
+
+
+def add_help_handler(handlers: typing.List,
+                     help_entries: typing.Any,
+                     name: str = "Unnamed help",
+                     cname: str = "help",
+                     general: str = "",
+                     is_eng: bool = True):
+    handlers.append(CommandHandler(
+        name=f"help-{cname}-{'en' if is_eng else 'ru'}",
+        pattern=re_ignore_case(re_pat_starts_with(re_prefix() + cname)),
+        help_message=(f"Show help for {name}" if is_eng else f"Показать справку для {name}"),
+        handler_impl=help_handler(help_entries, name, cname, general, is_eng),
+        is_prefix=True
+    ))
