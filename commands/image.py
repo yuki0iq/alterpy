@@ -371,6 +371,10 @@ image_prog_handlers = [
 
 
 async def on_image_prog(cm: util.CommandMessage):
+    if not cm.arg:
+        await cm.int_cur.reply("Can't PIE with empty code!")
+        return
+
     msg = PIL.Image.open(await cm.media.get())
     rep = PIL.Image.open(await cm.reply_media.get()) if cm.reply_media.type() != "" else None
 

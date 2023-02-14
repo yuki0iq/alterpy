@@ -504,16 +504,14 @@ def to_int(val: typing.Any, default: int = 0) -> int:
 
 
 def on_help_impl(arg: str, name: str, cname: str, gname: str, general: str, is_eng: bool) -> str:
-    if not arg:
-        return general
     dir = f"./help/{gname}/"
-    fn = f"{arg}.md"
+    fn = f"{arg or ('index' if is_eng else 'основная')}.md"
     help_entries = list_files(dir)
     if arg in ['list', 'список']:
         header = f"Available help entries for {name}:\n" if is_eng else f"Доступные справочные страницы для {name}:\n"
         return header + ', '.join(sorted(f"`{entry[:-3]}`" for entry in help_entries))
     if fn in help_entries:
-        return open(dir + fn).read()
+        return open(dir + fn).read() + [f"\n\n{general}", ""][int(bool(arg))]
     return f"No help entry for `{arg}` found" if is_eng else f"Справочная страница для `{arg}` не найдена"
 
 
