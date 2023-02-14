@@ -27,13 +27,7 @@ handlers.append(
     util.CommandHandler(
         name='advice',
         pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_only_prefix() + util.re_unite('adv', 'совет'))),
-        help_message="",
-        help_message_en=
-                    "Fucking great advice from fucking-great-advice.ru\n" +
-                    "Based on: github.com/Catware-Foundation/Catpy-Software/blob/main/advice.py",
-        help_message_ru=
-                    "Охрененный совет из fucking-great-advice.ru\n" +
-                    "На основе github.com/Catware-Foundation/Catpy-Software/blob/main/advice.py",
+        help_page=['advice', 'совет'],
         handler_impl=advice,
         is_prefix=True
     )

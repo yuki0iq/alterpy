@@ -33,9 +33,7 @@ handlers.append(util.CommandHandler(
     pattern=util.re_ignore_case(util.re_pat_starts_with(
         util.re_prefix() + util.re_unite('kb', 'ли', 'layout', 'дфнщге', 'раскладка', 'hfcrkflrf', 'рас', 'hfc')
     )),
-    help_message="",
-    help_message_en="Change keyboard layout (qwerty <-> йцукен)",
-    help_message_ru="Сменить раскладку клавиатуры (qwerty <-> йцукен)",
+    help_page=["keyboard", "клавиатура"],
     handler_impl=on_layout,
     is_prefix=True
 ))
@@ -45,9 +43,7 @@ handlers.append(util.CommandHandler(
     pattern=util.re_ignore_case(util.re_pat_starts_with(
         util.re_prefix() + util.re_unite('trl', 'translit', 'iuliia', 'трл', 'транслит', 'йуля')
     )),
-    help_message="",
-    help_message_en="wikipedia-style iuliia transliterate (привет -> privet), habr.com/post/499574",
-    help_message_ru="Транслитерация сообщения (привет -> privet) с помощью iuliia, habr.com/post/499574",
+    help_page=["keyboard", "клавиатура"],
     handler_impl=on_trl,
     is_prefix=True
 ))
@@ -55,9 +51,7 @@ handlers.append(util.CommandHandler(
 handlers.append(util.CommandHandler(
     name="me",
     pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_only_prefix() + util.re_unite('me', 'я'))),
-    help_message="",
-    help_message_en="IRC-style /me command",
-    help_message_ru="Команда /me как в IRC",
+    help_page=["keyboard", "клавиатура"],
     handler_impl=on_me,
     is_prefix=True
 ))

@@ -59,9 +59,7 @@ handlers.extend(
     util.CommandHandler(
         name=msg,
         pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + f'{msg}$')),
-        help_message="",
-        help_message_en="Measure ping",
-        help_message_ru="Измерить время пинга",
+        help_page=["ping", "пинг"],
         handler_impl=on_ping_wrapper(ans),
         is_elevated=False
     ) for msg, ans in [
@@ -75,14 +73,12 @@ handlers.extend(
 handlers.append(util.CommandHandler(
     name='stat',
     pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('stat', 'стат'))),
-    help_message="",
-    help_message_en="System info and bot statistics",
-    help_message_ru="Информация о хост-системе и статистика бота",
+    help_page=["stat", "стат"],
     handler_impl=on_stat
 ))
 
 handlers.extend(
-    util.get_handler_simple_reply(msg, ans, help_message='Simple ping replier', pattern=util.re_ignore_case(pat))
+    util.get_handler_simple_reply(msg, ans, help_page=["ping", "пинг"], pattern=util.re_ignore_case(pat))
     for msg, ans, pat in [
         ("bot", "I'm here!", util.re_pat_starts_with("bot$")),
         ("бот", "На месте!", util.re_pat_starts_with("бот$")),

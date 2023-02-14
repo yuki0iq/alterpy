@@ -410,14 +410,12 @@ async def on_image_prog(cm: util.CommandMessage):
 handlers = [util.CommandHandler(
     name="image-prog",
     pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_only_prefix() + util.re_unite('pie', 'пирог'))),
-    help_message="",
-    help_message_en="Programmable image edit",
-    help_message_ru="Программируемое редактирование изображений",
+    help_page=["pie", "пирог"],
     handler_impl=on_image_prog,
     is_prefix=True,
     required_media_type={'photo', 'file'}
 )]
 
-util.add_help_handler(handlers, image_prog_handlers, "PIE", "piehelp", is_eng=True)
-util.add_help_handler(handlers, image_prog_handlers, "PIE", "состав пирога", is_eng=False)
+util.add_help_handler(handlers, "PIE", "piehelp", "pie", is_eng=True)
+util.add_help_handler(handlers, "PIE", "состав пирога", "pie", is_eng=False)
 

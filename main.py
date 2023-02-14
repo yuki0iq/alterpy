@@ -29,9 +29,7 @@ async def on_command_version(cm: util.CommandMessage):
 handlers.append(util.CommandHandler(
     name='ver',
     pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_only_prefix() + 'ver')),
-    help_message="",
-    help_message_en="Show AlterPy version",
-    help_message_ru="Показать версию Альтера",
+    help_page=["start", "начало"],
     handler_impl=on_command_version,
     is_elevated=False
 ))
@@ -57,16 +55,14 @@ async def on_exec(cm: util.CommandMessage):
 handlers.append(util.CommandHandler(
     name="exec",
     pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + "exec")),
-    help_message="",
-    help_message_en="Elevated command to execute python code",
-    help_message_ru="Команда с повышенными правами для исполнения python-кода",
+    help_page=["elevated", "повышенные"],
     handler_impl=on_exec,
     is_prefix=True,
     is_elevated=True
 ))
 
-util.add_help_handler(handlers, handlers, "Commands", "help", is_eng=True)
-util.add_help_handler(handlers, handlers, "Команды", "справка", is_eng=False)
+util.add_help_handler(handlers, "commands", "help", ".", is_eng=True)
+util.add_help_handler(handlers, "commands", "справка", ".", is_eng=False)
 # TODO add "topics"
 
 initial_handlers = handlers[:]
@@ -88,7 +84,7 @@ def load_commands():
 async def process_command_message(cm: util.CommandMessage):
     tasks = [
         asyncio.create_task(handler.invoke(
-            util.cm_apply(cm, handler.pattern) if handler.is_prefix else cm
+            util.cm_apply(cm, handler) if handler.is_prefix else cm
         ))
         for handler in filter(
             lambda handler:

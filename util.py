@@ -9,6 +9,7 @@ import datetime
 import typing
 import os
 import platform
+import pathlib
 import telethon.tl.custom
 import telethon.tl.types
 import telethon.events
@@ -158,6 +159,11 @@ def temp_filename() -> str:
     return f"/tmp/alterpy-{random_printable()}"
 
 
+def is_file(path):
+	'''return True if 'path' is a path to existing file (not folder)'''
+	return pathlib.Path(path).is_file()
+
+
 logging_formatter = logging.Formatter("%(asctime)s: %(name)s [%(levelname)s]:  %(message)s")
 logging.basicConfig(format="%(asctime)s: %(name)s [%(levelname)s]:  %(message)s", level=logging.INFO)
 
@@ -304,7 +310,7 @@ class User(typing.NamedTuple):
         self.set_param('pronoun_set', pronoun_set)
 
     def reset_pronouns(self):
-        self.reset_param('pronouns')
+        self.reset_param('pronoun_set')
 
     def get_name(self) -> str:
         return self.get_param('name')
@@ -358,13 +364,6 @@ class CommandMessage(typing.NamedTuple):
     int_prev: MessageInteractor  # for attached reply
 
 
-def cm_apply(cm: CommandMessage, pattern: re.Pattern) -> CommandMessage:
-    arg = re.sub(pattern, '', cm.arg)
-    if not len(arg):
-        arg = cm.rep
-    return cm._replace(arg=arg)
-
-
 async def to_command_message(event: telethon.events.NewMessage) -> CommandMessage:
     """Construct CommandMessage from telethon NewMessage event"""
 
@@ -397,12 +396,11 @@ async def to_command_message(event: telethon.events.NewMessage) -> CommandMessag
 class CommandHandler(typing.NamedTuple):
     name: str  # command name
     pattern: re.Pattern  # regex pattern
-    help_message: str  # help message unlocalized, use if no localized is provided
-    help_message_en: str  # help in English
-    help_message_ru: str  # help in Russian
+    help_page: str | typing.List[str]
     handler_impl: typing.Callable[[CommandMessage], typing.Awaitable]
     is_prefix: bool = False  # should a command be deleted from its message when passed to handler
     is_elevated: bool = False  # should a command be invoked only if user is admin
+    is_arg_current: bool = False  # don't take arg from reply if set
     required_media_type: typing.Set[str] = {}
 
     async def invoke(self, cm: CommandMessage):
@@ -416,12 +414,17 @@ class CommandHandler(typing.NamedTuple):
             await cm.int_cur.reply("Only bot admins can run elevated commands")
 
 
+def cm_apply(cm: CommandMessage, ch: CommandHandler) -> CommandMessage:
+    arg = re.sub(ch.pattern, '', cm.arg)
+    if not len(arg) and not ch.is_arg_current:
+        arg = cm.rep
+    return cm._replace(arg=arg)
+
+
 def get_handler_simple_reply(
         msg: str,
         ans: typing.Union[str, typing.Callable[[], typing.Awaitable | str]],
-        help_message_en: str = "Simple reply command",
-        help_message_ru: str = "Простой автоответчик",
-        help_message: str = "",
+        help_page: str | typing.List[str] = "",
         pattern: typing.Union[str, re.Pattern] = ""
 ) -> CommandHandler:
     """
@@ -465,9 +468,7 @@ def get_handler_simple_reply(
     return CommandHandler(
         name=msg,
         pattern=pattern,
-        help_message=help_message,
-        help_message_en=help_message_en,
-        help_message_ru=help_message_ru,
+        help_page=help_page,
         handler_impl=on_simple_reply,
         is_prefix=False,
         is_elevated=False
@@ -502,28 +503,23 @@ def to_int(val: typing.Any, default: int = 0) -> int:
         return default
 
 
-def to_float(val: typing.Any, default: float = 0) -> float:
-    try:
-        return float(val)
-    except:
-        return default
-
-
-def on_help_impl(arg: str, name: str, help_entries: typing.Any, general: str, is_eng: bool) -> str:
+def on_help_impl(arg: str, name: str, cname: str, gname: str, general: str, is_eng: bool) -> str:
     if not arg:
         return general
+    dir = f"./help/{gname}/"
+    fn = f"{arg}.md"
+    help_entries = list_files(dir)
     if arg in ['list', 'список']:
         header = f"Available help entries for {name}:\n" if is_eng else f"Доступные справочные страницы для {name}:\n"
-        return header + ', '.join(sorted(f"`{entry.name}`" for entry in help_entries))
-    for entry in help_entries:
-        if arg == entry.name:
-            return (entry.help_message_en if is_eng else entry.help_message_ru) or entry.help_message
-    return f"No help enrty for `{arg}` found" if is_eng else f"Справочная страница для `{arg}` не найдена"
+        return header + ', '.join(sorted(f"`{entry[:-3]}`" for entry in help_entries))
+    if fn in help_entries:
+        return open(dir + fn).read()
+    return f"No help entry for `{arg}` found" if is_eng else f"Справочная страница для `{arg}` не найдена"
 
 
-def help_handler(help_entries: typing.Any,
-                 name: str = "Unnamed help",
+def help_handler(name: str = "Unnamed help",
                  cname: str = "help",
+                 gname: str = ".",
                  general: str = "For list of available topics, type `help list`",
                  is_eng: bool = True):
     if not general:
@@ -531,23 +527,30 @@ def help_handler(help_entries: typing.Any,
             general = f"For list of available topics, type `{cname} list`"
         else:
             general = f"Список доступных справочных страниц `{cname} список`"
+
     async def on_help(cm: CommandMessage):
-        await cm.int_cur.reply(on_help_impl(cm.arg, name, help_entries, general, is_eng))
+        await cm.int_cur.reply(on_help_impl(cm.arg, name, cname, gname, general, is_eng))
     return on_help
 
 
 def add_help_handler(handlers: typing.List,
-                     help_entries: typing.Any,
                      name: str = "Unnamed help",
                      cname: str = "help",
+                     gname: str = ".",
                      general: str = "",
                      is_eng: bool = True):
     handlers.append(CommandHandler(
         name=f"help-{cname}-{'en' if is_eng else 'ru'}",
         pattern=re_ignore_case(re_pat_starts_with(re_prefix() + cname)),
-        help_message="",
-        help_message_en=f"Show help for {name}",
-        help_message_ru=f"Показать справку для {name}",
-        handler_impl=help_handler(help_entries, name, cname, general, is_eng),
-        is_prefix=True
+        help_page=cname,
+        handler_impl=help_handler(name, cname, gname, general, is_eng),
+        is_prefix=True,
+        is_arg_current=True
     ))
+
+
+def to_float(val: typing.Any, default: float = 0) -> float:
+    try:
+        return float(val)
+    except:
+        return default
