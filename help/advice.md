@@ -1,4 +1,4 @@
-**Fucking great advice**
+*__Fucking great advice__*
 
 ```
 .adv [for who]
@@ -10,7 +10,7 @@ Takes random advice from fucking-great-advice.ru API and sends it as a reply.
 
 ```
 #01 1> .adv for AlterPy
-#02 A> [>>01] Охуенный блять совет альтеру: Не ссы бля, сделай как хочется!
+#02 A> [>>01] Охуенный блять совет for AlterPy: Не ссы бля, сделай как хочется!
 #03 1> .adv
 #04 A> [>>03] Хуёвый блять совет: Не торопи блять события!
 ```
