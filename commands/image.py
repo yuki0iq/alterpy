@@ -86,7 +86,7 @@ def re_var() -> str: return re_letter() + util.re_unite(re_letter(), '\\d') + '*
 def re_arg(name: str) -> str: return re_space() + re_named(name, re_var())
 def re_num_nat(name: str) -> str: return re_space() + re_named(name, '[1-9]\\d*')
 def re_real(name: str) -> str: return re_space() + re_named(name, '\\d*\\.?\\d*')
-def re_named(name: str, pat: str) -> str: return f"(?P<{name}>(?!(to|with|в|на|с))({pat}))"
+def re_named(name: str, pat: str) -> str: return f"(?P<{name}>(?!((to|with|в|на|с)\\b))({pat}))"
 def re_or(*args) -> str: return re_space() + util.re_unite(*args)
 
 
