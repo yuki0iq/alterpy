@@ -41,7 +41,7 @@ def re_ignore_case(pat: str) -> re.Pattern:
 
 def re_only_prefix() -> str:
     """regex pattern for command prefix"""
-    return re_unite('/', '\\!', '•', '\\.', 'альтер(\\b\\s*)')
+    return re_unite('/', '\\!', '•', '\\.', 'альтер') + "\\s*"
 
 
 def re_prefix() -> str:
@@ -505,7 +505,7 @@ def to_int(val: typing.Any, default: int = 0) -> int:
 
 def on_help_impl(arg: str, name: str, cname: str, gname: str, general: str, is_eng: bool) -> str:
     dir = f"./help/{gname}/"
-    fn = f"{arg or ('index' if is_eng else 'основная')}.md"
+    fn = f"{arg or ('summary' if is_eng else 'кратко')}.md"
     help_entries = list_files(dir)
     if arg in ['list', 'список']:
         header = f"Available help entries for {name}:\n" if is_eng else f"Доступные справочные страницы для {name}:\n"
