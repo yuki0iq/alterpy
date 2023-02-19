@@ -46,6 +46,7 @@ async def on_stat(cm: util.CommandMessage):
         f'Ping is {ping}, handled in {handle}',
         f'Up for {up}',
         f'Compute speed is {speed}M operations per second',
+        f'This chat ID is {cm.sender.chat_id}',
         f'',
         f'--- Current time is ---',
         f'{cur_time.astimezone(tzMSK).strftime(time_format)}',

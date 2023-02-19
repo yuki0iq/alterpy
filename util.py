@@ -240,7 +240,8 @@ class MessageInteractor(typing.NamedTuple):
 
 default_user_config = {
     'name': '',
-    'pronoun_set': 0
+    'pronoun_set': 0,
+    'anon': [],
 }
 
 
@@ -265,6 +266,7 @@ def str_to_pronouns(s: str) -> int:
 
 class User(typing.NamedTuple):
     sender: telethon.tl.types.User | telethon.tl.types.Channel | telethon.tl.types.Chat
+    chat_id: int = 0
 
     def is_admin(self) -> bool:  # check if in admins list
         return self.sender.id in get_config("config.toml")["admins"]
@@ -286,20 +288,21 @@ class User(typing.NamedTuple):
     def config_name(self) -> str:
         return f"user/{self.sender.id}.toml"
 
-    def load_user_config(self):
-        return default_user_config | get_config(self.config_name())
+    def load_user_config(self, check_anon: bool = True):
+        return default_user_config | (get_config(self.config_name()) if not self.is_self_anon(check_anon) else {})
 
-    def save_user_config(self, conf):
-        set_config(self.config_name(), conf)
+    def save_user_config(self, conf, check_anon: bool = True):
+        if not self.is_self_anon(check_anon):
+            set_config(self.config_name(), conf)
 
-    def get_param(self, param):
-        return self.load_user_config()[param]
+    def get_param(self, param, check_anon: bool = True):
+        return self.load_user_config(check_anon)[param]
 
-    def set_param(self, param, val):
-        self.save_user_config(self.load_user_config() | {param: val})
+    def set_param(self, param, val, check_anon: bool = True):
+        self.save_user_config(self.load_user_config(check_anon) | {param: val}, check_anon)
 
-    def reset_param(self, param):
-        self.set_param(param, default_user_config[param])
+    def reset_param(self, param, check_anon: bool = True):
+        self.set_param(param, default_user_config[param], check_anon)
 
     def get_pronouns(self) -> int:
         return self.get_param('pronoun_set')
@@ -321,11 +324,29 @@ class User(typing.NamedTuple):
     def reset_name(self):
         self.reset_param('name')
 
+    def get_anon_chats(self) -> typing.Set[int]:
+        return self.get_param('anon', False)
+
+    def add_anon_chat(self, id: int):
+        self.set_param('anon', list(set(self.get_anon_chats()) | {id}))
+
+    def del_anon_chat(self, id: int):
+        self.set_param('anon', list(set(self.get_anon_chats()) - {id}))
+
+    def reset_anon_chats(self):
+        self.reset_param('anon')
+
+    def is_anon(self, id: int) -> bool:
+        return id in self.get_anon_chats()
+
+    def is_self_anon(self, check_anon: bool = True):
+        return check_anon and self.is_anon(self.chat_id)
+
 
 def to_user(user: telethon.tl.types.User | telethon.tl.types.Channel, chat: telethon.tl.types.Chat) -> User:
     if user is not None:
-        return User(user)
-    return User(chat)
+        return User(user, chat.id)
+    return User(chat, chat.id)
 
 
 class Media(typing.NamedTuple):
