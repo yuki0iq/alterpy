@@ -41,15 +41,16 @@ async def on_stat(cm: util.CommandMessage):
     system_info = util.system_info()
 
     await cm.int_cur.reply('\n'.join([
-        f'```AlterPy is running on {system_info}',
+        f'```--- AlterPy ---',
+        f'Running on {system_info}',
         f'Ping is {ping}, handled in {handle}',
         f'Up for {up}',
         f'Compute speed is {speed}M operations per second',
         f'',
-        f'__Current time is__',
+        f'--- Current time is ---',
         f'{cur_time.astimezone(tzMSK).strftime(time_format)}',
         f'{cur_time.astimezone(tzMSK4).strftime(time_format)}',
-        f'__Started at__',
+        f'--- Started at ---',
         f'{start_time.astimezone(tzMSK).strftime(time_format)}',
         f'{start_time.astimezone(tzMSK4).strftime(time_format)}```',
     ]))

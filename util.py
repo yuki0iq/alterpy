@@ -41,7 +41,7 @@ def re_ignore_case(pat: str) -> re.Pattern:
 
 def re_only_prefix() -> str:
     """regex pattern for command prefix"""
-    return re_unite('/', '\\!', '•', '\\.', 'альтер') + "\\s*"
+    return re_unite('/', '\\!', '•', '\\.', 'альтер', '_', '#') + "\\s*"
 
 
 def re_prefix() -> str:
