@@ -19,6 +19,16 @@ async def on_set_name_ru(cm: util.CommandMessage):
         await cm.int_cur.reply(f"Ваше имя — {cm.sender.get_name() or 'не установлено'}")
 
 
+async def on_get_name_en(cm: util.CommandMessage):
+    user = cm.reply_sender or cm.sender
+    await cm.int_cur.reply(f"{await user.get_display_name()}'s name is {user.get_name() or 'not set'}")
+
+
+async def on_get_name_ru(cm: util.CommandMessage):
+    user = cm.reply_sender or cm.sender
+    await cm.int_cur.reply(f"Имя пользователя {await user.get_display_name()} — {user.get_name() or 'не установлено'}")
+
+
 async def on_reset_name_en(cm: util.CommandMessage):
     cm.sender.reset_name()
     await cm.int_cur.reply("Name is not set now")
@@ -47,6 +57,16 @@ async def on_set_gender_ru(cm: util.CommandMessage):
         await cm.int_cur.reply(f"Ваш набор местоимений — {util.pronouns_to_str_ru(cm.sender.get_pronouns())}")
 
 
+async def on_get_gender_en(cm: util.CommandMessage):
+    user = cm.reply_sender or cm.sender
+    await cm.int_cur.reply(f"{await user.get_display_name()}'s pronoun set is {util.pronouns_to_str_en(cm.sender.get_pronouns())}")
+
+
+async def on_get_gender_ru(cm: util.CommandMessage):
+    user = cm.reply_sender or cm.sender
+    await cm.int_cur.reply(f"Набор местоимений {await user.get_display_name()} — {util.pronouns_to_str_ru(cm.sender.get_pronouns())}")
+
+
 async def on_reset_gender_en(cm: util.CommandMessage):
     cm.sender.reset_pronouns()
     await cm.int_cur.reply("Prounon set is unset now")
@@ -68,6 +88,16 @@ handlers.append(util.CommandHandler(
     ["name", "имя"], on_set_name_ru, is_prefix=True, is_arg_current=True
 ))
 handlers.append(util.CommandHandler(
+    "?name",
+    util.re_ignore_case(util.re_pat_starts_with("\\?name")),
+    ["name", "имя"], on_get_name_en
+))
+handlers.append(util.CommandHandler(
+    "?имя",
+    util.re_ignore_case(util.re_pat_starts_with("\\?имя")),
+    ["name", "имя"], on_get_name_ru
+))
+handlers.append(util.CommandHandler(
     "-name",
     util.re_ignore_case(util.re_pat_starts_with("-name")),
     ["name", "имя"], on_reset_name_en
@@ -86,6 +116,16 @@ handlers.append(util.CommandHandler(
     "+мест",
     util.re_ignore_case(util.re_pat_starts_with("\\+мест")),
     ["name", "имя"], on_set_gender_ru, is_prefix=True, is_arg_current=True
+))
+handlers.append(util.CommandHandler(
+    "?pn",
+    util.re_ignore_case(util.re_pat_starts_with("\\?pn")),
+    ["name", "имя"], on_get_gender_en
+))
+handlers.append(util.CommandHandler(
+    "?мест",
+    util.re_ignore_case(util.re_pat_starts_with("\\?мест")),
+    ["name", "имя"], on_get_gender_ru
 ))
 handlers.append(util.CommandHandler(
     "-pn",
