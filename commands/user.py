@@ -55,7 +55,7 @@ async def on_set_gender_ru(cm: utils.cm.CommandMessage):
     if cm.arg:
         g = utils.pronouns.from_str(cm.arg)
         cm.sender.set_pronouns(g)
-        await cm.int_cur.reply(f"Установлен набор местоимений {utils.pronouns.to_str_en(g)}")
+        await cm.int_cur.reply(f"Установлен набор местоимений {utils.pronouns.to_str_ru(g)}")
     else:
         await cm.int_cur.reply(f"Ваш набор местоимений — {utils.pronouns.to_str_ru(cm.sender.get_pronouns())}")
 
