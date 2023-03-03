@@ -5,6 +5,7 @@ import utils.ch
 import utils.regex
 import utils.help
 import utils.file
+import utils.mod
 
 import asyncio
 import re
@@ -54,7 +55,7 @@ async def on_exec(cm: utils.cm.CommandMessage):
     except:
         await cm.int_cur.reply(f"```{traceback.format_exc()}```")
         code_lines = code.split('\n')
-        lined_code = '\n'.join(f"{i+1}  {code_lines[i]}" for i in range(len(code_lines)))
+        lined_code = '\n'.join(f"{i+1:02}  {code_lines[i]}" for i in range(len(code_lines)))
         await cm.int_cur.reply(f"While executing following code:\n```{lined_code}```")
 
 
@@ -88,18 +89,9 @@ utils.help.add(handlers, "commands", "справка", "commands", is_eng=False)
 
 initial_handlers = handlers[:]
 
-
-def load_commands():
-    global handlers
-    handlers[:] = initial_handlers[:]
-    commands_filenames = list(filter(lambda filename: filename[-3:] == ".py", sorted(utils.file.list_files("commands/"))))
-    log.info(f"commands: {commands_filenames}")
-    for filename in commands_filenames:
-        try:
-            mod = importlib.import_module(f"commands.{filename[:-3]}")
-            handlers.extend(mod.handlers)
-        except:
-            utils.log.fail(log, f"Loading {filename} failed")
+res = utils.mod.load_handlers(initial_handlers, handlers, "commands")
+log.info('\n'.join(["loading modules log:"] + res))
+del res
 
 
 async def process_command_message(cm: utils.cm.CommandMessage):
@@ -117,9 +109,6 @@ async def process_command_message(cm: utils.cm.CommandMessage):
     ]
     if tasks:
         await asyncio.wait(tasks)
-
-
-load_commands()
 
 
 @client.on(telethon.events.NewMessage)

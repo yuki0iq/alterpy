@@ -30,8 +30,9 @@ async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMe
     def unmd2(s: str) -> str:
         return s.replace('\\\\', '').replace('\\_', '_').replace('\\(', '(').replace('\\)', ')').replace('\\|', '|')
 
-    arg = unmd2(msg_cur.text)
-    rep = unmd2(msg_prev.text) if has_reply and msg_prev.message else None
+    # .text? .message?
+    arg = unmd2(msg_cur.message)
+    rep = unmd2(msg_prev.message) if has_reply and msg_prev.message else None
 
     # if no media is given then Media(None)
     media = utils.media.Media(msg_cur) if msg_cur.media else utils.media.Media(msg_prev)

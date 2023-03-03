@@ -412,7 +412,7 @@ async def on_image_prog(cm: utils.cm.CommandMessage):
             await asyncio.wait(code_locals['tasks'])
     except:
         code_lines = code.split('\n')
-        lined_code = '\n'.join(f"{i}  {code_lines[i]}" for i in range(len(code_lines)))
+        lined_code = '\n'.join(f"{i:02}  {code_lines[i]}" for i in range(len(code_lines)))
         await cm.int_cur.reply(f"```{traceback.format_exc()}```\nWhile executing following code:\n```{lined_code}```")
 
 

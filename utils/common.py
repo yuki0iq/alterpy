@@ -27,3 +27,7 @@ def to_float(val: typing.Any, default: float = 0) -> float:
         return float(val)
     except:
         return default
+
+
+def indexed(a: typing.Iterable) -> typing.Iterable:
+    return zip(a, range(len(a)))
