@@ -49,7 +49,7 @@ handlers.append(utils.ch.CommandHandler(
 
 handlers.append(utils.ch.CommandHandler(
     name="me",
-    pattern=utils.regex.command(utils.regex.unite('me', 'я')),
+    pattern=utils.regex.pre_command(utils.regex.unite('me', 'я')),
     help_page=["keyboard", "клавиатура"],
     handler_impl=on_me,
     is_prefix=True
