@@ -67,6 +67,22 @@ handlers.append(utils.ch.CommandHandler(
     is_elevated=True
 ))
 
+
+async def on_repeat(cm: utils.cm.CommandMessage):
+    msg_prev = cm.int_prev.message
+    cm_new = await utils.cm.from_message(msg_prev)
+    cm_new = cm_new._replace(sender=cm.sender)  # <- for rights...
+    await process_command_message(cm_new)
+
+
+handlers.append(utils.ch.CommandHandler(
+    name="repeat",
+    pattern=utils.regex.command(utils.regex.unite("повтор", "заново", "repeat")),
+    help_page=["repeat", "повтор"],
+    handler_impl=on_repeat
+))
+
+
 utils.help.add(handlers, "commands", "help", "commands", is_eng=True)
 utils.help.add(handlers, "commands", "справка", "commands", is_eng=False)
 
