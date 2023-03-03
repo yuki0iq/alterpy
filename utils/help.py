@@ -10,7 +10,7 @@ def on_help_impl(arg: str, name: str, cname: str, gname: str, general: str, is_e
     dir = f"./help/{gname}/"
     fn = f"{arg or ('summary' if is_eng else 'кратко')}.md"
     help_entries = utils.file.list_files(dir)
-    if arg in ['list', 'список']:
+    if not arg or arg in ['list', 'список']:
         header = f"Available help entries for {name}:\n" if is_eng else f"Доступные справочные страницы для {name}:\n"
         return header + ', '.join(sorted(f"`{entry[:-3]}`" for entry in help_entries))
     if fn in help_entries:
