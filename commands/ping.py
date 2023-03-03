@@ -46,21 +46,21 @@ async def on_stat(cm: utils.cm.CommandMessage):
     system_info = utils.system.system_info()
 
     await cm.int_cur.reply('\n'.join([
-        f'```--- AlterPy ---',
-        f'Running on {system_info}',
-        f'Ping is {ping}, handled in {handle}',
-        f'Up for {up}',
-        f'Compute speed is {speed}M operations per second',
-        f'This chat ID is {cm.sender.chat_id}',
+        f'——— AlterPy ———',
+        f'Running on `{system_info}`',
+        f'Ping is _{ping}_, handled in _{handle}_',
+        f'Up for _{up}_',
+        f'Compute speed is _{speed}M_ operations per second',
+        f'This chat ID is `{cm.sender.chat_id}`',
         f'',
-        f'--- Current time is ---',
-        f'{cur_time.astimezone(tzMSK).strftime(time_format)}',
-        f'{cur_time.astimezone(tzMSK2).strftime(time_format)}',
-        f'{cur_time.astimezone(tzMSK4).strftime(time_format)}',
-        f'--- Started at ---',
-        f'{start_time.astimezone(tzMSK).strftime(time_format)}',
-        f'{start_time.astimezone(tzMSK2).strftime(time_format)}',
-        f'{start_time.astimezone(tzMSK4).strftime(time_format)}```',
+        f'— Current time is —',
+        f'`{cur_time.astimezone(tzMSK).strftime(time_format)}`',
+        f'`{cur_time.astimezone(tzMSK2).strftime(time_format)}`',
+        f'`{cur_time.astimezone(tzMSK4).strftime(time_format)}`',
+        f'— Started at —',
+        f'`{start_time.astimezone(tzMSK).strftime(time_format)}`',
+        f'`{start_time.astimezone(tzMSK2).strftime(time_format)}`',
+        f'`{start_time.astimezone(tzMSK4).strftime(time_format)}`',
     ]))
 
 

@@ -26,7 +26,7 @@ the_bot_id = int(telethon_config['bot_token'].split(':')[0])
 del telethon_config
 
 
-handlers = []
+handlers, initial_handlers = [], []
 
 
 async def on_command_version(cm: utils.cm.CommandMessage):
@@ -84,14 +84,33 @@ handlers.append(utils.ch.CommandHandler(
 ))
 
 
+async def on_reload(cm: utils.cm.CommandMessage):
+    global handlers
+    global initial_handlers
+    res = utils.mod.load_handlers(initial_handlers, handlers, "commands")
+    res = ["reload log:"] + res
+    for i in range(0, len(res), 40):
+        res_slice = res[i:i + 40]
+        await cm.int_cur.reply('```' + '\n'.join(res_slice) + '```')
+
+
+handlers.append(utils.ch.CommandHandler(
+    name="reload",
+    pattern=utils.regex.command(utils.regex.unite("перезапуск", "reload")),
+    help_page=["elevated", "повышенные"],
+    handler_impl=on_reload,
+    is_elevated=True
+))
+
+
 utils.help.add(handlers, "commands", "help", "commands", is_eng=True)
 utils.help.add(handlers, "commands", "справка", "commands", is_eng=False)
 
-initial_handlers = handlers[:]
+initial_handlers[:] = handlers[:]
 
-res = utils.mod.load_handlers(initial_handlers, handlers, "commands")
-log.info('\n'.join(["loading modules log:"] + res))
-del res
+#res = utils.mod.load_handlers(initial_handlers, handlers, "commands")
+#log.info('\n'.join(["loading modules log:"] + res))
+#del res
 
 
 async def process_command_message(cm: utils.cm.CommandMessage):

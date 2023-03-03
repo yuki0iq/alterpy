@@ -27,12 +27,14 @@ def load_handlers(initial_handlers: list, handlers: list, path: str) -> list[str
         try:
             name = base + filename[:-3]
             mod = importlib.import_module(name)
+            mod = importlib.reload(mod)
             handlers.extend(mod.handlers)
+
             cnt_ok += 1
-            res.append(f"[{idx+1:03}/{cnt:03}] <  OK  >  `{name}`")
+            res.append(f"({idx+1:03}/{cnt:03}) <  OK  >  `{name}`")
         except:
             utils.log.fail(log, f"Loading {path}{filename} failed")
-            res.append(f"[{idx+1:03}/{cnt:03}] <failed>  `{name}`")
+            res.append(f"({idx+1:03}/{cnt:03}) <failed>  `{name}`")
 
     res.append(f"--> {cnt_ok:03} of {cnt:03} loaded successfully!")
 
