@@ -1,4 +1,4 @@
-import util
+import utils
 
 import asyncio
 import traceback
@@ -13,15 +13,15 @@ import PIL.ImageOps
 import PIL.ImageStat
 
 
-async def send_image(img: PIL.Image.Image, inter: util.MessageInteractor, text: str):
+async def send_image(img: PIL.Image.Image, inter: utils.interactor.MessageInteractor, text: str):
     file = io.BytesIO()
     img.save(file, "png")
     file.seek(0)
     await inter.reply(text, file)
 
 
-async def send_image_file(img: PIL.Image.Image, inter: util.MessageInteractor, text: str):
-    filename = f"{util.temp_filename()}.png"
+async def send_image_file(img: PIL.Image.Image, inter: utils.interactor.MessageInteractor, text: str):
+    filename = f"{utils.file.temp_filename()}.png"
     img.save(filename)
     await inter.send_file(filename, True, caption=text, force_document=True)
 
@@ -79,15 +79,15 @@ def image_denoise(img: PIL.Image.Image) -> PIL.Image.Image:
     return ans
 
 
-def re_build(arg: str) -> re.Pattern: return util.re_ignore_case(util.re_pat_starts_with(arg) + '$')
+def re_build(arg: str) -> re.Pattern: return utils.regex.raw_command(arg + '$')
 def re_letter() -> str: return '[a-zа-яё]'
 def re_space() -> str: return "\\s*"
-def re_var() -> str: return re_letter() + util.re_unite(re_letter(), '\\d') + '*'
+def re_var() -> str: return re_letter() + utils.regex.unite(re_letter(), '\\d') + '*'
 def re_arg(name: str) -> str: return re_space() + re_named(name, re_var())
 def re_num_nat(name: str) -> str: return re_space() + re_named(name, '[1-9]\\d*')
 def re_real(name: str) -> str: return re_space() + re_named(name, '\\d*\\.?\\d*')
 def re_named(name: str, pat: str) -> str: return f"(?P<{name}>(?!((to|with|в|на|с)\\b))({pat}))"
-def re_or(*args) -> str: return re_space() + util.re_unite(*args)
+def re_or(*args) -> str: return re_space() + utils.regex.unite(*args)
 
 
 class ImageProgrammableHandler(typing.NamedTuple):
@@ -125,7 +125,7 @@ image_prog_handlers = [
         'send',
         re_build(
             re_or('картинкой', 'отправить', 'image', 'send')
-            + util.re_optional(re_arg('inp'))
+            + utils.regex.optional(re_arg('inp'))
         ),
         "",
         "help-en",
@@ -136,7 +136,7 @@ image_prog_handlers = [
         'file',
         re_build(
             re_or('файлом', 'file')
-            + util.re_optional(re_arg('inp'))
+            + utils.regex.optional(re_arg('inp'))
         ),
         "",
         "help-en",
@@ -147,8 +147,8 @@ image_prog_handlers = [
         'copy',
         re_build(
             re_or('скопировать', 'copy')
-            + util.re_optional(re_arg('inp'))
-            + util.re_optional(re_or('в', 'to') + re_arg('out'))
+            + utils.regex.optional(re_arg('inp'))
+            + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
         "",
         "help-en",
@@ -159,8 +159,8 @@ image_prog_handlers = [
         'swap',
         re_build(
             re_or('обменять', 'swap')
-            + util.re_optional(re_arg('inp'))
-            + util.re_optional(re_or('с', 'with') + re_arg('sec'))
+            + utils.regex.optional(re_arg('inp'))
+            + utils.regex.optional(re_or('с', 'with') + re_arg('sec'))
         ),
         "",
         "help-en",
@@ -171,8 +171,8 @@ image_prog_handlers = [
         'gray',
         re_build(
             re_or('серым', 'grey', 'gray')
-            + util.re_optional(re_arg('inp'))
-            + util.re_optional(re_or('в', 'to') + re_arg('out'))
+            + utils.regex.optional(re_arg('inp'))
+            + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
         "",
         "help-en",
@@ -183,9 +183,9 @@ image_prog_handlers = [
         'spread',
         re_build(
             re_or('точками', 'spread')
-            + util.re_optional(re_arg('inp'))
-            + util.re_optional(re_num_nat("dist"))
-            + util.re_optional(re_or('в', 'to') + re_arg('out'))
+            + utils.regex.optional(re_arg('inp'))
+            + utils.regex.optional(re_num_nat("dist"))
+            + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
         "",
         "help-en",
@@ -196,8 +196,8 @@ image_prog_handlers = [
         'blur',
         re_build(
             re_or('размылить', 'blur')
-            + util.re_optional(re_arg('inp'))
-            + util.re_optional(re_or('в', 'to') + re_arg('out'))
+            + utils.regex.optional(re_arg('inp'))
+            + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
         "",
         "help-en",
@@ -208,8 +208,8 @@ image_prog_handlers = [
         'contour',
         re_build(
             re_or('контур', 'contour')
-            + util.re_optional(re_arg('inp'))
-            + util.re_optional(re_or('в', 'to') + re_arg('out'))
+            + utils.regex.optional(re_arg('inp'))
+            + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
         "",
         "help-en",
@@ -220,12 +220,12 @@ image_prog_handlers = [
         'scale-inc',
         re_build(
             re_or('масштаб', 'увеличить', 'scale', 'increase')
-            + util.re_optional(re_arg('inp'))
+            + utils.regex.optional(re_arg('inp'))
             + util.re_unite(
                 re_or('в') + re_real('scale_ru') + re_or('раз', 'раза'),
                 re_real('scale_en') + re_or('fold')
             )
-            + util.re_optional(re_or('в', 'to') + re_arg('out'))
+            + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
         "",
         "help-en",
@@ -236,12 +236,12 @@ image_prog_handlers = [
         'scale-dec',
         re_build(
             re_or('уменьшить', 'decrease')
-            + util.re_optional(re_arg('inp'))
+            + utils.regex.optional(re_arg('inp'))
             + util.re_unite(
                 re_or('в') + re_real('scale_ru') + re_or('раз', 'раза'),
                 re_real('scale_en') + re_or('fold')
             )
-            + util.re_optional(re_or('в', 'to') + re_arg('out'))
+            + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
         "",
         "help-en",
@@ -252,11 +252,11 @@ image_prog_handlers = [
         'rot-ccw',
         re_build(
             re_or(
-                util.re_optional('повернуть') + re_or('влево', 'налево', 'против часовой'),
-                util.re_optional('rotate') + re_or('left', 'ccw', 'counterclockwise'),
+                utils.regex.optional('повернуть') + re_or('влево', 'налево', 'против часовой'),
+                utils.regex.optional('rotate') + re_or('left', 'ccw', 'counterclockwise'),
             )
-            + util.re_optional(re_arg('inp'))
-            + util.re_optional(re_or('в', 'to') + re_arg('out'))
+            + utils.regex.optional(re_arg('inp'))
+            + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
         "",
         "help-en",
@@ -267,11 +267,11 @@ image_prog_handlers = [
         'rot-cw',
         re_build(
             re_or(
-                util.re_optional('повернуть') + re_or('вправо', 'направо', 'по часовой'),
-                util.re_optional('rotate') + re_or('right', 'cw', 'clockwise'),
+                utils.regex.optional('повернуть') + re_or('вправо', 'направо', 'по часовой'),
+                utils.regex.optional('rotate') + re_or('right', 'cw', 'clockwise'),
             )
-            + util.re_optional(re_arg('inp'))
-            + util.re_optional(re_or('в', 'to') + re_arg('out'))
+            + utils.regex.optional(re_arg('inp'))
+            + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
         "",
         "help-en",
@@ -285,8 +285,8 @@ image_prog_handlers = [
                 'перевернуть',
                 'upside down'
             )
-            + util.re_optional(re_arg('inp'))
-            + util.re_optional(re_or('в', 'to') + re_arg('out'))
+            + utils.regex.optional(re_arg('inp'))
+            + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
         "",
         "help-en",
@@ -297,9 +297,9 @@ image_prog_handlers = [
         'flip-v',
         re_build(
             re_or('отзеркалить', 'mirror', 'flip')
-            + util.re_optional(re_arg('inp'))
+            + utils.regex.optional(re_arg('inp'))
             + re_or('по вер', 'по вертикали', 'вертикально', 'vert', 'vertically')
-            + util.re_optional(re_or('в', 'to') + re_arg('out'))
+            + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
         "",
         "help-en",
@@ -310,9 +310,9 @@ image_prog_handlers = [
         'flip-h',
         re_build(
             re_or('отзеркалить', 'mirror', 'flip')
-            + util.re_optional(re_arg('inp'))
+            + utils.regex.optional(re_arg('inp'))
             + re_or('по гор', 'по горизонтали', 'горизонтально', 'hor', 'horiz', 'horizontally')
-            + util.re_optional(re_or('в', 'to') + re_arg('out'))
+            + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
         "",
         "help-en",
@@ -323,8 +323,8 @@ image_prog_handlers = [
         'bright',
         re_build(
             re_or('автояркость', 'bright')
-            + util.re_optional(re_arg('inp'))
-            + util.re_optional(re_or('в', 'to') + re_arg('out'))
+            + utils.regex.optional(re_arg('inp'))
+            + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
         "",
         "help-en",
@@ -335,8 +335,8 @@ image_prog_handlers = [
         'awb',
         re_build(
             re_or('автобаланс', 'awb')
-            + util.re_optional(re_arg('inp'))
-            + util.re_optional(re_or('в', 'to') + re_arg('out'))
+            + utils.regex.optional(re_arg('inp'))
+            + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
         "",
         "help-en",
@@ -347,8 +347,8 @@ image_prog_handlers = [
         'denoise',
         re_build(
             re_or('антишум', 'denoise')
-            + util.re_optional(re_arg('inp'))
-            + util.re_optional(re_or('в', 'to') + re_arg('out'))
+            + utils.regex.optional(re_arg('inp'))
+            + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
         "",
         "help-en",
@@ -359,8 +359,8 @@ image_prog_handlers = [
         'autocontrast',
         re_build(
             re_or('автоконтраст', 'autocontrast')
-            + util.re_optional(re_arg('inp'))
-            + util.re_optional(re_or('в', 'to') + re_arg('out'))
+            + utils.regex.optional(re_arg('inp'))
+            + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
         "",
         "help-en",
@@ -370,7 +370,7 @@ image_prog_handlers = [
 ]
 
 
-async def on_image_prog(cm: util.CommandMessage):
+async def on_image_prog(cm: utils.cm.CommandMessage):
     if not cm.arg:
         await cm.int_cur.reply("Can't PIE with empty code!")
         return
@@ -411,15 +411,15 @@ async def on_image_prog(cm: util.CommandMessage):
         await cm.int_cur.reply(f"```{traceback.format_exc()}```\nWhile executing following code:\n```{lined_code}```")
 
 
-handlers = [util.CommandHandler(
+handlers = [utils.ch.CommandHandler(
     name="image-prog",
-    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_only_prefix() + util.re_unite('pie', 'пирог'))),
+    pattern=utils.regex.pre_command(utils.regex.unite('pie', 'пирог')),
     help_page=["pie", "пирог"],
     handler_impl=on_image_prog,
     is_prefix=True,
     required_media_type={'photo', 'file'}
 )]
 
-util.add_help_handler(handlers, "PIE", "piehelp", "pie", is_eng=True)
-util.add_help_handler(handlers, "PIE", "состав пирога", "pie", is_eng=False)
+utils.help.add(handlers, "PIE", "piehelp", "pie", is_eng=True)
+utils.help.add(handlers, "PIE", "состав пирога", "pie", is_eng=False)
 

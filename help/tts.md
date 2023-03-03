@@ -8,7 +8,7 @@
 
 Text-to-speech for English, Russian, Japanese, Chinese and Korean.
 
-Commands: en: `tts`, ru: `озвучь`, jp: `vnsay`, zh: `sayccp`, ko: `kosay`.
+Commands: en: `tts`, ru: `озвучь`, jp: `vnsay`, zh: `sayccp`, ko: `kosay`, uk: `мова божія`.
 
 Example:
 

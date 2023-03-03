@@ -1,4 +1,4 @@
-import util
+import utils
 
 import random
 import re
@@ -38,51 +38,49 @@ prefs_ru = [
 ]
 
 
-async def on_prob_ru(cm: util.CommandMessage):
+async def on_prob_ru(cm: utils.cm.CommandMessage):
     await cm.int_cur.reply(f"{random.choice(prefs_ru)} {random.randint(0, 100)}%")
 
 
-async def on_prob_en(cm: util.CommandMessage):
+async def on_prob_en(cm: utils.cm.CommandMessage):
     await cm.int_cur.reply(f"{random.choice(prefs_en)} {random.randint(0, 100)}%")
 
 
-async def on_choose_ru(cm: util.CommandMessage):
+async def on_choose_ru(cm: utils.cm.CommandMessage):
     opts = re.split('(?i)(^|\\s)(or|или)($|\\s)', cm.arg)[::4]
     await cm.int_cur.reply(f"{random.choice(prefs_ru)} {random.choice(opts).strip()}")
 
 
-async def on_choose_en(cm: util.CommandMessage):
+async def on_choose_en(cm: utils.cm.CommandMessage):
     opts = re.split('(?i)(^|\\s)(or|или)($|\\s)', cm.arg)[::4]
     await cm.int_cur.reply(f"{random.choice(prefs_en)} {random.choice(opts).strip()}")
 
 
-handlers.append(util.CommandHandler(
+handlers.append(utils.ch.CommandHandler(
     name='шанс',
-    pattern=util.re_ignore_case(util.re_pat_starts_with(
-        util.re_prefix() + util.re_unite('инфа', 'шанс', 'вер' + util.re_optional('оятность'))
-    )),
+    pattern=utils.regex.command(utils.regex.unite('инфа', 'шанс', 'вер' + utils.regex.optional('оятность'))),
     help_page=["random", "случайность"],
     handler_impl=on_prob_ru
 ))
 
-handlers.append(util.CommandHandler(
+handlers.append(utils.ch.CommandHandler(
     name='prob',
-    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('prob', 'chance'))),
+    pattern=utils.regex.command(utils.regex.unite('prob', 'chance')),
     help_page=["random", "случайность"],
     handler_impl=on_prob_en
 ))
 
-handlers.append(util.CommandHandler(
+handlers.append(utils.ch.CommandHandler(
     name='выбери',
-    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + 'выбери')),
+    pattern=utils.regex.command('выбери'),
     help_page=["random", "случайность"],
     handler_impl=on_choose_ru,
     is_prefix=True
 ))
 
-handlers.append(util.CommandHandler(
+handlers.append(utils.ch.CommandHandler(
     name='choose',
-    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_prefix() + util.re_unite('choose', 'select'))),
+    pattern=utils.regex.command(utils.regex.unite('choose', 'select')),
     help_page=["random", "случайность"],
     handler_impl=on_choose_en,
     is_prefix=True

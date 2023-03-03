@@ -1,6 +1,6 @@
-import util
+import utils
 
-handlers = [util.get_handler_simple_reply(
+handlers = [utils.ch.simple_reply(
     "start",
     "Привет! На связи alterpy - быстрый, потому что никому не нужный телеграм-бот!\n" +
     "\n" +
@@ -12,6 +12,6 @@ handlers = [util.get_handler_simple_reply(
     "\n" +
     "В разработке принимали участие: t.me/yuki_the_girl",
     ["start", "начало"],
-    util.re_ignore_case(util.re_pat_starts_with("/start(@alterpy_bot)?"))
+    utils.regex.raw_command("/start(@alterpy_bot)?")
 )]
 

@@ -1,21 +1,21 @@
-import util
+import utils
 
 import iuliia
 
 handlers = []
 
 
-async def on_layout(cm: util.CommandMessage):
+async def on_layout(cm: utils.cm.CommandMessage):
     if cm.arg:
-        await cm.int_cur.reply(util.change_layout(cm.arg))
+        await cm.int_cur.reply(utils.string.change_layout(cm.arg))
 
 
-async def on_trl(cm: util.CommandMessage):
+async def on_trl(cm: utils.cm.CommandMessage):
     if cm.arg:
         await cm.int_cur.reply(iuliia.translate(cm.arg, iuliia.WIKIPEDIA))
 
 
-async def on_me(cm: util.CommandMessage):
+async def on_me(cm: utils.cm.CommandMessage):
     if cm.arg:
         msg = f"\* _{await cm.sender.get_display_name()} {cm.arg}_"
         if cm.int_prev:
@@ -28,29 +28,25 @@ async def on_me(cm: util.CommandMessage):
             await cm.int_cur.reply("Can't delete message — no permission")
 
 
-handlers.append(util.CommandHandler(
+handlers.append(utils.ch.CommandHandler(
     name='layout',
-    pattern=util.re_ignore_case(util.re_pat_starts_with(
-        util.re_prefix() + util.re_unite('kb', 'ли', 'layout', 'дфнщге', 'раскладка', 'hfcrkflrf', 'рас', 'hfc')
-    )),
+    pattern=utils.command(utils.regex.unite('kb', 'ли', 'layout', 'дфнщге', 'раскладка', 'hfcrkflrf', 'рас', 'hfc')),
     help_page=["keyboard", "клавиатура"],
     handler_impl=on_layout,
     is_prefix=True
 ))
 
-handlers.append(util.CommandHandler(
+handlers.append(utils.ch.CommandHandler(
     name='iuliia',
-    pattern=util.re_ignore_case(util.re_pat_starts_with(
-        util.re_prefix() + util.re_unite('trl', 'translit', 'iuliia', 'трл', 'транслит', 'йуля')
-    )),
+    pattern=utils.command(utils.regex.unite('trl', 'translit', 'iuliia', 'трл', 'транслит', 'йуля')),
     help_page=["keyboard", "клавиатура"],
     handler_impl=on_trl,
     is_prefix=True
 ))
 
-handlers.append(util.CommandHandler(
+handlers.append(utils.ch.CommandHandler(
     name="me",
-    pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_only_prefix() + util.re_unite('me', 'я'))),
+    pattern=utils.command(utils.regex.unite('me', 'я')),
     help_page=["keyboard", "клавиатура"],
     handler_impl=on_me,
     is_prefix=True

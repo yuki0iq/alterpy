@@ -1,4 +1,4 @@
-import util
+import utils
 
 import random
 import requests
@@ -7,7 +7,8 @@ import json
 handlers = []
 
 
-async def advice(cm: util.CommandMessage):
+async def advice(cm: utils.cm.CommandMessage):
+    adv = "Не досупен"
     try:
         adv_json = requests.get(
             'http://fucking-great-advice.ru/api/random',
@@ -18,15 +19,15 @@ async def advice(cm: util.CommandMessage):
         adv = json.loads(adv_json)['text']
     except:
         await cm.int_cur.reply("Advice API down")
-        util.log_fail(util.get_log("adv"), "API down")
+        utils.log.fail(utils.log.get("adv"), "API down")
 
     await cm.int_cur.reply(f'{random.choice(["Охуенный", "Хуёвый"])} блять совет{" " + cm.arg if cm.arg else ""}: {adv}')
 
 
 handlers.append(
-    util.CommandHandler(
+    utils.ch.CommandHandler(
         name='advice',
-        pattern=util.re_ignore_case(util.re_pat_starts_with(util.re_only_prefix() + util.re_unite('adv', 'совет'))),
+        pattern=utils.regex.ignore_case(utils.regex.pat_starts_with(utils.regex.only_prefix() + utils.regex.unite('adv', 'совет'))),
         help_page=['advice', 'совет'],
         handler_impl=advice,
         is_prefix=True
