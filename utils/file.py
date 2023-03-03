@@ -1,7 +1,8 @@
+import utils.rand
+
 import os
 import typing
 import pathlib
-import utils.rand
 
 
 def list_files(path: str) -> typing.List[str]:

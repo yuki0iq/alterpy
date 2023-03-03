@@ -1,6 +1,7 @@
+import utils.config
+
 import typing
 import telethon.tl.types
-import utils
 
 
 default_user_config = {

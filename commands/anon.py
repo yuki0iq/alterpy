@@ -1,4 +1,7 @@
-import utils
+import utils.cm
+import utils.common
+import utils.ch
+import utils.regex
 
 handlers = []
 
@@ -38,7 +41,7 @@ async def on_reset_anon_en(cm: utils.cm.CommandMessage):
     await cm.int_cur.reply("Anon chats are unset now")
 
 
-async def on_del_anon_en(cm: util.cm.CommandMessage):
+async def on_del_anon_en(cm: utils.cm.CommandMessage):
     g = cm.sender.chat_id
     if cm.arg:
         g = utils.common.to_int(cm.arg, 0)

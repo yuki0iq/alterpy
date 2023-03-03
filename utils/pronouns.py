@@ -1,4 +1,4 @@
-import utils
+import utils.common
 
 
 def to_str_ru(pronoun_set: int) -> str:

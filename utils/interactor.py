@@ -1,7 +1,8 @@
+import utils.log
+
 import typing
 import telethon.tl.custom
 import traceback
-import utils
 
 
 class MessageInteractor(typing.NamedTuple):

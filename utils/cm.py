@@ -1,6 +1,9 @@
+import utils.user
+import utils.interactor
+import utils.media
+
 import typing
 import datetime
-import utils
 import telethon.tl.custom
 
 
@@ -28,7 +31,7 @@ async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMe
         return s.replace('\\\\', '').replace('\\_', '_').replace('\\(', '(').replace('\\)', ')').replace('\\|', '|')
 
     arg = unmd2(msg_cur.text)
-    rep = unmd2(msg_prev.text) if has_reply and msg_prev.mesage else None
+    rep = unmd2(msg_prev.text) if has_reply and msg_prev.message else None
 
     # if no media is given then Media(None)
     media = utils.media.Media(msg_cur) if msg_cur.media else utils.media.Media(msg_prev)
@@ -49,4 +52,4 @@ async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMe
 
 
 async def from_event(event: telethon.events.NewMessage) -> CommandMessage:
-    return from_message(event.message)
+    return await from_message(event.message)

@@ -1,4 +1,9 @@
-import utils
+import utils.interactor
+import utils.file
+import utils.cm
+import utils.ch
+import utils.regex
+import utils.help
 
 import asyncio
 import traceback
@@ -221,7 +226,7 @@ image_prog_handlers = [
         re_build(
             re_or('масштаб', 'увеличить', 'scale', 'increase')
             + utils.regex.optional(re_arg('inp'))
-            + util.re_unite(
+            + utils.regex.unite(
                 re_or('в') + re_real('scale_ru') + re_or('раз', 'раза'),
                 re_real('scale_en') + re_or('fold')
             )
@@ -237,7 +242,7 @@ image_prog_handlers = [
         re_build(
             re_or('уменьшить', 'decrease')
             + utils.regex.optional(re_arg('inp'))
-            + util.re_unite(
+            + utils.regex.unite(
                 re_or('в') + re_real('scale_ru') + re_or('раз', 'раза'),
                 re_real('scale_en') + re_or('fold')
             )

@@ -1,4 +1,7 @@
-import utils
+import utils.regex
+import utils.string
+import utils.cm
+import utils.ch
 
 import iuliia
 
@@ -30,7 +33,7 @@ async def on_me(cm: utils.cm.CommandMessage):
 
 handlers.append(utils.ch.CommandHandler(
     name='layout',
-    pattern=utils.command(utils.regex.unite('kb', 'ли', 'layout', 'дфнщге', 'раскладка', 'hfcrkflrf', 'рас', 'hfc')),
+    pattern=utils.regex.command(utils.regex.unite('kb', 'ли', 'layout', 'дфнщге', 'раскладка', 'hfcrkflrf', 'рас', 'hfc')),
     help_page=["keyboard", "клавиатура"],
     handler_impl=on_layout,
     is_prefix=True
@@ -38,7 +41,7 @@ handlers.append(utils.ch.CommandHandler(
 
 handlers.append(utils.ch.CommandHandler(
     name='iuliia',
-    pattern=utils.command(utils.regex.unite('trl', 'translit', 'iuliia', 'трл', 'транслит', 'йуля')),
+    pattern=utils.regex.command(utils.regex.unite('trl', 'translit', 'iuliia', 'трл', 'транслит', 'йуля')),
     help_page=["keyboard", "клавиатура"],
     handler_impl=on_trl,
     is_prefix=True
@@ -46,7 +49,7 @@ handlers.append(utils.ch.CommandHandler(
 
 handlers.append(utils.ch.CommandHandler(
     name="me",
-    pattern=utils.command(utils.regex.unite('me', 'я')),
+    pattern=utils.regex.command(utils.regex.unite('me', 'я')),
     help_page=["keyboard", "клавиатура"],
     handler_impl=on_me,
     is_prefix=True

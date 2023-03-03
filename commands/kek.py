@@ -1,4 +1,5 @@
-import utils
+import utils.ch
+import utils.rand
 
 handlers = [
     utils.ch.simple_reply(
