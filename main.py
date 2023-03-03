@@ -67,8 +67,8 @@ handlers.append(utils.ch.CommandHandler(
     is_elevated=True
 ))
 
-utils.help.add(handlers, "commands", "help", ".", is_eng=True)
-utils.help.add(handlers, "commands", "справка", ".", is_eng=False)
+utils.help.add(handlers, "commands", "help", "commands", is_eng=True)
+utils.help.add(handlers, "commands", "справка", "commands", is_eng=False)
 
 initial_handlers = handlers[:]
 
