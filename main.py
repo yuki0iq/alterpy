@@ -110,6 +110,8 @@ load_commands()
 async def event_handler(event: telethon.events.NewMessage):
     if event.message.sender_id == the_bot_id:  # Ignore messages from self
         return
+    if event.message.fwd_from is not None:  # Ignore forwarded messages
+        return
 
     cm = await utils.cm.from_event(event)
     await process_command_message(cm)
