@@ -103,14 +103,14 @@ handlers.append(utils.ch.CommandHandler(
 ))
 
 
-utils.help.add(handlers, "commands", "help", "commands", is_eng=True)
-utils.help.add(handlers, "commands", "справка", "commands", is_eng=False)
+utils.help.add(handlers, "commands", "help", "command", "commands", is_eng=True)
+utils.help.add(handlers, "commands", "справка", "команда", "commands", is_eng=False)
 
 initial_handlers[:] = handlers[:]
 
-#res = utils.mod.load_handlers(initial_handlers, handlers, "commands")
-#log.info('\n'.join(["loading modules log:"] + res))
-#del res
+res = utils.mod.load_handlers(initial_handlers, handlers, "commands")
+log.info('\n'.join(["loading modules log:"] + res))
+del res
 
 
 async def process_command_message(cm: utils.cm.CommandMessage):

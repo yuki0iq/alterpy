@@ -98,9 +98,7 @@ def re_or(*args) -> str: return re_space() + utils.regex.unite(*args)
 class ImageProgrammableHandler(typing.NamedTuple):
     name: str
     pattern: re.Pattern
-    help_message: str
-    help_message_en: str
-    help_message_ru: str
+    help_pages: list[str]
     handler_impl: str
 
     def apply(self, line: str) -> str | None:
@@ -132,9 +130,7 @@ image_prog_handlers = [
             re_or('картинкой', 'отправить', 'image', 'send')
             + utils.regex.optional(re_arg('inp'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "tasks.append(asyncio.create_task(send_image({inp}, cm.int_cur, '{inp} on line {line}')))"
     ),
     ImageProgrammableHandler(
@@ -143,9 +139,7 @@ image_prog_handlers = [
             re_or('файлом', 'file')
             + utils.regex.optional(re_arg('inp'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "tasks.append(asyncio.create_task(send_image_file({inp}, cm.int_cur, '{inp} on line {line}')))"
     ),
     ImageProgrammableHandler(
@@ -155,9 +149,7 @@ image_prog_handlers = [
             + utils.regex.optional(re_arg('inp'))
             + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{out} = {inp}.copy()"
     ),
     ImageProgrammableHandler(
@@ -167,9 +159,7 @@ image_prog_handlers = [
             + utils.regex.optional(re_arg('inp'))
             + utils.regex.optional(re_or('с', 'with') + re_arg('sec'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{inp}, {sec} = {sec}, {inp}"
     ),
     ImageProgrammableHandler(
@@ -179,9 +169,7 @@ image_prog_handlers = [
             + utils.regex.optional(re_arg('inp'))
             + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{out} = PIL.ImageOps.grayscale({inp})"
     ),
     ImageProgrammableHandler(
@@ -192,9 +180,7 @@ image_prog_handlers = [
             + utils.regex.optional(re_num_nat("dist"))
             + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{out} = {inp}.effect_spread({dist} or 20)"
     ),
     ImageProgrammableHandler(
@@ -204,9 +190,7 @@ image_prog_handlers = [
             + utils.regex.optional(re_arg('inp'))
             + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{out} = {inp}.filter(PIL.ImageFilter.BLUR)"
     ),
     ImageProgrammableHandler(
@@ -216,9 +200,7 @@ image_prog_handlers = [
             + utils.regex.optional(re_arg('inp'))
             + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{out} = {inp}.filter(PIL.ImageFilter.CONTOUR)"
     ),
     ImageProgrammableHandler(
@@ -232,9 +214,7 @@ image_prog_handlers = [
             )
             + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{out} = image_scale({inp}, {scale_ru} or {scale_en})"
     ),
     ImageProgrammableHandler(
@@ -248,9 +228,7 @@ image_prog_handlers = [
             )
             + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{out} = image_scale({inp}, 1 / ({scale_ru} or {scale_en}))"
     ),
     ImageProgrammableHandler(
@@ -263,9 +241,7 @@ image_prog_handlers = [
             + utils.regex.optional(re_arg('inp'))
             + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{out} = {inp}.transpose(PIL.Image.ROTATE_90)"
     ),
     ImageProgrammableHandler(
@@ -278,9 +254,7 @@ image_prog_handlers = [
             + utils.regex.optional(re_arg('inp'))
             + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{out} = {inp}.transpose(PIL.Image.ROTATE_270)"
     ),
     ImageProgrammableHandler(
@@ -293,9 +267,7 @@ image_prog_handlers = [
             + utils.regex.optional(re_arg('inp'))
             + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{out} = {inp}.transpose(PIL.Image.ROTATE_180)"
     ),
     ImageProgrammableHandler(
@@ -306,9 +278,7 @@ image_prog_handlers = [
             + re_or('по вер', 'по вертикали', 'вертикально', 'vert', 'vertically')
             + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{out} = {inp}.transpose(PIL.Image.FLIP_TOP_BOTTOM)"
     ),
     ImageProgrammableHandler(
@@ -319,9 +289,7 @@ image_prog_handlers = [
             + re_or('по гор', 'по горизонтали', 'горизонтально', 'hor', 'horiz', 'horizontally')
             + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{out} = {inp}.transpose(PIL.Image.FLIP_LEFT_RIGHT)"
     ),
     ImageProgrammableHandler(
@@ -331,9 +299,7 @@ image_prog_handlers = [
             + utils.regex.optional(re_arg('inp'))
             + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{out} = image_brightness({inp})"
     ),
     ImageProgrammableHandler(
@@ -343,9 +309,7 @@ image_prog_handlers = [
             + utils.regex.optional(re_arg('inp'))
             + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{out} = image_white_balance({inp})"
     ),
     ImageProgrammableHandler(
@@ -355,9 +319,7 @@ image_prog_handlers = [
             + utils.regex.optional(re_arg('inp'))
             + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{out} = image_denoise({inp})"
     ),
     ImageProgrammableHandler(
@@ -367,9 +329,7 @@ image_prog_handlers = [
             + utils.regex.optional(re_arg('inp'))
             + utils.regex.optional(re_or('в', 'to') + re_arg('out'))
         ),
-        "",
-        "help-en",
-        "help-ru",
+        [],
         "{out} = PIL.ImageOps.autocontrast({inp}, 5)"
     )
 ]
@@ -425,6 +385,6 @@ handlers = [utils.ch.CommandHandler(
     required_media_type={'photo', 'file'}
 )]
 
-utils.help.add(handlers, "PIE", "piehelp", "pie", is_eng=True)
-utils.help.add(handlers, "PIE", "состав пирога", "pie", is_eng=False)
+utils.help.add(handlers, "PIE", "piehelp", "piecmd", "pie", is_eng=True)
+utils.help.add(handlers, "PIE", "состав пирога", "состав", "pie", is_eng=False)
 

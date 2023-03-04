@@ -11,3 +11,7 @@ def change_layout(s: str) -> str:
         else:
             res.append(c)
     return ''.join(res)
+
+
+def is_eng(s: str) -> bool:
+    return not s or 'a' <= s[0].lower() <= 'z'
