@@ -3,6 +3,7 @@ import utils.time
 import utils.system
 import utils.ch
 import utils.regex
+import utils.locale
 
 import datetime
 import zoneinfo
@@ -17,8 +18,56 @@ tzMSK4 = zoneinfo.ZoneInfo("Asia/Krasnoyarsk")
 
 time_format = "(%Z) %Y-%m-%d, %H:%M:%S"
 
+translations = {
+    'ping_message': {
+        'en': '**{rep}**. Ping is {ping}, handled in {handle}\nUp for {up}',
+        'ru': '**{rep}**. Пинг — {ping}, обработка — {handle}\nНе падает вот уже {up}',
+    },
+    'ping_reply': {
+        'en': 'PONG',
+        'ru': 'ПОНГ',
+    },
+    'test_reply': {
+        'en': 'PASSED',
+        'ru': 'ПРОЙДЕН',
+    },
+    'stat_message': {
+        'en': '''——— AlterPy ———
+Running on `{system_info}`
+Ping is _{ping}_, handled in _{handle}_
+Up for _{up}_
+Compute speed is _{speed}M_ operations per second
+This chat ID is `{cm.sender.chat_id}`
 
-def get_ping_times(cm: utils.cm.CommandMessage):
+— Current time is —
+`{cur_time.astimezone(tzMSK).strftime(time_format)}`
+`{cur_time.astimezone(tzMSK2).strftime(time_format)}`
+`{cur_time.astimezone(tzMSK4).strftime(time_format)}`
+— Started at —
+`{start_time.astimezone(tzMSK).strftime(time_format)}`
+`{start_time.astimezone(tzMSK2).strftime(time_format)}`
+`{start_time.astimezone(tzMSK4).strftime(time_format)}`''',
+        'ru': '''——— АльтерПай ———
+Запущена на `{system_info}`
+Пинг — _{ping}_, обработка — _{handle}_
+Работает вот уже _{up}_
+Скорость вычислений — _{speed}M_ операций в секунду
+ID чата — `{cm.sender.chat_id}`
+
+— Текущее время —
+`{cur_time.astimezone(tzMSK).strftime(time_format)}`
+`{cur_time.astimezone(tzMSK2).strftime(time_format)}`
+`{cur_time.astimezone(tzMSK4).strftime(time_format)}`
+— Время запуска —
+`{start_time.astimezone(tzMSK).strftime(time_format)}`
+`{start_time.astimezone(tzMSK2).strftime(time_format)}`
+`{start_time.astimezone(tzMSK4).strftime(time_format)}`''',
+    }
+}
+LOC = utils.locale.Localizator(translations)
+
+
+def get_ping_times(cm: utils.cm.CommandMessage, lang: str):
     """return ping, handle and up formatted times"""
     cur_time = datetime.datetime.now(datetime.timezone.utc)
 
@@ -26,42 +75,30 @@ def get_ping_times(cm: utils.cm.CommandMessage):
     handle = cur_time - cm.local_time
     up = cur_time - start_time
 
-    ping_s = utils.time.timedelta_to_str(ping, is_short=True)
-    handle_s = utils.time.timedelta_to_str(handle, is_short=True)
-    up_s = utils.time.timedelta_to_str(up)
+    ping_s = utils.time.timedelta_to_str(ping, is_short=True, lang=lang)
+    handle_s = utils.time.timedelta_to_str(handle, is_short=True, lang=lang)
+    up_s = utils.time.timedelta_to_str(up, lang=lang)
     return ping_s, handle_s, up_s
 
 
-def on_ping_wrapper(rep: str):
+def on_ping_wrapper(s: str, lang: str):
     async def on_ping(cm: utils.cm.CommandMessage):
-        ping, handle, up = get_ping_times(cm)
-        await cm.int_cur.reply(f"**{rep}**. Ping is {ping}, handled in {handle}\nUp for {up}")
+        ping, handle, up = get_ping_times(cm, lang)
+        rep = eval(LOC.get(s + '_reply', lang))
+        msg = eval(LOC.get('ping_message', lang))
+        await cm.int_cur.reply(msg)
     return on_ping
 
 
-async def on_stat(cm: utils.cm.CommandMessage):
-    cur_time = datetime.datetime.now(datetime.timezone.utc)
-    ping, handle, up = get_ping_times(cm)
-    speed = utils.system.perf_test_compute()
-    system_info = utils.system.system_info()
-
-    await cm.int_cur.reply('\n'.join([
-        f'——— AlterPy ———',
-        f'Running on `{system_info}`',
-        f'Ping is _{ping}_, handled in _{handle}_',
-        f'Up for _{up}_',
-        f'Compute speed is _{speed}M_ operations per second',
-        f'This chat ID is `{cm.sender.chat_id}`',
-        f'',
-        f'— Current time is —',
-        f'`{cur_time.astimezone(tzMSK).strftime(time_format)}`',
-        f'`{cur_time.astimezone(tzMSK2).strftime(time_format)}`',
-        f'`{cur_time.astimezone(tzMSK4).strftime(time_format)}`',
-        f'— Started at —',
-        f'`{start_time.astimezone(tzMSK).strftime(time_format)}`',
-        f'`{start_time.astimezone(tzMSK2).strftime(time_format)}`',
-        f'`{start_time.astimezone(tzMSK4).strftime(time_format)}`',
-    ]))
+def on_stat_wrapper(lang: str):
+    async def on_stat(cm: utils.cm.CommandMessage):
+        cur_time = datetime.datetime.now(datetime.timezone.utc)
+        ping, handle, up = get_ping_times(cm, lang=lang)
+        speed = utils.system.perf_test_compute()
+        system_info = utils.system.system_info()
+        msg = eval(LOC.get('stat_message', lang))
+        await cm.int_cur.reply(msg)
+    return on_stat
 
 
 handlers.extend(
@@ -69,22 +106,28 @@ handlers.extend(
         name=msg,
         pattern=utils.regex.command(msg + '$'),
         help_page=["ping", "пинг"],
-        handler_impl=on_ping_wrapper(ans),
+        handler_impl=on_ping_wrapper(s, lang),
         is_elevated=False
-    ) for msg, ans in [
-        ("ping", "PONG"),
-        ("пинг", "ПОНГ"),
-        ("test", "PASSED"),
-        ("тест", "ПРОЙДЕН")
+    ) for msg, s, lang in [
+        ("ping", "ping", 'en'),
+        ("пинг", "ping", 'ru'),
+        ("test", "test", 'en'),
+        ("тест", "test", 'ru')
     ]
 )
 
-handlers.append(utils.ch.CommandHandler(
-    name='stat',
-    pattern=utils.regex.command(utils.regex.unite('stat', 'стат')),
-    help_page=["stat", "стат"],
-    handler_impl=on_stat
-))
+handlers.extend(
+    utils.ch.CommandHandler(
+        name=msg,
+        pattern=utils.regex.command(msg + '$'),
+        help_page=["stat", "стат"],
+        handler_impl=on_stat_wrapper(lang),
+        is_elevated=False
+    ) for msg, lang in [
+        ("stat", 'en'),
+        ("стат", 'ru'),
+    ]
+)
 
 handlers.extend(
     utils.ch.simple_reply(msg, ans, help_page=["ping", "пинг"], pattern=utils.regex.ignore_case(pat))

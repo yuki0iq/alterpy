@@ -15,3 +15,16 @@ def change_layout(s: str) -> str:
 
 def is_eng(s: str) -> bool:
     return not s or 'a' <= s[0].lower() <= 'z'
+
+
+class FStr:
+    __slots__ = ['_s']
+
+    def __init__(self, s):
+        self._s = s
+
+    def __repr__(self):
+        return eval(str(self))
+
+    def __str__(self):
+        return f"""f'''{self._s}'''"""
