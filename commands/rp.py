@@ -152,9 +152,9 @@ mention_pattern = re.compile(r'''\[.+\]\(tg://user\?id=\d+\)|@\w+''')
 
 
 async def on_rp(cm: utils.cm.CommandMessage):
-    user = await cm.sender.get_mention()
+    user = (await cm.sender.get_mention()).replace('_', '\\_')
     pronoun_set = cm.sender.get_pronouns()
-    mention = (await cm.reply_sender.get_mention()) if cm.reply_sender is not None else None
+    mention = (await cm.reply_sender.get_mention()).replace('_', '\\_') if cm.reply_sender is not None else None
     res = []
     for line in cm.arg.split('\n')[:20]:  # technical limitation
         # try match to RP-1 as "RP-1 arg"
@@ -171,10 +171,10 @@ async def on_rp(cm: utils.cm.CommandMessage):
                 cur_mention = mention
                 match = re.search(mention_pattern, arg)
                 if match:
-                    cur_mention, arg = match[0].replace('_', '\\_'), arg[len(match[0]):]
+                    cur_mention, arg = match[0], arg[len(match[0]):]
                     # FIX cur_mention IFF id is specified
                 if cur_mention is not None or arg is not None:
-                    res.append(handler.invoke(user, pronoun_set, cur_mention or '', arg))
+                    res.append(handler.invoke(user, pronoun_set, cur_mention.replace('_', '\\_') or '', arg))
                 else:
                     res.append("RP-2 commands can't be executed without second user mention")
     if res:
