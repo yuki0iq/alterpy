@@ -7,12 +7,12 @@ handlers = []
 
 async def on_bmi(cm: utils.cm.CommandMessage):
     try:
-        h, m = map(int, cm.arg.split())
+        h, m = map(float, cm.arg.split())
     except:
         await cm.int_cur.reply("Can't parse size")
         return
 
-    bmi = (1000000 * m) // (h * h)
+    bmi = int((1000000 * m) / (h * h))
 
     text = ["underweight", "normal", "overweight", "obesity"][[bmi < 1850, bmi < 2500, bmi < 3000, True].index(True)]
 
