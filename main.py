@@ -70,10 +70,11 @@ handlers.append(utils.ch.CommandHandler(
 
 
 async def on_repeat(cm: utils.cm.CommandMessage):
-    msg_prev = cm.int_prev.message
-    cm_new = await utils.cm.from_message(msg_prev)
-    cm_new = cm_new._replace(sender=cm.sender)  # <- for rights...
-    await process_command_message(cm_new)
+    if cm.int_prev:
+        msg_prev = cm.int_prev.message
+        cm_new = await utils.cm.from_message(msg_prev)
+        cm_new = cm_new._replace(sender=cm.sender)._replace(time=cm.time)._replace(local_time=cm.local_time)  # <- for rights, and other
+        await process_command_message(cm_new)
 
 
 handlers.append(utils.ch.CommandHandler(
