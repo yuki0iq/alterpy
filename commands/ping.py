@@ -136,7 +136,7 @@ handlers.extend(
         ("бот", "На месте!", utils.regex.pat_starts_with("бот$")),
         ("ты где", "Я тут", utils.regex.pat_starts_with("(ты где)|(где ты)$")),
         ("сдох", "Ты тоже.", utils.regex.pat_starts_with("сдох\\?$")),
-        ("слава партии", "Слава Партии!", utils.regex.pat_starts_with("слава партии[?!]*")),
-        ("кто здесь власть", "ПАРТИЯ!", utils.regex.pat_starts_with("кто здесь власть")),
+        ("слава партии", "Слава Партии!", utils.regex.pat_starts_with("слава партии[\\?!]*")),
+        ("кто здесь власть", "ПАРТИЯ!", utils.regex.pat_starts_with("кто здесь власть[\\?]*")),
     ]
 )
