@@ -1,6 +1,7 @@
 def one_many(val: int):
     return 0 if val == 1 else 1
 
+
 def one_two_five(val: int):
     val = val % 100
     d, r = divmod(val, 10)
