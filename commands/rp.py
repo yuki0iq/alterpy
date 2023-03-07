@@ -174,7 +174,7 @@ async def on_rp(cm: utils.cm.CommandMessage):
                     cur_mention, arg = match[0], arg[len(match[0]):]
                     # FIX cur_mention IFF id is specified
                 if cur_mention is not None or arg is not None:
-                    res.append(handler.invoke(user, pronoun_set, cur_mention.replace('_', '\\_') or '', arg))
+                    res.append(handler.invoke(user, pronoun_set, (cur_mention or '').replace('_', '\\_') or '', arg))
                 else:
                     res.append("RP-2 commands can't be executed without second user mention")
     if res:
