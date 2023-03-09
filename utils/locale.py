@@ -1,4 +1,5 @@
-import utils.string
+import utils.str
+import importlib
 
 
 class Localizator:
@@ -18,4 +19,9 @@ class Localizator:
         return cur[lang] if lang in cur else list(cur)[0]
 
     def get(self, s: str, lang: str) -> str:
-        return str(utils.string.FStr(self.obj(s, lang)))
+        return str(utils.str.FStr(self.obj(s, lang)))
+
+
+def lang(lg: str):
+    mod = importlib.import_module(f"utils.lang.{lg}")
+    return mod

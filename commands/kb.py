@@ -1,5 +1,5 @@
 import utils.regex
-import utils.string
+import utils.str
 import utils.cm
 import utils.ch
 
@@ -10,7 +10,7 @@ handlers = []
 
 async def on_layout(cm: utils.cm.CommandMessage):
     if cm.arg:
-        await cm.int_cur.reply(utils.string.change_layout(cm.arg))
+        await cm.int_cur.reply(utils.str.change_layout(cm.arg))
 
 
 async def on_trl(cm: utils.cm.CommandMessage):

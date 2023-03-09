@@ -4,6 +4,8 @@ import utils.system
 import utils.ch
 import utils.regex
 import utils.locale
+import utils.lang.ru
+import utils.common
 
 import datetime
 import zoneinfo
@@ -21,7 +23,7 @@ time_format = "(%Z) %Y-%m-%d, %H:%M:%S"
 translations = {
     'ping_message': {
         'en': '**{rep}**. Ping is {ping}, handled in {handle}\nUp for {up}',
-        'ru': '**{rep}**. Пинг — {ping}, обработка — {handle}\nНе падает вот уже {up}',
+        'ru': '**{rep}**. Пинг — {ping}, обработка — {handle}\nНе падает, работает {up}!',
     },
     'ping_reply': {
         'en': 'PONG',
@@ -50,7 +52,7 @@ This chat ID is `{cm.sender.chat_id}`
         'ru': '''——— АльтерПай ———
 Запущена на `{system_info}`
 Пинг — _{ping}_, обработка — _{handle}_
-Работает вот уже _{up}_
+Не падает, работает _{up}_
 Скорость вычислений — _{speed}M_ операций в секунду
 ID чата — `{cm.sender.chat_id}`
 
@@ -77,7 +79,7 @@ def get_ping_times(cm: utils.cm.CommandMessage, lang: str):
 
     ping_s = utils.time.timedelta_to_str(ping, is_short=True, lang=lang)
     handle_s = utils.time.timedelta_to_str(handle, is_short=True, lang=lang)
-    up_s = utils.time.timedelta_to_str(up, lang=lang)
+    up_s = utils.time.timedelta_to_str(up, lang=lang, form={"accs"})
     return ping_s, handle_s, up_s
 
 

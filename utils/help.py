@@ -2,7 +2,7 @@ import utils.file
 import utils.cm
 import utils.ch
 import utils.regex
-import utils.string
+import utils.str
 
 import re
 
@@ -49,7 +49,7 @@ def on_reverse_help_impl(handlers: list, arg: str, cmd: str, path: str, is_eng: 
     for hp in help_pages_list:
         help_pages.extend(hp)
 
-    help_pages = list(filter(lambda hp: is_eng == utils.string.is_eng(hp), help_pages))
+    help_pages = list(filter(lambda hp: is_eng == utils.str.is_eng(hp), help_pages))
 
     if not help_pages:
         return f"No command `{arg}` found" if is_eng else f"Команда `{arg}` не найдена"

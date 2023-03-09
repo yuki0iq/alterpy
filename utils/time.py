@@ -1,42 +1,38 @@
 import datetime
 import typing
 import utils.locale
-import utils.numclass
+import utils.common
 
 translations = {
     'weeks': {
-        'en': ['w', ('week', 'weeks')],
-        'ru': ['нед', ('неделя', 'недели', 'недель')],
+        'en': ['w', 'week'],
+        'ru': ['нед', 'неделя'],
     },
     'days': {
-        'en': ['d', ('day', 'days')],
-        'ru': ['дн', ('день', 'дня', 'дней')],
+        'en': ['d', 'day'],
+        'ru': ['дн', 'день'],
     },
     'hours': {
-        'en': ['h', ('hour', 'hours')],
-        'ru': ['ч', ('час', 'часа', 'часов')],
+        'en': ['h', 'hour'],
+        'ru': ['ч', 'час'],
     },
     'minutes': {
-        'en': ['m', ('minute', 'minutes')],
-        'ru': ['мин', ('минута', 'минуты', 'минут')],
+        'en': ['m', 'minute'],
+        'ru': ['мин', 'минута'],
     },
     'seconds': {
-        'en': ['s', ('second', 'seconds')],
-        'ru': ['сек', ('секунда', 'секунды', 'секунд')],
+        'en': ['s', 'second'],
+        'ru': ['сек', 'секунда'],
     },
     'milliseconds': {
-        'en': ['ms', ('milliseconds',)],
-        'ru': ['мс', ('миллисекунд',)],
+        'en': ['ms', 'milliseconds'],
+        'ru': ['мс', 'миллисекунд'],
     },
-    'numclass': {
-        'en': utils.numclass.one_many,
-        'ru': utils.numclass.one_two_five,
-    }
 }
 LOC = utils.locale.Localizator(translations)
 
 
-def timedelta_to_str(d: datetime.timedelta, is_short: bool = False, lang: str = 'en') -> str:
+def timedelta_to_str(d: datetime.timedelta, is_short: bool = False, lang: str = 'en', form = None) -> str:
     """
     15 weeks 4 days 10 hours 45 minutes 37 seconds 487.5 milliseconds, (is_short=False|default)
     15 недель 4 дня 10 часов 45 минут 37 секунд 487.5 миллисекунд
@@ -66,13 +62,12 @@ def timedelta_to_str(d: datetime.timedelta, is_short: bool = False, lang: str = 
         return cnt != 0
 
     def short(val: int, name: str) -> str:
-        form = LOC.obj(name, lang)[0]
-        return f'{val}{form}'
+        word = LOC.obj(name, lang)[0]
+        return f'{val}{word}'
 
     def long(val: int, name: str) -> str:
-        forms = LOC.obj(name, lang)[1]
-        form = forms[LOC.obj('numclass', lang)(val) if len(forms) != 1 else 0]
-        return f'{val} {form}'
+        word = utils.locale.lang(lang).agree_with_number(LOC.obj(name, lang)[1], val, form)
+        return f'{val} {word}'
 
     def stringify(el: typing.Tuple[int, str]) -> str:
         cnt, name = el

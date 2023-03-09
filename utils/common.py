@@ -31,3 +31,7 @@ def to_float(val: typing.Any, default: float = 0) -> float:
 
 def indexed(a: typing.Iterable) -> typing.Iterable:
     return zip(a, range(len(a)))
+
+
+def identity(x):
+    return x
