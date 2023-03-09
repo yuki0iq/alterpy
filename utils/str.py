@@ -17,6 +17,18 @@ def is_eng(s: str) -> bool:
     return not s or 'a' <= s[0].lower() <= 'z'
 
 
+def equal_capitalize(word: str, pattern: str) -> str:
+    def pat(idx: int):
+        if idx >= len(pattern):
+            return pattern[-1].islower()
+        return pattern[idx].islower()
+
+    word = list(word)
+    for i in range(len(word)):
+        word[i] = word[i].lower() if pat(i) else word[i].upper()
+    return ''.join(word)
+
+
 class FStr:
     __slots__ = ['_s']
 

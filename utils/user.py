@@ -1,4 +1,5 @@
 import utils.config
+import utils.locale
 
 import typing
 import telethon.tl.types
@@ -29,8 +30,10 @@ class User(typing.NamedTuple):
         except:
             return 'null'
 
-    async def get_mention(self) -> str:
-        return f"[{await self.get_display_name()}](tg://user?id={self.sender.id})"
+    async def get_mention(self, lang='ru', form='nomn') -> str:
+        name = await self.get_display_name()
+        infl = utils.locale.lang(lang).inflector(form)
+        return f"[{infl(name)}](tg://user?id={self.sender.id})"
 
     def config_name(self) -> str:
         return f"user/{self.sender.id}.toml"

@@ -3,7 +3,6 @@
 from collections import defaultdict
 from operator import attrgetter, itemgetter
 import logging
-import pymorphy3
 import utils.log
 
 
@@ -29,8 +28,9 @@ class PhraseInflector(object):
         def __init__(self, parsed):
             self.parsed = parsed
 
-    def __init__(self, morph):
+    def __init__(self, morph, inf):
         self.morph = morph
+        self.inf = inf
 
     def parse_first(self, word):
         parse = self.morph.parse(word)
@@ -66,7 +66,7 @@ class PhraseInflector(object):
 
     def inflect(self, phrase, form):
         # phrase = phrase.lower()
-        master_word = self.select_master(phrase.lower().split())
+        master_word = self.select_master(phrase.split())
         if master_word:
             return self._inflect_with_master(form, phrase, master_word.parsed)
         else:
@@ -84,7 +84,7 @@ class PhraseInflector(object):
             form = form - {'sing', 'plur'}
 
         infl = form
-        inflected_master = master_word.inflect(infl)
+        inflected_master = self.inf(master_word, infl)  # master_word.inflect(infl)
         if not inflected_master:
             logger.error(u'Can not inflect master word {1} with {2}: {0}'.format(phrase, master_word.word, str(infl)))
 
@@ -111,7 +111,7 @@ class PhraseInflector(object):
                         infl.add(master_word.tag.animacy)
 
                     try:
-                        inflected = version.inflect(infl)
+                        inflected = self.inf(version, infl)  # version.inflect(infl)
                     except ValueError as e:
                         logger.error(u'{0} at {1}'.format(e, version.word))
                         dependent = version
@@ -148,7 +148,7 @@ class PhraseInflector(object):
             if u'accs' in form:
                 infl.add('inan')
             try:
-                inflected = parsed_chunk.inflect(infl)
+                inflected = self.inf(parsed_chunk, infl)  # parsed_chunk.inflect(infl)
                 if inflected:
                     result.append(inflected.word)
                 else:

@@ -1,12 +1,38 @@
 import pymorphy3
 import utils.pyphrasy3
+import utils.str
 
-morph = pymorphy3.MorphAnalyzer()
-pi = utils.pyphrasy3.PhraseInflector(morph)
+
+class MorphAnalyzer:
+    __slots__ = ['morph']
+
+    def __init__(self, morph):
+        self.morph = morph
+
+    def parse(self, word):
+        return [el._replace(word=utils.str.equal_capitalize(el.word, word)) for el in self.morph.parse(word)]
+
+
+def parse_inflect(word, form):
+    if type(form) == str:
+        form = {form}
+    res = word.inflect(form)
+    return res._replace(word=utils.str.equal_capitalize(res.word, word.word))
+
+
+morph = MorphAnalyzer(pymorphy3.MorphAnalyzer())
+pi = utils.pyphrasy3.PhraseInflector(morph, parse_inflect)
+
+
+def inflect(s, form):
+    try:
+        return pi.inflect(s, form)
+    except:
+        return parse_inflect(morph.parse(s)[0], form).word
 
 
 def inflector(form):
-    return lambda s: pi.inflect(s, form)
+    return lambda s: inflect(s, form)
 
 
 def agree_with_number(s, num, form):
