@@ -10,7 +10,6 @@ import utils.mod
 import asyncio
 import re
 import telethon
-import importlib
 import traceback
 
 log = utils.log.get("main")

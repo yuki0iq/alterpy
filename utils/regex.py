@@ -44,3 +44,7 @@ def command(a: str) -> re.Pattern:
 
 def pre_command(a: str) -> re.Pattern:
     return raw_command(only_prefix() + a)
+
+
+def split_by_word_border(a: str) -> list:
+    return re.split('\\b', a)

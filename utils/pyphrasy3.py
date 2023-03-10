@@ -1,18 +1,13 @@
 # https://github.com/summerisgone/pyphrasy
 
 from collections import defaultdict
-from operator import attrgetter, itemgetter
-import logging
+from operator import attrgetter
 import utils.log
+import utils.regex
 
 
 GRAM_CHOICES = ('nomn', 'gent', 'datv', 'accs', 'ablt', 'loct', 'voct', 'gen2', 'acc2', 'loc2', 'sing', 'plur')
 
-LOGGING_LEVELS = {
-    0: logging.ERROR,
-    1: logging.INFO,
-    2: logging.DEBUG
-}
 logger = utils.log.get("pyphrasy3")
 
 
@@ -66,11 +61,11 @@ class PhraseInflector(object):
 
     def inflect(self, phrase, form):
         # phrase = phrase.lower()
-        master_word = self.select_master(phrase.split())
+        master_word = self.select_master(utils.regex.split_by_word_border(phrase))
         if master_word:
             return self._inflect_with_master(form, phrase, master_word.parsed)
         else:
-            logger.error(u'Can not find master word in: {0}'.format(phrase))
+            # logger.error('Can not find master word in: {0}'.format(phrase))
             return self._inflect_without_master(form, phrase)
 
     def _inflect_with_master(self, form, phrase, master_word):
@@ -86,9 +81,9 @@ class PhraseInflector(object):
         infl = form
         inflected_master = self.inf(master_word, infl)  # master_word.inflect(infl)
         if not inflected_master:
-            logger.error(u'Can not inflect master word {1} with {2}: {0}'.format(phrase, master_word.word, str(infl)))
+            logger.error('Can not inflect master word {1} with {2}: {0}'.format(phrase, master_word.word, str(infl)))
 
-        for chunk in phrase.split():
+        for chunk in utils.regex.split_by_word_border(phrase):
             parsed_chunk = self.morph.parse(chunk)
             if chunk.lower() == master_word.word.lower():
                 if inflected_master:
@@ -100,26 +95,26 @@ class PhraseInflector(object):
             dependent = None
             for version in parsed_chunk:
                 # If POS should adopt the form AND was in the same case(падеж) which the master word had
-                if version.tag.POS in (u'ADJF', u'PRTF') and version.tag.case == master_word.tag.case:
+                if version.tag.POS in ('ADJF', 'PRTF') and version.tag.case == master_word.tag.case:
                     infl = form | {inflected_master.tag.number}
                     # If in the single number, adopt the gender of master word
                     if inflected_master.tag.number == 'sing':
                         infl.add(inflected_master.tag.gender)
 
-                    if (u'accs' in form) \
-                            and (inflected_master.tag.gender == u'masc' or inflected_master.tag.number == u'plur'):
+                    if ('accs' in form) \
+                            and (inflected_master.tag.gender == 'masc' or inflected_master.tag.number == 'plur'):
                         infl.add(master_word.tag.animacy)
 
                     try:
                         inflected = self.inf(version, infl)  # version.inflect(infl)
                     except ValueError as e:
-                        logger.error(u'{0} at {1}'.format(e, version.word))
+                        logger.error('{0} at {1}'.format(e, version.word))
                         dependent = version
                     else:
                         if inflected:
                             dependent = inflected
                         else:
-                            logger.error(u'Can not inflect word {1} with {2}: {0}'.format(phrase, version.word, infl))
+                            logger.error('Can not inflect word {1} with {2}: {0}'.format(phrase, version.word, infl))
                             dependent = version
                     break
 
@@ -128,7 +123,7 @@ class PhraseInflector(object):
             else:
                 result.append(chunk)
 
-        return u' '.join(result)
+        return ''.join(result)
 
     def _inflect_without_master(self, form, phrase):
         result = []
@@ -136,7 +131,7 @@ class PhraseInflector(object):
             form = {form}
         else:
             form = set(form)
-        for chunk in phrase.split():
+        for chunk in utils.regex.split_by_word_border(phrase):
             parsed_chunk = self.parse_first(chunk)
             if not parsed_chunk:
                 result.append(chunk)
@@ -145,17 +140,17 @@ class PhraseInflector(object):
                 result.append(chunk)
                 continue
             infl = form
-            if u'accs' in form:
+            if 'accs' in form:
                 infl.add('inan')
             try:
                 inflected = self.inf(parsed_chunk, infl)  # parsed_chunk.inflect(infl)
                 if inflected:
                     result.append(inflected.word)
                 else:
-                    logger.error(u'Can not inflect word {1}: {0}'.format(phrase, chunk))
+                    logger.error('Can not inflect word {1}: {0}'.format(phrase, chunk))
                     result.append(chunk)
             except ValueError:
                 result.append(chunk)
 
-        return u' '.join(result)
+        return ''.join(result)
 
