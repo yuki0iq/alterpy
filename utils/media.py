@@ -1,4 +1,4 @@
-import telethon.tl.custom
+import telethon.tl.custom.message
 import typing
 import io
 

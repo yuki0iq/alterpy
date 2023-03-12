@@ -1,5 +1,4 @@
 import utils.config
-import utils.locale
 
 import typing
 import telethon.tl.types
@@ -30,10 +29,9 @@ class User(typing.NamedTuple):
         except:
             return 'null'
 
-    async def get_mention(self, lang='ru', form='nomn') -> str:
+    async def get_mention(self) -> str:
         name = await self.get_display_name()
-        infl = utils.locale.lang(lang).inflector(form)
-        return f"[{infl(name)}](tg://user?id={self.sender.id})"
+        return f"[{name}](tg://user?id={self.sender.id})"
 
     def config_name(self) -> str:
         return f"user/{self.sender.id}.toml"
@@ -93,7 +91,13 @@ class User(typing.NamedTuple):
         return check_anon and self.is_anon(self.chat_id)
 
 
-def from_telethon(user: telethon.tl.types.User | telethon.tl.types.Channel, chat: telethon.tl.types.Chat) -> User:
+async def from_telethon(
+        user: telethon.tl.types.User | telethon.tl.types.Channel | str | None,
+        chat: telethon.tl.types.Chat | None = None,
+        client: telethon.client.TelegramClient = None
+) -> User:
+    if type(user) == str:
+        return await from_telethon(await client.get_entity(await client.get_input_entity(user)), chat)
     if user is not None:
-        return User(user, chat.id)
-    return User(chat, chat.id)
+        return User(user, chat.id if chat else 0)
+    return User(chat, chat.id if chat else 0)

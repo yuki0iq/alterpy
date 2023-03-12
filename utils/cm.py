@@ -5,6 +5,8 @@ import utils.media
 import typing
 import datetime
 import telethon.tl.custom
+import telethon.tl.types
+import telethon.client
 
 
 class CommandMessage(typing.NamedTuple):
@@ -16,9 +18,9 @@ class CommandMessage(typing.NamedTuple):
     local_time: datetime.datetime  # UTC time when recv
     sender: utils.user.User  # sender
     reply_sender: utils.user.User  # reply sender if applicable
-    # chat: Chat  # chat object --- unneeded for now
     int_cur: utils.interactor.MessageInteractor  # for current message
     int_prev: utils.interactor.MessageInteractor  # for attached reply
+    client: telethon.client.TelegramClient
 
 
 async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMessage:
@@ -27,12 +29,17 @@ async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMe
     chat_obj = await msg_cur.get_chat()
 
     # TODO handle markdownv2 properly
-    def unmd2(s: str) -> str:
-        return s.replace('\\\\', '').replace('\\_', '_').replace('\\(', '(').replace('\\)', ')').replace('\\|', '|')
+    def unmd2(s: str, es) -> str:
+        s = s.replace('\\\\', '').replace('\\_', '_').replace('\\(', '(').replace('\\)', ')').replace('\\|', '|')
+        for e in es or []:
+            if type(e) == telethon.tl.types.MessageEntityMentionName:
+                i, l, uid = e.offset, e.length, e.user_id
+                s = s[:i] + '{' + str(uid) + '|' + str(l) + '}' + s[i:]
+        return s
 
     # .text? .message?
-    arg = unmd2(msg_cur.message)
-    rep = unmd2(msg_prev.message) if has_reply and msg_prev.message else None
+    arg = unmd2(msg_cur.message, msg_cur.entities)
+    rep = unmd2(msg_prev.message, msg_prev.entities) if has_reply and msg_prev.message else None
 
     # if no media is given then Media(None)
     media = utils.media.Media(msg_cur) if msg_cur.media else utils.media.Media(msg_prev)
@@ -40,8 +47,8 @@ async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMe
 
     time = msg_cur.date
 
-    sender = utils.user.from_telethon(await msg_cur.get_sender(), chat_obj)
-    reply_sender = utils.user.from_telethon(await msg_prev.get_sender(), chat_obj) if has_reply else None
+    sender = await utils.user.from_telethon(await msg_cur.get_sender(), chat_obj)
+    reply_sender = await utils.user.from_telethon(await msg_prev.get_sender(), chat_obj) if has_reply else None
 
     # self.chat = Chat(??)
     int_cur = utils.interactor.MessageInteractor(msg_cur)
@@ -49,7 +56,9 @@ async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMe
 
     local_time = datetime.datetime.now(datetime.timezone.utc)
 
-    return CommandMessage(arg, rep, media, reply_media, time, local_time, sender, reply_sender, int_cur, int_prev)
+    client = msg_cur.client
+
+    return CommandMessage(arg, rep, media, reply_media, time, local_time, sender, reply_sender, int_cur, int_prev, client)
 
 
 async def from_event(event: telethon.events.NewMessage) -> CommandMessage:

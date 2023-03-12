@@ -48,3 +48,15 @@ def pre_command(a: str) -> re.Pattern:
 
 def split_by_word_border(a: str) -> list:
     return re.split('\\b', a)
+
+
+def named(name: str, pat: str) -> str:
+    return f"(?P<{name}>({pat}))"
+
+
+def integer() -> str:
+    return "[1-9]\\d*"
+
+
+def named_int(name: str) -> str:
+    return named(name, integer())

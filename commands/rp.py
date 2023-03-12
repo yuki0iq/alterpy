@@ -3,9 +3,16 @@ import utils.cm
 import utils.regex
 import utils.rand
 import utils.common
+import utils.locale
+import utils.user
 
 import typing
 import re
+
+
+def inflect_mention(mention: str, form: str, lang: str = "ru") -> str:
+    le, ri = 1, mention.rindex(']')
+    return mention[:le] + utils.locale.lang(lang).inflect(mention[le:ri], form) + mention[ri:]
 
 
 class RP1Handler(typing.NamedTuple):
@@ -23,9 +30,13 @@ class RP2Handler(typing.NamedTuple):
     ans: typing.Callable[[], str]
     ans_masc: typing.Callable[[], str]
     ans_fem: typing.Callable[[], str]
+    lang: str = "ru"
+    form: str = "accs"
 
     def invoke(self, user, pronouns, mention, comment):
-        return [self.ans, self.ans_masc, self.ans_fem][pronouns]().format(user, mention, comment).strip().replace('  ', ' ', 1)
+        return [self.ans, self.ans_masc, self.ans_fem][pronouns]().format(
+            user, inflect_mention(mention, self.form, self.lang), comment
+        ).strip().replace('  ', ' ', 1)
 
 
 rp1handlers = [
@@ -48,13 +59,14 @@ rp2handlers = [
         utils.regex.command("дать"),
         utils.common.wrap("🎁 | {0} дал(а) {1} {2}"),
         utils.common.wrap("🎁 | {0} дал {1} {2}"),
-        utils.common.wrap("🎁 | {0} дала {1} {2}")
+        utils.common.wrap("🎁 | {0} дала {1} {2}"),
+        form="datv",
     ),
     RP2Handler(
         utils.regex.command("сломать"),
         utils.common.wrap("🔧 | {0} сломал(а) {1} {2}"),
         utils.common.wrap("🔧 | {0} сломал {1} {2}"),
-        utils.common.wrap("🔧 | {0} сломала {1} {2}")
+        utils.common.wrap("🔧 | {0} сломала {1} {2}"),
     ),
     RP2Handler(
         utils.regex.command("убить"),
@@ -138,7 +150,8 @@ rp2handlers = [
         utils.regex.command("предложить пива"),
         utils.common.wrap("🍻 | {0} предложил(а) пива {1} {2}"),
         utils.common.wrap("🍻 | {0} предложил пива {1} {2}"),
-        utils.common.wrap("🍻 | {0} предложила пива {1} {2}")
+        utils.common.wrap("🍻 | {0} предложила пива {1} {2}"),
+        form="datv"
     ),
     RP2Handler(
         utils.regex.command("дефенестрировать"),
@@ -148,15 +161,30 @@ rp2handlers = [
     ),
 ]
 
-mention_pattern = re.compile(r'''\[.+\]\(tg://user\?id=\d+\)|@\w+''')
+
+# mention:
+#  OR:
+#    @(username)
+#      where username is (a-zA-Z0-9_){5,64} and can't start with digit
+#                        -> using simple check (word-like character)
+#    {(uid)|(len)}(name)
+#      where uid  is number
+#            len  is number
+#            name is string of len=len
+mention_pattern = utils.regex.ignore_case(
+    utils.regex.unite(
+        '@' + utils.regex.named('username', r'\w+'),
+        r'\{' + utils.regex.named_int('uid') + r'\|' + utils.regex.named_int('len') + r'\}'
+    )
+)
 
 
 async def on_rp(cm: utils.cm.CommandMessage):
     user = (await cm.sender.get_mention()).replace('_', '\\_')
     pronoun_set = cm.sender.get_pronouns()
-    mention = (await cm.reply_sender.get_mention(form="accs")).replace('_', '\\_') if cm.reply_sender is not None else None
+    mention = (await cm.reply_sender.get_mention()).replace('_', '\\_') if cm.reply_sender is not None else None
     res = []
-    for line in cm.arg.split('\n')[:20]:  # technical limitation
+    for line in cm.arg.split('\n')[:20]:  # technical limitation TODO fix!
         # try match to RP-1 as "RP-1 arg"
         for handler in rp1handlers:
             match = re.search(handler.pattern, line)
@@ -171,8 +199,20 @@ async def on_rp(cm: utils.cm.CommandMessage):
                 cur_mention = mention
                 match = re.search(mention_pattern, arg)
                 if match:
-                    cur_mention, arg = match[0], arg[len(match[0]):]
-                    # FIX cur_mention IFF id is specified
+                    # if matched 'username' then get name
+                    # if matched 'uid + len' then get name from text
+                    vars = match.groupdict()
+                    if vars['username'] is not None:
+                        username, arg = match[0][1:], arg[len(match[0]):]
+                        cur_user = await utils.user.from_telethon(username, client=cm.client)
+                        cur_mention = await cur_user.get_mention()
+                    else:
+                        uid = int(vars['uid'])
+                        l = int(vars['len'])
+                        arg = arg[len(match[0]):]
+                        name, arg = arg[:l], arg[l:]
+                        cur_mention = f"[{name}](tg://user?id={uid})"
+
                 if cur_mention is not None or arg is not None:
                     res.append(handler.invoke(user, pronoun_set, (cur_mention or '').replace('_', '\\_') or '', arg))
                 else:
