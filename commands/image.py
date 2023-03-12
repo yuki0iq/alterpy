@@ -89,9 +89,9 @@ def re_letter() -> str: return '[a-zа-яё]'
 def re_space() -> str: return "\\s*"
 def re_var() -> str: return re_letter() + utils.regex.unite(re_letter(), '\\d') + '*'
 def re_arg(name: str) -> str: return re_space() + re_named(name, re_var())
-def re_num_nat(name: str) -> str: return re_space() + re_named(name, '[1-9]\\d*')
+def re_num_nat(name: str) -> str: return re_space() + utils.regex.named_int(name)
 def re_real(name: str) -> str: return re_space() + re_named(name, '\\d*\\.?\\d*')
-def re_named(name: str, pat: str) -> str: return f"(?P<{name}>(?!((to|with|в|на|с)\\b))({pat}))"
+def re_named(name: str, pat: str) -> str: return utils.regex.named(name, f"(?!((to|with|в|на|с)\\b))({pat})")
 def re_or(*args) -> str: return re_space() + utils.regex.unite(*args)
 
 
