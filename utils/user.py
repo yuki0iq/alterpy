@@ -91,13 +91,11 @@ class User(typing.NamedTuple):
         return check_anon and self.is_anon(self.chat_id)
 
 
-async def from_telethon(
-        user: telethon.tl.types.User | telethon.tl.types.Channel | str | None,
-        chat: telethon.tl.types.Chat | None = None,
-        client: telethon.client.TelegramClient = None
-) -> User:
+async def from_telethon(user: telethon.tl.types.User | telethon.tl.types.Channel | str | None,
+                        chat: telethon.tl.types.Chat | int | None = None,
+                        client: telethon.client.TelegramClient = None) -> User:
     if type(user) == str:
         return await from_telethon(await client.get_entity(await client.get_input_entity(user)), chat)
     if user is not None:
-        return User(user, chat.id if chat else 0)
-    return User(chat, chat.id if chat else 0)
+        return User(user, (chat.id if type(chat) != int else chat) if chat else 0)
+    return User(chat, (chat.id if type(chat) != int else chat) if chat else 0)

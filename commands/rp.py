@@ -204,7 +204,7 @@ async def on_rp(cm: utils.cm.CommandMessage):
                     vars = match.groupdict()
                     if vars['username'] is not None:
                         username, arg = match[0][1:], arg[len(match[0]):]
-                        cur_user = await utils.user.from_telethon(username, client=cm.client)
+                        cur_user = await utils.user.from_telethon(username, chat=cm.sender.chat_id, client=cm.client)
                         cur_mention = await cur_user.get_mention()
                     else:
                         uid = int(vars['uid'])
