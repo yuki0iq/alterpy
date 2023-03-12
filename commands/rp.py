@@ -11,6 +11,8 @@ import re
 
 
 def inflect_mention(mention: str, form: str, lang: str = "ru") -> str:
+    if not mention:
+        return mention
     le, ri = 1, mention.rindex(']')
     return mention[:le] + utils.locale.lang(lang).inflect(mention[le:ri], form) + mention[ri:]
 
