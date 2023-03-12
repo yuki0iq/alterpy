@@ -35,3 +35,8 @@ def indexed(a: typing.Iterable) -> typing.Iterable:
 
 def identity(x):
     return x
+
+
+def values(a: list[tuple[int, typing.Any]]) -> list[typing.Any]:
+    return [el[1] for el in a]
+

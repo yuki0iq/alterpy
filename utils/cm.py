@@ -21,6 +21,8 @@ class CommandMessage(typing.NamedTuple):
     int_cur: utils.interactor.MessageInteractor  # for current message
     int_prev: utils.interactor.MessageInteractor  # for attached reply
     client: telethon.client.TelegramClient
+    id: int
+    reply_id: int  # -1 if no reply
 
 
 async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMessage:
@@ -57,8 +59,10 @@ async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMe
     local_time = datetime.datetime.now(datetime.timezone.utc)
 
     client = msg_cur.client
+    id = msg_cur.id
+    reply_id = msg_prev.id if msg_prev else -1
 
-    return CommandMessage(arg, rep, media, reply_media, time, local_time, sender, reply_sender, int_cur, int_prev, client)
+    return CommandMessage(arg, rep, media, reply_media, time, local_time, sender, reply_sender, int_cur, int_prev, client, id, reply_id)
 
 
 async def from_event(event: telethon.events.NewMessage) -> CommandMessage:

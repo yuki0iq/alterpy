@@ -6,6 +6,9 @@ import utils.regex
 import utils.help
 import utils.file
 import utils.mod
+import utils.sorted
+import utils.common
+import utils.quote
 
 import asyncio
 import re
@@ -128,6 +131,49 @@ async def process_command_message(cm: utils.cm.CommandMessage):
     ]
     if tasks:
         await asyncio.wait(tasks)
+
+
+message_database: dict[int, utils.sorted.SortedAssociativeArray] = {}  # chat_id -> [(msg_id, telethon message)] no more than 50
+message_database_limit = 50
+
+
+def add_message(message):
+    msg_id = message.id
+    chat_id = message.chat.id
+    if chat_id not in message_database:
+        message_database[chat_id] = utils.sorted.SortedAssociativeArray()
+
+    message_database[chat_id].set(msg_id, message)
+    message_database[chat_id].shrink(message_database_limit)
+
+
+async def on_quote(cm: utils.cm.CommandMessage):
+    if not cm.reply_sender:
+        await cm.int_cur.reply("Команде необходим прикрепленный ответ")
+    else:
+        cnt = int((cm.arg or '1').split()[0])
+        messages = utils.common.values(message_database[cm.sender.chat_id].slice(cm.reply_id, cnt))
+        await cm.int_cur.reply((await utils.quote.create(messages, cm.sender.chat_id)).replace('(', '\\(').replace(')', '\\)').replace('[', '\\[').replace(']', '\\]'))
+
+
+handlers.append(utils.ch.CommandHandler(
+    name="quote",
+    pattern=utils.regex.command(utils.regex.unite('q', 'й')),
+    help_page=["quote", "цитатник"],
+    handler_impl=on_quote,
+    is_arg_current=True,
+    is_prefix=True,
+
+    is_elevated=True
+))
+
+
+@client.on(telethon.events.NewMessage)
+async def message_database_handler(event: telethon.events.NewMessage):
+    add_message(event.message)
+    msg_prev = await event.message.get_reply_message()
+    if msg_prev:
+        add_message(msg_prev)
 
 
 @client.on(telethon.events.NewMessage)

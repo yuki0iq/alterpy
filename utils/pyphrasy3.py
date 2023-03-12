@@ -43,7 +43,6 @@ class PhraseInflector(object):
             is_derivative = any({'ADJF', 'PRTF', 'GRND'} & version.tag.grammemes for version in self.morph.parse(word))
 
             for j, parsed in enumerate(self.morph.parse(word)):
-
                 if {'NOUN', 'nomn'} in parsed.tag:
                     version = self.ScoreHelper(parsed)
                     version.fixed_number_score = 1 if ({'Pltm', 'Sgtm'} & set(parsed.tag.grammemes)) else 0
@@ -60,7 +59,6 @@ class PhraseInflector(object):
             return None
 
     def inflect(self, phrase, form):
-        # phrase = phrase.lower()
         master_word = self.select_master(utils.regex.split_by_word_border(phrase))
         if master_word:
             return self._inflect_with_master(form, phrase, master_word.parsed)
