@@ -153,7 +153,8 @@ async def on_quote(cm: utils.cm.CommandMessage):
     else:
         cnt = int((cm.arg or '1').split()[0])
         messages = utils.common.values(message_database[cm.sender.chat_id].slice(cm.reply_id, cnt))
-        await cm.int_cur.reply((await utils.quote.create(messages, cm.sender.chat_id)).replace('(', '\\(').replace(')', '\\)').replace('[', '\\[').replace(']', '\\]'))
+        # .replace('(', '\\(').replace(')', '\\)').replace('[', '\\[').replace(']', '\\]')
+        await cm.int_cur.reply('```' + (await utils.quote.create(messages, cm.sender.chat_id, cm.client)) + '```')
 
 
 handlers.append(utils.ch.CommandHandler(

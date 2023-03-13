@@ -184,7 +184,7 @@ mention_pattern = utils.regex.ignore_case(
 async def on_rp(cm: utils.cm.CommandMessage):
     user = (await cm.sender.get_mention()).replace('_', '\\_')
     pronoun_set = cm.sender.get_pronouns()
-    mention = (await cm.reply_sender.get_mention()).replace('_', '\\_') if cm.reply_sender is not None else None
+    mention = (await cm.reply_sender.get_mention()) if cm.reply_sender is not None else None
     res = []
     for line in cm.arg.split('\n')[:20]:  # technical limitation TODO fix!
         # try match to RP-1 as "RP-1 arg"

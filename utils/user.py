@@ -1,3 +1,7 @@
+import io
+
+import PIL.Image
+
 import utils.config
 
 import typing
@@ -13,7 +17,8 @@ default_user_config = {
 
 class User(typing.NamedTuple):
     sender: telethon.tl.types.User | telethon.tl.types.Channel | telethon.tl.types.Chat
-    chat_id: int = 0
+    chat_id: int
+    client: telethon.client.TelegramClient
 
     def is_admin(self) -> bool:  # check if in admins list
         return self.sender.id in utils.config.load("config.toml")["admins"]
@@ -32,6 +37,15 @@ class User(typing.NamedTuple):
     async def get_mention(self) -> str:
         name = await self.get_display_name()
         return f"[{name}](tg://user?id={self.sender.id})"
+
+    async def userpic(self) -> PIL.Image.Image | None:
+        by = io.BytesIO()
+        await self.client.download_profile_photo(self.sender, file=by)
+        by.seek(0)
+        try:
+            return PIL.Image.open(by)
+        except:
+            return None
 
     def config_name(self) -> str:
         return f"user/{self.sender.id}.toml"
@@ -92,10 +106,10 @@ class User(typing.NamedTuple):
 
 
 async def from_telethon(user: telethon.tl.types.User | telethon.tl.types.Channel | str | None,
-                        chat: telethon.tl.types.Chat | int | None = None,
-                        client: telethon.client.TelegramClient = None) -> User:
+                        chat: telethon.tl.types.Chat | int | None,
+                        client: telethon.client.TelegramClient) -> User:
     if type(user) == str:
-        return await from_telethon(await client.get_entity(await client.get_input_entity(user)), chat)
+        return await from_telethon(await client.get_entity(await client.get_input_entity(user)), chat, client)
     if user is not None:
-        return User(user, (chat.id if type(chat) != int else chat) if chat else 0)
-    return User(chat, (chat.id if type(chat) != int else chat) if chat else 0)
+        return User(user, (chat.id if type(chat) != int else chat) if chat else 0, client)
+    return User(chat, (chat.id if type(chat) != int else chat) if chat else 0, client)

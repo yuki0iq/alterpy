@@ -30,6 +30,10 @@ async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMe
     has_reply = msg_prev is not None
     chat_obj = await msg_cur.get_chat()
 
+    client = msg_cur.client
+    id = msg_cur.id
+    reply_id = msg_prev.id if msg_prev else -1
+
     # TODO handle markdownv2 properly
     def unmd2(s: str, es) -> str:
         s = s.replace('\\\\', '').replace('\\_', '_').replace('\\(', '(').replace('\\)', ')').replace('\\|', '|')
@@ -49,18 +53,14 @@ async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMe
 
     time = msg_cur.date
 
-    sender = await utils.user.from_telethon(await msg_cur.get_sender(), chat_obj)
-    reply_sender = await utils.user.from_telethon(await msg_prev.get_sender(), chat_obj) if has_reply else None
+    sender = await utils.user.from_telethon(await msg_cur.get_sender(), chat_obj, client)
+    reply_sender = await utils.user.from_telethon(await msg_prev.get_sender(), chat_obj, client) if has_reply else None
 
     # self.chat = Chat(??)
     int_cur = utils.interactor.MessageInteractor(msg_cur)
     int_prev = utils.interactor.MessageInteractor(msg_prev) if has_reply else None
 
     local_time = datetime.datetime.now(datetime.timezone.utc)
-
-    client = msg_cur.client
-    id = msg_cur.id
-    reply_id = msg_prev.id if msg_prev else -1
 
     return CommandMessage(arg, rep, media, reply_media, time, local_time, sender, reply_sender, int_cur, int_prev, client, id, reply_id)
 

@@ -1,3 +1,6 @@
+import unicodedata
+
+
 def change_layout(s: str) -> str:
     """alternate between QWERTY and JCUKEN"""
     en = r"""`~!@#$^&qwertyuiop[]\QWERTYUIOP{}|asdfghjkl;'ASDFGHJKL:"zxcvbnm,./ZXCVBNM<>?"""
@@ -40,3 +43,20 @@ class FStr:
 
     def __str__(self):
         return f"""f'''{self._s}'''"""
+
+
+def is_full(ch: str) -> bool:
+    return unicodedata.east_asian_width(ch) in ['F', 'W']
+
+
+def strlen(s: str) -> int:
+    return sum(2 if is_full(ch) else 1 for ch in s)
+
+
+def is_normal_space(ch: str) -> bool:
+    return ch in '\t\n\x0b\x0c\r '
+
+
+def rjust(s: str, n: int) -> str:
+    """Fullwidth-aware right justify"""
+    return s.rjust(n - (strlen(s) - len(s)))
