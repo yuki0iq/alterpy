@@ -62,12 +62,12 @@ async def on_set_gender_ru(cm: utils.cm.CommandMessage):
 
 async def on_get_gender_en(cm: utils.cm.CommandMessage):
     user = cm.reply_sender or cm.sender
-    await cm.int_cur.reply(f"{await user.get_display_name()}'s pronoun set is {utils.pronouns.to_str_en(cm.sender.get_pronouns())}")
+    await cm.int_cur.reply(f"{await user.get_display_name()}'s pronoun set is {utils.pronouns.to_str_en(user.get_pronouns())}")
 
 
 async def on_get_gender_ru(cm: utils.cm.CommandMessage):
     user = cm.reply_sender or cm.sender
-    await cm.int_cur.reply(f"Набор местоимений {await user.get_display_name()} — {utils.pronouns.to_str_ru(cm.sender.get_pronouns())}")
+    await cm.int_cur.reply(f"Набор местоимений {await user.get_display_name()} — {utils.pronouns.to_str_ru(user.get_pronouns())}")
 
 
 async def on_reset_gender_en(cm: utils.cm.CommandMessage):

@@ -10,7 +10,7 @@ import utils.textwrap
 
 class Message(typing.NamedTuple):
     name: str
-    avatar: PIL.Image.Image | None  # TODO
+    avatar: PIL.Image.Image | None  # TODO use
     id: int
     reply_id: int | None
     media: None  # TODO
@@ -43,11 +43,14 @@ def merge(messages: list[Message]) -> str:
 async def create(messages: list[telethon.tl.custom.message.Message], chat_id: int, client: telethon.client.TelegramClient) -> str:
     res = []
     for msg in messages:
+        # TODO handle reply headers
         user = utils.user.User(msg.sender, chat_id, client)
         r_id = None
         msg_prev = await msg.get_reply_message()
         if msg_prev:
             r_id = msg_prev.id
-        res.append(Message(await user.get_display_name(), None, msg.id, r_id, None, msg.message))
+        name = await user.get_display_name()
+        avatar = await user.userpic()
+        res.append(Message(name + " AV" if avatar else "", avatar, msg.id, r_id, None, msg.message))
     return merge(res)
 
