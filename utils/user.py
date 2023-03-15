@@ -1,11 +1,10 @@
-import io
-
-import PIL.Image
-
 import utils.config
+import utils.str
 
 import typing
 import telethon.tl.types
+import PIL.Image
+import io
 
 
 default_user_config = {
@@ -36,7 +35,7 @@ class User(typing.NamedTuple):
 
     async def get_mention(self) -> str:
         name = await self.get_display_name()
-        return f"[{name}](tg://user?id={self.sender.id})"
+        return f"[{utils.str.escape(name)}](tg://user?id={self.sender.id})"
 
     async def userpic(self) -> PIL.Image.Image | None:
         by = io.BytesIO()
@@ -105,10 +104,10 @@ class User(typing.NamedTuple):
         return check_anon and self.is_anon(self.chat_id)
 
 
-async def from_telethon(user: telethon.tl.types.User | telethon.tl.types.Channel | str | None,
+async def from_telethon(user: telethon.tl.types.User | telethon.tl.types.Channel | str | int | None,
                         chat: telethon.tl.types.Chat | int | None,
                         client: telethon.client.TelegramClient) -> User:
-    if type(user) == str:
+    if type(user) == str or type(user) == int:
         return await from_telethon(await client.get_entity(await client.get_input_entity(user)), chat, client)
     if user is not None:
         return User(user, (chat.id if type(chat) != int else chat) if chat else 0, client)
