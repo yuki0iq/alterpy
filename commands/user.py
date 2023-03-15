@@ -2,6 +2,7 @@ import utils.cm
 import utils.ch
 import utils.pronouns
 import utils.regex
+import utils.str
 
 handlers = []
 
@@ -11,7 +12,7 @@ async def on_set_name_en(cm: utils.cm.CommandMessage):
         cm.sender.set_name(cm.arg)
         await cm.int_cur.reply(f"Name set to {cm.arg}")
     else:
-        await cm.int_cur.reply(f"Your name is {cm.sender.get_name() or 'not set'}")
+        await cm.int_cur.reply(f"Your name is {utils.str.escape(cm.sender.get_name()) or 'not set'}")
 
 
 async def on_set_name_ru(cm: utils.cm.CommandMessage):
@@ -19,17 +20,17 @@ async def on_set_name_ru(cm: utils.cm.CommandMessage):
         cm.sender.set_name(cm.arg)
         await cm.int_cur.reply(f"Установлено имя {cm.arg}")
     else:
-        await cm.int_cur.reply(f"Ваше имя — {cm.sender.get_name() or 'не установлено'}")
+        await cm.int_cur.reply(f"Ваше имя — {utils.str.escape(cm.sender.get_name()) or 'не установлено'}")
 
 
 async def on_get_name_en(cm: utils.cm.CommandMessage):
     user = cm.reply_sender or cm.sender
-    await cm.int_cur.reply(f"{await user.get_display_name()}'s name is {user.get_name() or 'not set'}")
+    await cm.int_cur.reply(f"{utils.str.escape(await user.get_display_name())}'s name is {utils.str.escape(user.get_name()) or 'not set'}")
 
 
 async def on_get_name_ru(cm: utils.cm.CommandMessage):
     user = cm.reply_sender or cm.sender
-    await cm.int_cur.reply(f"Имя пользователя {await user.get_display_name()} — {user.get_name() or 'не установлено'}")
+    await cm.int_cur.reply(f"Имя пользователя {utils.str.escape(await user.get_display_name())} — {utils.str.escape(user.get_name()) or 'не установлено'}")
 
 
 async def on_reset_name_en(cm: utils.cm.CommandMessage):
@@ -62,12 +63,12 @@ async def on_set_gender_ru(cm: utils.cm.CommandMessage):
 
 async def on_get_gender_en(cm: utils.cm.CommandMessage):
     user = cm.reply_sender or cm.sender
-    await cm.int_cur.reply(f"{await user.get_display_name()}'s pronoun set is {utils.pronouns.to_str_en(user.get_pronouns())}")
+    await cm.int_cur.reply(f"{utils.str.escape(await user.get_display_name())}'s pronoun set is {utils.pronouns.to_str_en(user.get_pronouns())}")
 
 
 async def on_get_gender_ru(cm: utils.cm.CommandMessage):
     user = cm.reply_sender or cm.sender
-    await cm.int_cur.reply(f"Набор местоимений {await user.get_display_name()} — {utils.pronouns.to_str_ru(user.get_pronouns())}")
+    await cm.int_cur.reply(f"Набор местоимений {utils.str.escape(await user.get_display_name())} — {utils.pronouns.to_str_ru(user.get_pronouns())}")
 
 
 async def on_reset_gender_en(cm: utils.cm.CommandMessage):
