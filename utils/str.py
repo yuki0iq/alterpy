@@ -60,3 +60,8 @@ def is_normal_space(ch: str) -> bool:
 def rjust(s: str, n: int) -> str:
     """Fullwidth-aware right justify"""
     return s.rjust(n - (strlen(s) - len(s)))
+
+
+def escape(s: str) -> str:
+    return s.replace('\\', '\\\\').replace('_', r'\_').replace('[', r'\[').replace(']', r'\]').replace('*', r'\*')
+
