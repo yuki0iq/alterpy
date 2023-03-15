@@ -5,7 +5,7 @@ import utils.rand
 import utils.common
 import utils.locale
 import utils.user
-
+import utils.str
 import typing
 import re
 
@@ -14,7 +14,8 @@ def inflect_mention(mention: str, form: str, lang: str = "ru") -> str:
     if not mention:
         return mention
     le, ri = 1, mention.rindex(']')
-    return mention[:le] + utils.locale.lang(lang).inflect(mention[le:ri], form) + mention[ri:]
+    lt = utils.locale.lang(lang)
+    return mention[:le] + lt.inflect(lt.tr(mention[le:ri]), form) + mention[ri:]
 
 
 class RP1Handler(typing.NamedTuple):
@@ -182,7 +183,7 @@ mention_pattern = utils.regex.ignore_case(
 
 
 async def on_rp(cm: utils.cm.CommandMessage):
-    user = (await cm.sender.get_mention()).replace('_', '\\_')
+    user = await cm.sender.get_mention()
     pronoun_set = cm.sender.get_pronouns()
     mention = (await cm.reply_sender.get_mention()) if cm.reply_sender is not None else None
     res = []
@@ -213,10 +214,10 @@ async def on_rp(cm: utils.cm.CommandMessage):
                         l = int(vars['len'])
                         arg = arg[len(match[0]):]
                         name, arg = arg[:l], arg[l:]
-                        cur_mention = f"[{name}](tg://user?id={uid})"
+                        cur_mention = f"[{utils.str.escape(name)}](tg://user?id={uid})"
 
                 if cur_mention is not None or arg is not None:
-                    res.append(handler.invoke(user, pronoun_set, (cur_mention or '').replace('_', '\\_') or '', arg))
+                    res.append(handler.invoke(user, pronoun_set, cur_mention or '', arg))
                 else:
                     res.append("RP-2 commands can't be executed without second user mention")
     if res:

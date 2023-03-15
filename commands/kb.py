@@ -2,8 +2,7 @@ import utils.regex
 import utils.str
 import utils.cm
 import utils.ch
-
-import iuliia
+import utils.locale
 
 handlers = []
 
@@ -15,7 +14,8 @@ async def on_layout(cm: utils.cm.CommandMessage):
 
 async def on_trl(cm: utils.cm.CommandMessage):
     if cm.arg:
-        await cm.int_cur.reply(iuliia.translate(cm.arg, iuliia.WIKIPEDIA))
+        await cm.int_cur.reply(utils.locale.lang('en').tr(cm.arg))
+        await cm.int_cur.reply(utils.locale.lang('ru').tr(cm.arg))
 
 
 async def on_me(cm: utils.cm.CommandMessage):

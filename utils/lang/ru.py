@@ -1,6 +1,7 @@
 import pymorphy3
 import utils.pyphrasy3
 import utils.str
+import utils.transliterator
 
 
 class MorphAnalyzer:
@@ -37,3 +38,10 @@ def inflector(form):
 
 def agree_with_number(s, num, form):
     return morph.parse(s)[0].inflect(form).make_agree_with_number(num).word
+
+
+translit = utils.transliterator.Transliterator()
+
+
+def tr(s):
+    return translit.inverse_transliterate(s)
