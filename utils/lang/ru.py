@@ -2,6 +2,7 @@ import pymorphy3
 import utils.pyphrasy3
 import utils.str
 import utils.transliterator
+import utils.kiri43i
 
 
 class MorphAnalyzer:
@@ -44,4 +45,4 @@ translit = utils.transliterator.Transliterator()
 
 
 def tr(s):
-    return translit.inverse_transliterate(s)
+    return translit.inverse_transliterate(utils.kiri43i.parse(s))

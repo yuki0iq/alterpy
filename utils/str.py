@@ -1,4 +1,5 @@
 import unicodedata
+import utils.common
 
 
 def change_layout(s: str) -> str:
@@ -47,6 +48,10 @@ class FStr:
 
 def is_full(ch: str) -> bool:
     return unicodedata.east_asian_width(ch) in ['F', 'W']
+
+
+def is_kanji(ch: str) -> bool:
+    return utils.common.one_of_in(['HIRAGANA', 'KATAKANA', 'CJK'], unicodedata.name(ch[0]))
 
 
 def strlen(s: str) -> int:

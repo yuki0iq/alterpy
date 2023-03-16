@@ -40,3 +40,16 @@ def identity(x):
 def values(a: list[tuple[int, typing.Any]]) -> list[typing.Any]:
     return [el[1] for el in a]
 
+
+def split_by_func(s: str, f: callable) -> list[str]:
+    res = []
+    cur = []
+    p = s[0]
+    for c in s:
+        if f(c) != f(p):
+            res.append(''.join(cur))
+            cur = []
+        cur.append(c)
+    res.append(''.join(cur))
+    return res
+

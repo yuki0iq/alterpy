@@ -31,19 +31,6 @@ del telethon_config
 handlers, initial_handlers = [], []
 
 
-async def on_command_version(cm: utils.cm.CommandMessage):
-    await cm.int_cur.reply("AlterPy on Feb 13 of 2023 by Yuki the girl")
-
-
-handlers.append(utils.ch.CommandHandler(
-    name='ver',
-    pattern=utils.regex.pre_command('ver'),
-    help_page=["start", "начало"],
-    handler_impl=on_command_version,
-    is_elevated=False
-))
-
-
 async def on_exec(cm: utils.cm.CommandMessage):
     shifted_arg = cm.arg.strip().strip('`').replace('\n', '\n    ')
     code = '\n'.join([
