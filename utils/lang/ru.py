@@ -46,3 +46,7 @@ translit = utils.transliterator.Transliterator()
 
 def tr(s):
     return translit.inverse_transliterate(utils.kiri43i.parse(s))
+
+
+def ander(arr: [str]) -> str:
+    return (', '.join(arr))[::-1].replace(' ,', ' и ', 1)[::-1]

@@ -18,6 +18,13 @@ def inflect_mention(mention: str, form: str, lang: str = "ru") -> str:
     return mention[:le] + lt.inflect(lt.tr(mention[le:ri]), form) + mention[ri:]
 
 
+def inflect_mentions(mentions: [str], form: str, lang: str = "ru") -> str:
+    if not mentions:
+        return ""
+    lt = utils.locale.lang(lang)
+    return lt.ander(inflect_mention(mention, form, lang) for mention in mentions)
+
+
 class RP1Handler(typing.NamedTuple):
     pattern: re.Pattern
     ans: typing.Callable[[], str]
@@ -38,7 +45,7 @@ class RP2Handler(typing.NamedTuple):
 
     def invoke(self, user, pronouns, mention, comment):
         return [self.ans, self.ans_masc, self.ans_fem][pronouns]().format(
-            user, inflect_mention(mention, self.form, self.lang), comment
+            user, inflect_mentions(mention, self.form, self.lang), comment
         ).strip().replace('  ', ' ', 1)
 
 
@@ -185,7 +192,7 @@ mention_pattern = utils.regex.ignore_case(
 async def on_rp(cm: utils.cm.CommandMessage):
     user = await cm.sender.get_mention()
     pronoun_set = cm.sender.get_pronouns()
-    mention = (await cm.reply_sender.get_mention()) if cm.reply_sender is not None else None
+    default_mention = [await cm.reply_sender.get_mention()] if cm.reply_sender is not None else []
     res = []
     for line in cm.arg.split('\n')[:20]:  # technical limitation TODO fix!
         # try match to RP-1 as "RP-1 arg"
@@ -199,24 +206,28 @@ async def on_rp(cm: utils.cm.CommandMessage):
             match = re.search(handler.pattern, line)
             if match:
                 arg = line[len(match[0]):]
-                cur_mention = mention
+                cur_mention = default_mention[:]
+                arg = arg.lstrip()
                 match = re.search(mention_pattern, arg)
-                if match:
+                while match:
                     # if matched 'username' then get name
                     # if matched 'uid + len' then get name from text
                     vars = match.groupdict()
                     if vars['username'] is not None:
                         username, arg = match[0][1:], arg[len(match[0]):]
                         cur_user = await utils.user.from_telethon(username, chat=cm.sender.chat_id, client=cm.client)
-                        cur_mention = await cur_user.get_mention()
+                        mention = await cur_user.get_mention()
                     else:
                         uid = int(vars['uid'])
                         l = int(vars['len'])
                         arg = arg[len(match[0]):]
                         name, arg = arg[:l], arg[l:]
-                        cur_mention = f"[{utils.str.escape(name)}](tg://user?id={uid})"
+                        mention = f"[{utils.str.escape(name)}](tg://user?id={uid})"
+                    cur_mention.append(mention)
+                    arg = arg.lstrip()
+                    match = re.search(mention_pattern, arg)
 
-                if cur_mention is not None or arg is not None:
+                if cur_mention or arg:
                     res.append(handler.invoke(user, pronoun_set, cur_mention or '', arg))
                 else:
                     res.append("RP-2 commands can't be executed without second user mention")
