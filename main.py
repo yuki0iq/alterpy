@@ -6,7 +6,6 @@ import utils.regex
 import utils.help
 import utils.file
 import utils.mod
-import utils.sorted
 import utils.common
 import utils.quote
 
@@ -14,6 +13,8 @@ import asyncio
 import re
 import telethon
 import traceback
+import sortedcollections
+
 
 log = utils.log.get("main")
 log.info("AlterPy")
@@ -120,7 +121,7 @@ async def process_command_message(cm: utils.cm.CommandMessage):
         await asyncio.wait(tasks)
 
 
-message_database: dict[int, utils.sorted.SortedAssociativeArray] = {}  # chat_id -> [(msg_id, telethon message)] no more than 50
+message_database: dict[int, sortedcollections.SortedDict] = {}  # chat_id -> [(msg_id, telethon message)] no more than 50
 message_database_limit = 50
 
 
@@ -128,10 +129,11 @@ def add_message(message):
     msg_id = message.id
     chat_id = message.chat.id
     if chat_id not in message_database:
-        message_database[chat_id] = utils.sorted.SortedAssociativeArray()
+        message_database[chat_id] = sortedcollections.SortedDict()
 
-    message_database[chat_id].set(msg_id, message)
-    message_database[chat_id].shrink(message_database_limit)
+    message_database[chat_id][msg_id] = message
+    while len(message_database[chat_id]) > message_database_limit:
+        message_database[chat_id].popitem(0)
 
 
 async def on_quote(cm: utils.cm.CommandMessage):
@@ -139,7 +141,12 @@ async def on_quote(cm: utils.cm.CommandMessage):
         await cm.int_cur.reply("Команде необходим прикрепленный ответ")
     else:
         cnt = int((cm.arg or '1').split()[0])
-        messages = utils.common.values(message_database[cm.sender.chat_id].slice(cm.reply_id, cnt))
+        start = message_database[cm.sender.chat_id].index(cm.reply_id)
+        if cnt >= 0:
+            le, ri = start, start + cnt
+        elif cnt < 0:
+            le, ri = start + cnt + 1, start + 1
+        messages = message_database[cm.sender.chat_id].values()[le:ri]
         quote_text = await utils.quote.create(messages, cm.sender.chat_id, cm.client)
         if quote_text[0] == ' ': quote_text = '.' + quote_text[1:]
         # .replace('(', '\\(').replace(')', '\\)').replace('[', '\\[').replace(']', '\\]')

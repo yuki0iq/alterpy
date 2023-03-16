@@ -9,3 +9,4 @@ iuliia
 DAWG-Python
 fugashi
 unidic
+sortedcollections
