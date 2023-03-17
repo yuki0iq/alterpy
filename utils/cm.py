@@ -36,6 +36,7 @@ async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMe
 
     # TODO handle markdownv2 properly
     def unmd2(s: str, es) -> str:
+        if not s: return ""
         s = s.replace('\\_', '_').replace('\\(', '(').replace('\\)', ')').replace('\\|', '|')
         mentions = []
         for e in es or []:

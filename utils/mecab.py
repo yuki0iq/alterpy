@@ -31,7 +31,7 @@ def reading(s):
         if '補助記号' == word.feature.pos1:
             if '点' not in word.feature.pos2:
                 rea.append("#space#")
-        print(word.feature)
+        # print(word.feature)
     return (' '.join(rea)).replace("## ", "##").replace(" #space# ", "").replace("#space# ", "").replace(" #space#", "")
 
 
