@@ -50,6 +50,7 @@ def split_by_func(s: str, f: callable) -> list[str]:
             res.append(''.join(cur))
             cur = []
         cur.append(c)
+        p = c
     res.append(''.join(cur))
     return res
 
