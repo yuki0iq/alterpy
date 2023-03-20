@@ -48,7 +48,7 @@ async def load_handlers(initial_handlers: list, handlers: list, path: str) -> st
         cnt_ok += int(ok)
         handlers.extend(cur_handlers)
 
-    log.info(f"Loading from {path} finished, {cnt_ok:03} of {cnt:03} loaded successfully")
+    log.info(f"Loading from {path} finished, {cnt_ok} of {cnt} loaded successfully")
 
     return f"{cnt_ok} of {cnt} loaded successfully"
 
