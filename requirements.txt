@@ -10,3 +10,5 @@ DAWG-Python
 fugashi
 unidic
 sortedcollections
+rich
+requests

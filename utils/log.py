@@ -1,9 +1,13 @@
 import logging
-import traceback
+import rich.logging
 
 
 logging_formatter = logging.Formatter("%(asctime)s: %(name)s [%(levelname)s]:  %(message)s")
-logging.basicConfig(format="%(asctime)s: %(name)s [%(levelname)s]:  %(message)s", level=logging.INFO)
+logging.basicConfig(
+    format="%(name)s:  %(message)s",
+    level=logging.INFO,
+    handlers=[rich.logging.RichHandler(rich_tracebacks=True, tracebacks_show_locals=True)]
+)
 
 
 def get(name="unknown") -> logging.Logger:
@@ -24,4 +28,4 @@ def get(name="unknown") -> logging.Logger:
 
 
 def fail(log: logging.Logger, text: str) -> None:
-    log.error(f"{text}\n{traceback.format_exc()}")
+    log.exception(text)

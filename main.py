@@ -15,6 +15,9 @@ import telethon
 import traceback
 import sortedcollections
 
+import rich.traceback
+rich.traceback.install(show_locals=True)
+
 
 log = utils.log.get("main")
 log.info("AlterPy")
