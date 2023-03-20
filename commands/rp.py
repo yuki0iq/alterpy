@@ -206,9 +206,9 @@ async def on_rp(cm: utils.cm.CommandMessage):
             match = re.search(handler.pattern, line)
             if match:
                 arg = line[len(match[0]):]
-                cur_mention = default_mention[:]
                 arg = arg.lstrip()
                 match = re.search(mention_pattern, arg)
+                cur_mention = []
                 while match:
                     # if matched 'username' then get name
                     # if matched 'uid + len' then get name from text
@@ -228,7 +228,7 @@ async def on_rp(cm: utils.cm.CommandMessage):
                     match = re.search(mention_pattern, arg)
 
                 if cur_mention or arg:
-                    res.append(handler.invoke(user, pronoun_set, cur_mention or '', arg))
+                    res.append(handler.invoke(user, pronoun_set, cur_mention or default_mention or '', arg))
                 else:
                     res.append("RP-2 commands can't be executed without second user mention")
     if res:
