@@ -15,7 +15,7 @@ default_user_config = {
 
 
 class User(typing.NamedTuple):
-    sender: telethon.tl.types.User | telethon.tl.types.Channel | telethon.tl.types.Chat
+    sender: telethon.tl.types.User | telethon.tl.types.Channel | telethon.tl.types.Chat | int
     chat_id: int
     client: telethon.client.TelegramClient
 
@@ -47,7 +47,10 @@ class User(typing.NamedTuple):
             return None
 
     def config_name(self) -> str:
-        return f"user/{self.sender.id}.toml"
+        try:
+            return f"user/{self.sender.id}.toml"
+        except:
+            return f"user/{int(self.sender)}.toml"
 
     def load_user_config(self, check_anon: bool = True):
         return default_user_config | (utils.config.load(self.config_name()) if not self.is_self_anon(check_anon) else {})
