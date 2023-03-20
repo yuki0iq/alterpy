@@ -226,9 +226,10 @@ async def on_rp(cm: utils.cm.CommandMessage):
                     cur_mention.append(mention)
                     arg = arg.lstrip()
                     match = re.search(mention_pattern, arg)
+                cur_mention = cur_mention or default_mention
 
                 if cur_mention or arg:
-                    res.append(handler.invoke(user, pronoun_set, cur_mention or default_mention or '', arg))
+                    res.append(handler.invoke(user, pronoun_set, cur_mention or '', arg))
                 else:
                     res.append("RP-2 commands can't be executed without second user mention")
     if res:

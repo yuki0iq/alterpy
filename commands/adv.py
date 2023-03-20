@@ -22,7 +22,7 @@ async def advice(cm: utils.cm.CommandMessage):
         adv = json.loads(adv_json)['text']
     except:
         await cm.int_cur.reply("Advice API down")
-        utils.log.fail(utils.log.get("adv"), "API down")
+        utils.log.get("adv").exception("API down")
 
     await cm.int_cur.reply(f'{random.choice(["Охуенный", "Хуёвый"])} блять совет{" " + cm.arg if cm.arg else ""}: {adv}')
 

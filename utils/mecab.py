@@ -4,7 +4,7 @@ import fugashi
 
 log = utils.log.get('mecab')
 
-log.info("Probing MeCab")
+log.info("Probing MeCab...")
 try:
     fugashi.Tagger()
     log.info("MeCab OK!")

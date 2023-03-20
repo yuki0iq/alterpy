@@ -26,6 +26,3 @@ def get(name="unknown") -> logging.Logger:
 
     return log
 
-
-def fail(log: logging.Logger, text: str) -> None:
-    log.exception(text)

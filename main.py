@@ -81,11 +81,8 @@ handlers.append(utils.ch.CommandHandler(
 async def on_reload(cm: utils.cm.CommandMessage):
     global handlers
     global initial_handlers
-    res = utils.mod.load_handlers(initial_handlers, handlers, "commands")
-    res = ["reload log:"] + res
-    for i in range(0, len(res), 40):
-        res_slice = res[i:i + 40]
-        await cm.int_cur.reply('```' + '\n'.join(res_slice) + '```')
+    res = await utils.mod.load_handlers(initial_handlers, handlers, "commands")
+    await cm.int_cur.reply(res)
 
 
 handlers.append(utils.ch.CommandHandler(
@@ -102,9 +99,7 @@ utils.help.add(handlers, "commands", "справка", "команда", "comman
 
 initial_handlers[:] = handlers[:]
 
-res = utils.mod.load_handlers(initial_handlers, handlers, "commands")
-log.info('\n'.join(["loading modules log:"] + res))
-del res
+asyncio.get_event_loop().run_until_complete(utils.mod.load_handlers(initial_handlers, handlers, "commands"))
 
 
 async def process_command_message(cm: utils.cm.CommandMessage):

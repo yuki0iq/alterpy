@@ -24,7 +24,7 @@ class CommandHandler(typing.NamedTuple):
                 await self.handler_impl(cm)
             except:
                 await cm.int_cur.reply(f"Exception occurred.\n```{traceback.format_exc()}```")
-                utils.log.fail(utils.log.get("handler"), "invoke exception")
+                utils.log.get("handler").exception("invoke exception")
         else:
             await cm.int_cur.reply("Only bot admins can run elevated commands")
 
@@ -74,7 +74,7 @@ def simple_reply(
         async def on_simple_reply(cm: utils.cm.CommandMessage):
             await cm.int_cur.reply("Broken handler!")
 
-        utils.log.fail(utils.log.get("handler"), "Wrong reply answer passed")
+        utils.log.get("handler").exception("Wrong reply answer passed")
 
     if not pattern:
         pattern = utils.regex.pat_starts_with(msg)

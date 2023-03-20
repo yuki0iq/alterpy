@@ -17,7 +17,7 @@ class MessageInteractor(typing.NamedTuple):
                 await self.message.reply(f"```{traceback.format_exc()}```")
             except:
                 pass
-            utils.log.fail(utils.log.get("telethon"), "Could not reply")
+            utils.log.get("telethon").exception("Could not reply")
 
     async def respond(self, text, file=None):
         """Respond to message (without replying)"""
@@ -28,7 +28,7 @@ class MessageInteractor(typing.NamedTuple):
                 await self.message.reply(f"```{traceback.format_exc()}```")
             except:
                 pass
-            utils.log.fail(utils.log.get("telethon"), "Could not respond")
+            utils.log.get("telethon").exception("Could not respond")
 
     async def send_file(self, file, as_reply=False, **kwargs):
         """Send file with special parameters (for example as voice note)"""
@@ -44,7 +44,7 @@ class MessageInteractor(typing.NamedTuple):
                 await self.message.reply(f"```{traceback.format_exc()}```")
             except:
                 pass
-            utils.log.fail(utils.log.get("telethon"), "Could not send file")
+            utils.log.get("telethon").exception("Could not send file")
 
     async def delete(self):
         """Delete the message"""
