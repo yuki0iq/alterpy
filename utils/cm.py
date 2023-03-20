@@ -23,6 +23,7 @@ class CommandMessage(typing.NamedTuple):
     client: telethon.client.TelegramClient
     id: int
     reply_id: int  # -1 if no reply
+    msg: telethon.tl.custom.message.Message
 
 
 async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMessage:
@@ -66,7 +67,7 @@ async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMe
 
     local_time = datetime.datetime.now(datetime.timezone.utc)
 
-    return CommandMessage(arg, rep, media, reply_media, time, local_time, sender, reply_sender, int_cur, int_prev, client, id, reply_id)
+    return CommandMessage(arg, rep, media, reply_media, time, local_time, sender, reply_sender, int_cur, int_prev, client, id, reply_id, msg_cur)
 
 
 async def from_event(event: telethon.events.NewMessage) -> CommandMessage:

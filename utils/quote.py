@@ -49,7 +49,7 @@ def merge(messages: list[Message]) -> str:
     return '\n'.join(message_to_string(message, max_name, max_id) for message in messages)
 
 
-async def create(messages: list[telethon.tl.custom.message.Message], chat_id: int, client: telethon.client.TelegramClient) -> str:
+async def create(messages: [telethon.tl.custom.message.Message], chat_id: int, client: telethon.client.TelegramClient) -> str:
     res = []
     for msg in messages:
         # TODO handle reply headers

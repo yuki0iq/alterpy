@@ -13,7 +13,6 @@ import asyncio
 import re
 import telethon
 import traceback
-import sortedcollections
 
 import rich.traceback
 rich.traceback.install(show_locals=True)
@@ -117,58 +116,6 @@ async def process_command_message(cm: utils.cm.CommandMessage):
     ]
     if tasks:
         await asyncio.wait(tasks)
-
-
-message_database: dict[int, sortedcollections.SortedDict] = {}  # chat_id -> [(msg_id, telethon message)] no more than 50
-message_database_limit = 50
-
-
-def add_message(message):
-    msg_id = message.id
-    chat_id = message.chat.id
-    if chat_id not in message_database:
-        message_database[chat_id] = sortedcollections.SortedDict()
-
-    message_database[chat_id][msg_id] = message
-    while len(message_database[chat_id]) > message_database_limit:
-        message_database[chat_id].popitem(0)
-
-
-async def on_quote(cm: utils.cm.CommandMessage):
-    if not cm.reply_sender:
-        await cm.int_cur.reply("Команде необходим прикрепленный ответ")
-    else:
-        cnt = int((cm.arg or '1').split()[0])
-        start = message_database[cm.sender.chat_id].index(cm.reply_id)
-        if cnt >= 0:
-            le, ri = start, start + cnt
-        elif cnt < 0:
-            le, ri = start + cnt + 1, start + 1
-        messages = message_database[cm.sender.chat_id].values()[le:ri]
-        quote_text = await utils.quote.create(messages, cm.sender.chat_id, cm.client)
-        if quote_text[0] == ' ': quote_text = '.' + quote_text[1:]
-        # .replace('(', '\\(').replace(')', '\\)').replace('[', '\\[').replace(']', '\\]')
-        await cm.int_cur.reply('```' + quote_text + '```')
-
-
-handlers.append(utils.ch.CommandHandler(
-    name="quote",
-    pattern=utils.regex.command(utils.regex.unite('q', 'й')),
-    help_page=["quote", "цитатник"],
-    handler_impl=on_quote,
-    is_arg_current=True,
-    is_prefix=True,
-
-    is_elevated=True
-))
-
-
-@client.on(telethon.events.NewMessage)
-async def message_database_handler(event: telethon.events.NewMessage):
-    add_message(event.message)
-    msg_prev = await event.message.get_reply_message()
-    if msg_prev:
-        add_message(msg_prev)
 
 
 @client.on(telethon.events.NewMessage)
