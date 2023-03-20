@@ -6,7 +6,7 @@ logging_formatter = logging.Formatter("%(asctime)s: %(name)s [%(levelname)s]:  %
 logging.basicConfig(
     format="%(name)s:  %(message)s",
     level=logging.INFO,
-    handlers=[rich.logging.RichHandler(rich_tracebacks=True, tracebacks_show_locals=True)]
+    handlers=[rich.logging.RichHandler(rich_tracebacks=True, tracebacks_show_locals=True, markup=True)]
 )
 
 

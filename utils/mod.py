@@ -14,10 +14,10 @@ async def load_handlers_from_name(name: str) -> tuple[bool, list]:
         mod = importlib.import_module(name)
         mod = importlib.reload(mod)
         handlers = mod.handlers
-        log.info(f"Loaded {name} OK!")
+        log.info(f"Loaded [italic]{name}[/] [green bold]OK[/]!")
         return True, handlers
     except:
-        log.exception(f"Failed to load handlers from {name}, ignoring module")
+        log.exception(f"[red]Failed[/] to load handlers from [italic]{name}[/], ignoring module")
         return False, []
 
 
@@ -31,11 +31,11 @@ async def load_handlers(initial_handlers: list, handlers: list, path: str) -> st
     returns log message
     """
 
-    log.info(f"Started loading from {path}")
-
     if path[-1] != '/':
         path = path + '/'
     path = path.replace('\\', '/')
+
+    log.info(f"Started loading from ./{path}")
 
     handlers[:] = initial_handlers[:]
     filenames = list(filter(lambda fn: fn[-3:] == ".py", sorted(utils.file.list_filenames(path))))
@@ -48,7 +48,7 @@ async def load_handlers(initial_handlers: list, handlers: list, path: str) -> st
         cnt_ok += int(ok)
         handlers.extend(cur_handlers)
 
-    log.info(f"Loading from {path} finished, {cnt_ok} of {cnt} loaded successfully")
+    log.info(f"Loading from ./{path} finished, {cnt_ok} of {cnt} loaded successfully")
 
     return f"{cnt_ok} of {cnt} loaded successfully"
 
