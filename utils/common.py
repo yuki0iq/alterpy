@@ -18,14 +18,14 @@ def to_async(func):
 def to_int(val: typing.Any, default: int = 0) -> int:
     try:
         return int(val)
-    except:
+    except ValueError:
         return default
 
 
 def to_float(val: typing.Any, default: float = 0) -> float:
     try:
         return float(val)
-    except:
+    except ValueError:
         return default
 
 
