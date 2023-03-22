@@ -3,7 +3,7 @@ import utils.common
 import utils.ch
 import utils.regex
 
-handlers = []
+handler_list = []
 
 
 async def on_set_anon_en(cm: utils.cm.CommandMessage):
@@ -68,42 +68,42 @@ async def on_reset_anon_ru(cm: utils.cm.CommandMessage):
     await cm.int_cur.reply("Список чатов с анонимностью сброшен")
 
 
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "+anon",
     utils.regex.raw_command("\\+anon"),
     ["anon", "анон"], on_set_anon_en, is_prefix=True, is_arg_current=True
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "+анон",
     utils.regex.raw_command("\\+анон"),
     ["anon", "анон"], on_set_anon_ru, is_prefix=True, is_arg_current=True
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "?anon",
     utils.regex.raw_command("\\?anon"),
     ["anon", "анон"], on_get_anon_en
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "?анон",
     utils.regex.raw_command("\\?анон"),
     ["anon", "анон"], on_get_anon_ru
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "!anon",
     utils.regex.raw_command("\\!anon"),
     ["anon", "анон"], on_reset_anon_en
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "!анон",
     utils.regex.raw_command("\\!анон"),
     ["anon", "анон"], on_reset_anon_ru
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "-anon",
     utils.regex.raw_command("-anon"),
     ["anon", "анон"], on_del_anon_en, is_prefix=True, is_arg_current=True
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "-анон",
     utils.regex.raw_command("-анон"),
     ["anon", "анон"], on_del_anon_ru, is_prefix=True, is_arg_current=True

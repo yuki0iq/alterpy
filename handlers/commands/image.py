@@ -376,7 +376,7 @@ async def on_image_prog(cm: utils.cm.CommandMessage):
         await cm.int_cur.reply(f"```{traceback.format_exc()}```\nWhile executing following code:\n```{lined_code}```")
 
 
-handlers = [utils.ch.CommandHandler(
+handler_list = [utils.ch.CommandHandler(
     name="image-prog",
     pattern=utils.regex.pre_command(utils.regex.unite('pie', 'пирог')),
     help_page=["pie", "пирог"],
@@ -385,6 +385,6 @@ handlers = [utils.ch.CommandHandler(
     required_media_type={'photo', 'file'}
 )]
 
-utils.help.add(handlers, "PIE", "piehelp", "piecmd", "pie", is_eng=True)
-utils.help.add(handlers, "PIE", "состав пирога", "состав", "pie", is_eng=False)
+utils.help.add(handler_list, "PIE", "piehelp", "piecmd", "../pie", is_eng=True)
+utils.help.add(handler_list, "PIE", "состав пирога", "состав", "../pie", is_eng=False)
 

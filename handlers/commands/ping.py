@@ -10,7 +10,7 @@ import utils.common
 import datetime
 import zoneinfo
 
-handlers = []
+handler_list = []
 
 start_time = datetime.datetime.now(datetime.timezone.utc)
 
@@ -103,7 +103,7 @@ def on_stat_wrapper(lang: str):
     return on_stat
 
 
-handlers.extend(
+handler_list.extend(
     utils.ch.CommandHandler(
         name=msg,
         pattern=utils.regex.command(msg + '$'),
@@ -118,7 +118,7 @@ handlers.extend(
     ]
 )
 
-handlers.extend(
+handler_list.extend(
     utils.ch.CommandHandler(
         name=msg,
         pattern=utils.regex.command(msg + '$'),
@@ -131,7 +131,7 @@ handlers.extend(
     ]
 )
 
-handlers.extend(
+handler_list.extend(
     utils.ch.simple_reply(msg, ans, help_page=["ping", "пинг"], pattern=utils.regex.ignore_case(pat))
     for msg, ans, pat in [
         ("bot", "I'm here!", utils.regex.pat_starts_with("bot$")),

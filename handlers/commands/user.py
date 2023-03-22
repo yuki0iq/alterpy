@@ -4,7 +4,7 @@ import utils.pronouns
 import utils.regex
 import utils.str
 
-handlers = []
+handler_list = []
 
 
 async def on_set_name_en(cm: utils.cm.CommandMessage):
@@ -81,62 +81,62 @@ async def on_reset_gender_ru(cm: utils.cm.CommandMessage):
     await cm.int_cur.reply("Набор местоимений сброшен")
 
 
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "+name",
     utils.regex.raw_command("\\+name"),
     ["name", "имя"], on_set_name_en, is_prefix=True, is_arg_current=True
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "+имя",
     utils.regex.raw_command("\\+имя"),
     ["name", "имя"], on_set_name_ru, is_prefix=True, is_arg_current=True
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "?name",
     utils.regex.raw_command("\\?name"),
     ["name", "имя"], on_get_name_en
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "?имя",
     utils.regex.raw_command("\\?имя"),
     ["name", "имя"], on_get_name_ru
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "-name",
     utils.regex.raw_command("-name"),
     ["name", "имя"], on_reset_name_en
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "-имя",
     utils.regex.raw_command("-имя"),
     ["name", "имя"], on_reset_name_ru
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "+pn",
     utils.regex.raw_command("\\+pn"),
     ["name", "имя"], on_set_gender_en, is_prefix=True, is_arg_current=True
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "+мест",
     utils.regex.raw_command("\\+мест"),
     ["name", "имя"], on_set_gender_ru, is_prefix=True, is_arg_current=True
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "?pn",
     utils.regex.raw_command("\\?pn"),
     ["name", "имя"], on_get_gender_en
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "?мест",
     utils.regex.raw_command("\\?мест"),
     ["name", "имя"], on_get_gender_ru
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "-pn",
     utils.regex.raw_command("-pn"),
     ["name", "имя"], on_reset_gender_en
 ))
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     "-мест",
     utils.regex.raw_command("-мест"),
     ["name", "имя"], on_reset_gender_ru

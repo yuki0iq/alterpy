@@ -23,7 +23,7 @@ def tts_handler(name: str, lang: str) -> utils.ch.CommandHandler:
     return utils.ch.CommandHandler(f"tts-{lang}", utils.regex.command(name), ["tts", "озвучка"], on_tts_wrapper(lang), is_prefix=True)
 
 
-handlers = [
+handler_list = [
     tts_handler("tts", "en"),
     tts_handler("озвучь", "ru"),
     tts_handler("мова божія", "uk"),

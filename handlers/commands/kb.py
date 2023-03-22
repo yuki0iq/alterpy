@@ -4,7 +4,7 @@ import utils.cm
 import utils.ch
 import utils.locale
 
-handlers = []
+handler_list = []
 
 
 async def on_layout(cm: utils.cm.CommandMessage):
@@ -31,7 +31,7 @@ async def on_me(cm: utils.cm.CommandMessage):
             await cm.int_cur.reply("Can't delete message — no permission")
 
 
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     name='layout',
     pattern=utils.regex.command(utils.regex.unite('kb', 'ли', 'layout', 'дфнщге', 'раскладка', 'hfcrkflrf', 'рас', 'hfc')),
     help_page=["keyboard", "клавиатура"],
@@ -39,7 +39,7 @@ handlers.append(utils.ch.CommandHandler(
     is_prefix=True
 ))
 
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     name='iuliia',
     pattern=utils.regex.command(utils.regex.unite('trl', 'translit', 'iuliia', 'трл', 'транслит', 'йуля')),
     help_page=["keyboard", "клавиатура"],
@@ -47,7 +47,7 @@ handlers.append(utils.ch.CommandHandler(
     is_prefix=True
 ))
 
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     name="me",
     pattern=utils.regex.pre_command(utils.regex.unite('me', 'я')),
     help_page=["irc", "ирка"],

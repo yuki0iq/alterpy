@@ -2,7 +2,7 @@ import utils.cm
 import utils.ch
 import utils.regex
 
-handlers = []
+handler_list = []
 
 
 async def on_bmi(cm: utils.cm.CommandMessage):
@@ -24,7 +24,7 @@ async def on_bmi(cm: utils.cm.CommandMessage):
     await cm.int_cur.reply(f"Your BMI is {bmi} ({text})")
 
 
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     name="bmi",
     pattern=utils.regex.command(utils.regex.unite('bmi', 'имт')),
     help_page=["bmi", "имт"],

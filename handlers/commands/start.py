@@ -1,7 +1,7 @@
 import utils.ch
 import utils.regex
 
-handlers = [utils.ch.simple_reply(
+handler_list = [utils.ch.simple_reply(
     "start",
     "Привет! На связи alterpy - быстрый, потому что никому не нужный телеграм-бот!\n" +
     "\n" +

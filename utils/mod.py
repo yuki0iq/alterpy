@@ -9,11 +9,14 @@ import importlib
 log = utils.log.get("modloader")
 
 
-async def load_handlers_from_name(name: str) -> tuple[bool, list]:
+async def load_handlers_from_name(name: str, do_reload: bool) -> tuple[bool, list]:
     try:
         mod = importlib.import_module(name)
-        mod = importlib.reload(mod)
-        handlers = mod.handlers
+        if do_reload:
+            mod = importlib.reload(mod)
+            if hasattr(mod, 'init'):
+                await mod.init()
+        handlers = mod.handler_list
         log.info(f"Loaded [italic]{name}[/] [green bold]OK[/]!")
         return True, handlers
     except:
@@ -21,11 +24,11 @@ async def load_handlers_from_name(name: str) -> tuple[bool, list]:
         return False, []
 
 
-async def load_handlers_from_filename(filename: str) -> tuple[bool, list]:
-    return await load_handlers_from_name(filename[:-3].replace('/', '.'))
+async def load_handlers_from_filename(filename: str, do_reload: bool) -> tuple[bool, list]:
+    return await load_handlers_from_name(filename[:-3].replace('/', '.'), do_reload)
 
 
-async def load_handlers(initial_handlers: list, handlers: list, path: str) -> str:
+async def load_handlers(initial_handlers: list, handlers: list, path: str, do_reload: bool = False) -> str:
     """
     load all .py files from given path and merge all of their "handlers" into given with initial
     returns log message
@@ -42,7 +45,7 @@ async def load_handlers(initial_handlers: list, handlers: list, path: str) -> st
 
     cnt_ok, cnt = 0, len(filenames)
 
-    loaders = [load_handlers_from_filename(filename) for filename in filenames]
+    loaders = [load_handlers_from_filename(filename, do_reload) for filename in filenames]
     for loader in asyncio.as_completed(loaders):
         ok, cur_handlers = await loader
         cnt_ok += int(ok)

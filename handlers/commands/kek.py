@@ -1,7 +1,7 @@
 import utils.ch
 import utils.rand
 
-handlers = [
+handler_list = [
     utils.ch.simple_reply(
         'да',
         utils.rand.weighted_fun([

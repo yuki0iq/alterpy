@@ -236,4 +236,4 @@ async def on_rp(cm: utils.cm.CommandMessage):
         await cm.int_cur.reply('\n'.join(res))
 
 
-handlers = [utils.ch.CommandHandler("role", re.compile(""), ["role", "рп"], on_rp)]
+handler_list = [utils.ch.CommandHandler("role", re.compile(""), ["role", "рп"], on_rp)]

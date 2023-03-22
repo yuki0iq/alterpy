@@ -7,7 +7,7 @@ import random
 import requests
 import json
 
-handlers = []
+handler_list = []
 
 
 async def advice(cm: utils.cm.CommandMessage):
@@ -27,7 +27,7 @@ async def advice(cm: utils.cm.CommandMessage):
     await cm.int_cur.reply(f'{random.choice(["Охуенный", "Хуёвый"])} блять совет{" " + cm.arg if cm.arg else ""}: {adv}')
 
 
-handlers.append(
+handler_list.append(
     utils.ch.CommandHandler(
         name='advice',
         pattern=utils.regex.ignore_case(utils.regex.pat_starts_with(utils.regex.only_prefix() + utils.regex.unite('adv', 'совет'))),

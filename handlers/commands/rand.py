@@ -5,7 +5,7 @@ import utils.regex
 import random
 import re
 
-handlers = []
+handler_list = []
 
 prefs_en = [
     "Yuki said",
@@ -58,21 +58,21 @@ async def on_choose_en(cm: utils.cm.CommandMessage):
     await cm.int_cur.reply(f"{random.choice(prefs_en)} {random.choice(opts).strip()}")
 
 
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     name='шанс',
     pattern=utils.regex.command(utils.regex.unite('инфа', 'шанс', 'вер' + utils.regex.optional('оятность'))),
     help_page=["random", "случайность"],
     handler_impl=on_prob_ru
 ))
 
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     name='prob',
     pattern=utils.regex.command(utils.regex.unite('prob', 'chance')),
     help_page=["random", "случайность"],
     handler_impl=on_prob_en
 ))
 
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     name='выбери',
     pattern=utils.regex.command('выбери'),
     help_page=["random", "случайность"],
@@ -80,7 +80,7 @@ handlers.append(utils.ch.CommandHandler(
     is_prefix=True
 ))
 
-handlers.append(utils.ch.CommandHandler(
+handler_list.append(utils.ch.CommandHandler(
     name='choose',
     pattern=utils.regex.command(utils.regex.unite('choose', 'select')),
     help_page=["random", "случайность"],
