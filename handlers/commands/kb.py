@@ -3,6 +3,8 @@ import utils.str
 import utils.cm
 import utils.ch
 import utils.locale
+import utils.common
+import utils.kiri43i
 
 handler_list = []
 
@@ -14,8 +16,13 @@ async def on_layout(cm: utils.cm.CommandMessage):
 
 async def on_trl(cm: utils.cm.CommandMessage):
     if cm.arg:
-        await cm.int_cur.reply(utils.locale.lang('en').tr(cm.arg))
-        await cm.int_cur.reply(utils.locale.lang('ru').tr(cm.arg))
+        res = []
+        for part in utils.common.split_by_func(cm.arg, utils.str.is_eng):
+            if utils.str.is_eng(part):
+                res.append(utils.locale.lang('ru').tr(part))
+            else:
+                res.append(utils.locale.lang('en').tr(part))
+        await cm.int_cur.reply(utils.kiri43i.parse(''.join(res)))
 
 
 async def on_me(cm: utils.cm.CommandMessage):
