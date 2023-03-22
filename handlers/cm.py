@@ -12,8 +12,8 @@ import main
 the_bot_id = main.the_bot_id
 ch_list = []
 
-utils.help.add(ch_list, "commands", "help", "command", "handlers", is_eng=True)
-utils.help.add(ch_list, "commands", "справка", "команда", "handlers", is_eng=False)
+utils.help.add(ch_list, "commands", "help", "command", "commands", is_eng=True)
+utils.help.add(ch_list, "commands", "справка", "команда", "commands", is_eng=False)
 
 initial_handlers = ch_list[:]
 handlers_dir = "handlers/commands"

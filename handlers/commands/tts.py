@@ -27,7 +27,7 @@ handler_list = [
     tts_handler("tts", "en"),
     tts_handler("озвучь", "ru"),
     tts_handler("мова божія", "uk"),
-    tts_handler("vnsay", "jp"),
+    tts_handler("vnsay", "ja"),
     tts_handler("sayccp", "zh"),
     tts_handler("kosay", "ko")
 ]
