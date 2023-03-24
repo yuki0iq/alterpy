@@ -2,6 +2,7 @@ import utils.cm
 import utils.ch
 import utils.file
 import utils.regex
+import utils.log
 
 import gtts
 
@@ -9,13 +10,16 @@ import gtts
 def on_tts_wrapper(lang: str):
     async def on_tts(cm: utils.cm.CommandMessage):
         filename = f"{utils.file.temp_filename()}.mp3"
+        if not cm.arg:
+            await cm.int_cur.reply("Empty messages can't be TTSd")
+            return
+        if len(cm.arg) > 250:
+            await cm.int_cur.reply("Please wait while message is being processed...")
         try:
-            if len(cm.arg) > 250:
-                await cm.int_cur.reply("Please wait while message is being processed...")
             gtts.gTTS(cm.arg, lang=lang).save(filename)
             await cm.int_cur.send_file(filename, as_reply=True, voice_note=True)
         except:
-            await cm.int_cur.reply("Empty messages can't be TTSd")
+            utils.log.get("tts").exception("TTS error")
     return on_tts
 
 
