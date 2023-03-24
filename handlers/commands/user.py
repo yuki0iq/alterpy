@@ -47,33 +47,33 @@ async def on_set_gender_en(cm: utils.cm.CommandMessage):
     if cm.arg:
         g = utils.pronouns.from_str(cm.arg)
         cm.sender.set_pronouns(g)
-        await cm.int_cur.reply(f"Pronoun set is {utils.pronouns.to_str_en(g)}")
+        await cm.int_cur.reply(f"Pronoun set is {utils.pronouns.to_str(g, 'en')}")
     else:
-        await cm.int_cur.reply(f"Your pronoun set is {utils.pronouns.to_str_en(cm.sender.get_pronouns())}")
+        await cm.int_cur.reply(f"Your pronoun set is {utils.pronouns.to_str(cm.sender.get_pronouns(), 'en')}")
 
 
 async def on_set_gender_ru(cm: utils.cm.CommandMessage):
     if cm.arg:
         g = utils.pronouns.from_str(cm.arg)
         cm.sender.set_pronouns(g)
-        await cm.int_cur.reply(f"Установлен набор местоимений {utils.pronouns.to_str_ru(g)}")
+        await cm.int_cur.reply(f"Установлен набор местоимений {utils.pronouns.to_str(g, 'ru')}")
     else:
-        await cm.int_cur.reply(f"Ваш набор местоимений — {utils.pronouns.to_str_ru(cm.sender.get_pronouns())}")
+        await cm.int_cur.reply(f"Ваш набор местоимений — {utils.pronouns.to_str(cm.sender.get_pronouns(), 'ru')}")
 
 
 async def on_get_gender_en(cm: utils.cm.CommandMessage):
     user = cm.reply_sender or cm.sender
-    await cm.int_cur.reply(f"{utils.str.escape(await user.get_display_name())}'s pronoun set is {utils.pronouns.to_str_en(user.get_pronouns())}")
+    await cm.int_cur.reply(f"{utils.str.escape(await user.get_display_name())}'s pronoun set is {utils.pronouns.to_str(user.get_pronouns(), 'en')}")
 
 
 async def on_get_gender_ru(cm: utils.cm.CommandMessage):
     user = cm.reply_sender or cm.sender
-    await cm.int_cur.reply(f"Набор местоимений {utils.str.escape(await user.get_display_name())} — {utils.pronouns.to_str_ru(user.get_pronouns())}")
+    await cm.int_cur.reply(f"Набор местоимений {utils.str.escape(await user.get_display_name())} — {utils.pronouns.to_str(user.get_pronouns(), 'ru')}")
 
 
 async def on_reset_gender_en(cm: utils.cm.CommandMessage):
     cm.sender.reset_pronouns()
-    await cm.int_cur.reply("Prounon set is unset now")
+    await cm.int_cur.reply("Pronoun set is unset now")
 
 
 async def on_reset_gender_ru(cm: utils.cm.CommandMessage):

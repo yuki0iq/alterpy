@@ -46,8 +46,20 @@ def pre_command(a: str) -> re.Pattern:
     return raw_command(only_prefix() + a)
 
 
+def word_border() -> str:
+    return r'\b'
+
+
 def split_by_word_border(a: str) -> list:
-    return re.split('\\b', a)
+    return re.split(word_border(), a)
+
+
+def negative_lookbehind(a: str) -> str:
+    return f'(?<!{a})'
+
+
+def negative_lookahead(a: str) -> str:
+    return f'(?!{a})'
 
 
 def named(name: str, pat: str) -> str:

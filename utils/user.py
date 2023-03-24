@@ -68,12 +68,10 @@ class User(typing.NamedTuple):
     def reset_param(self, param, check_anon: bool = True):
         self.set_param(param, default_user_config[param], check_anon)
 
-    def get_pronouns(self) -> int:
+    def get_pronouns(self) -> int | list[int]:
         return self.get_param('pronoun_set')
 
-    def set_pronouns(self, pronoun_set: int):
-        if not 0 <= pronoun_set <= 2:
-            raise ValueError("Wrong pronoun set number passed")
+    def set_pronouns(self, pronoun_set: int | list[int]):
         self.set_param('pronoun_set', pronoun_set)
 
     def reset_pronouns(self):
