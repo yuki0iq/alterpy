@@ -2,6 +2,7 @@ import utils.cm
 import utils.ch
 import utils.regex
 import utils.quote
+import utils.common
 import handlers.qdb
 
 
@@ -9,8 +10,13 @@ async def on_quote(cm: utils.cm.CommandMessage):
     if not cm.reply_sender:
         await cm.int_cur.reply("Команде необходим прикрепленный ответ")
     else:
-        cnt = int((cm.arg or '1').split()[0])
-        start = handlers.qdb.message_database[cm.sender.chat_id].index(cm.reply_id)
+        cnt = utils.common.to_int((cm.arg or '1').split()[0], 1)
+        try:
+            start = handlers.qdb.message_database[cm.sender.chat_id].index(cm.reply_id)
+        except ValueError:
+            await cm.int_cur.reply("Сообщение слишком старое")
+            return
+
         if cnt >= 0:
             le, ri = start, start + cnt
         else:
