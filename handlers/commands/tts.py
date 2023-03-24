@@ -16,7 +16,7 @@ def on_tts_wrapper(lang: str):
         if len(cm.arg) > 250:
             await cm.int_cur.reply("Please wait while message is being processed...")
         try:
-            gtts.gTTS(cm.arg, lang=lang).save(filename)
+            gtts.gTTS(cm.arg.replace(chr(0xA0), ' '), lang=lang).save(filename)
             await cm.int_cur.send_file(filename, as_reply=True, voice_note=True)
         except:
             utils.log.get("tts").exception("TTS error")
