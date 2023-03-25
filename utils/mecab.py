@@ -6,16 +6,14 @@ log = utils.log.get('mecab')
 
 log.info("Probing MeCab...")
 try:
-    fugashi.Tagger()
-    log.info("MeCab OK!")
+    tagger = fugashi.Tagger()
 except RuntimeError:
     log.warning("Dictionary not found, downloading...")
     import unidic.download
     unidic.download.download_version()
     log.info("Dictionary downloaded")
-
-
-tagger = fugashi.Tagger()
+    tagger = fugashi.Tagger()
+log.info("MeCab OK!")
 
 
 def reading(s):
