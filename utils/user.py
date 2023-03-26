@@ -130,7 +130,8 @@ async def from_str(arg: str, chat_id: int, client: telethon.client.TelegramClien
         return arg, None, '', ''
 
     m = match[0]
-    pre_arg = arg[:match.endpos - len(m)]
+    idx = match.span()[0]
+    pre_arg, arg = arg[:idx], arg[idx:]
 
     # if matched 'username' then get name
     # if matched 'uid + len' then get name from text

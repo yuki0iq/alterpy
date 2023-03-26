@@ -1,8 +1,24 @@
 import pymorphy3
 import utils.pyphrasy3
 import utils.str
+import utils.log
 import utils.transliterator
 import utils.kiri43i
+import spacy
+
+
+log = utils.log.get("lang-ru")
+
+spacy_model_name = "ru_core_news_md"
+log.info("Probing spaCy-ru...")
+try:
+    nlp = spacy.load(spacy_model_name)
+except OSError:
+    log.info("Model not found, downloading...")
+    import spacy.cli.download
+    spacy.cli.download(spacy_model_name)
+    nlp = spacy.load(spacy_model_name)
+log.info("spaCy-ru OK!")
 
 
 class MorphAnalyzer:

@@ -12,3 +12,4 @@ unidic
 sortedcollections
 rich
 requests
+spacy

@@ -313,3 +313,47 @@ async def on_rp(cm: utils.cm.CommandMessage):
 
 
 handler_list = [utils.ch.CommandHandler("role", re.compile(""), ["role", "рп"], on_rp)]
+
+
+
+async def on_role(cm: utils.cm.CommandMessage):
+    self_mention = [(cm.sender, await cm.sender.get_mention())]
+    pronoun_set = cm.sender.get_pronouns()
+    default_mention = [(cm.reply_sender, await cm.reply_sender.get_mention())] if cm.reply_sender is not None else []
+    chat_id = cm.sender.chat_id
+    client = cm.client
+    res = []
+    for line in cm.arg.split('\n'):
+        if line[0] != '~':
+            continue
+
+        line = f"MENTION0 {line[1:]}"
+        mentions = self_mention[:]
+
+        pre, user, mention, post = await utils.user.from_str(line, chat_id, client)
+        while user:
+            line = f"{pre}MENTION{len(mentions)}{post}"
+            mentions.append((user, mention))
+            pre, user, mention, post = await utils.user.from_str(line, chat_id, client)
+
+        line, need_second_mention = utils.locale.lang('en').to_role(line)  # TODO lang
+
+        if '%' in line and default_mention:
+            line = line.replace('%', f'MENTION{len(mentions)}')
+            mentions.extend(default_mention)
+
+        if need_second_mention and len(mentions) == 1:
+            mentions.extend(default_mention)
+            line = f"{line} MENTION1"
+
+        if len(mentions) == 1:
+            res.append("newRP-2 commands can't be executed without second user mention")  # TODO lang
+        else:
+            for i in range(len(mentions) - 1, -1, -1):
+                line = line.replace(f'MENTION{i}', mentions[i][1])
+            res.append(line)
+    if res:
+        await cm.int_cur.reply('\n'.join(res), link_preview=False)
+
+
+handler_list.append(utils.ch.CommandHandler("role-new", utils.regex.ignore_case("(^|\n)~"), ["role", "рп"], on_role))
