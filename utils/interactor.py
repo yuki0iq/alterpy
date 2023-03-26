@@ -8,10 +8,10 @@ import traceback
 class MessageInteractor(typing.NamedTuple):
     message: telethon.tl.custom.message.Message
 
-    async def reply(self, text, file=None):
+    async def reply(self, text, file=None, link_preview=True):
         """Reply to message"""
         try:
-            return MessageInteractor(await self.message.reply(text, file=file))
+            return MessageInteractor(await self.message.reply(text, file=file, link_preview=link_preview))
         except:
             try:
                 await self.message.reply(f"```{traceback.format_exc()}```")
@@ -19,10 +19,10 @@ class MessageInteractor(typing.NamedTuple):
                 pass
             utils.log.get("telethon").exception("Could not reply")
 
-    async def respond(self, text, file=None):
+    async def respond(self, text, file=None, link_preview=True):
         """Respond to message (without replying)"""
         try:
-            return MessageInteractor(await self.message.respond(text, file=file))
+            return MessageInteractor(await self.message.respond(text, file=file, link_preview=link_preview))
         except:
             try:
                 await self.message.reply(f"```{traceback.format_exc()}```")
