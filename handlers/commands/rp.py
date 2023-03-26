@@ -264,23 +264,6 @@ rp2handlers = [
 ]
 
 
-# mention:
-#  OR:
-#    @(username)
-#      where username is (a-zA-Z0-9_){5,64} and can't start with digit
-#                        -> using simple check (word-like character)
-#    {(uid)|(len)}(name)
-#      where uid  is number
-#            len  is number
-#            name is string of len=len
-mention_pattern = utils.regex.ignore_case(
-    utils.regex.unite(
-        '@' + utils.regex.named('username', r'\w+'),
-        r'\{' + utils.regex.named_int('uid') + r'\|' + utils.regex.named_int('len') + r'\}'
-    )
-)
-
-
 async def on_rp(cm: utils.cm.CommandMessage):
     user = await cm.sender.get_mention()
     pronoun_set = cm.sender.get_pronouns()
@@ -299,7 +282,7 @@ async def on_rp(cm: utils.cm.CommandMessage):
             if match:
                 arg = line[len(match[0]):]
                 arg = arg.lstrip()
-                match = re.search(mention_pattern, arg)
+                match = re.search(utils.user.mention_pattern, arg)
                 cur_mention = []
                 while match:
                     # if matched 'username' then get name
@@ -318,7 +301,7 @@ async def on_rp(cm: utils.cm.CommandMessage):
                         mention = f"[{utils.str.escape(name)}](tg://user?id={uid})"
                     cur_mention.append((cur_user, mention))
                     arg = arg.lstrip()
-                    match = re.search(mention_pattern, arg)
+                    match = re.search(utils.user.mention_pattern, arg)
                 cur_mention = cur_mention or default_mention
 
                 if cur_mention or arg:
@@ -326,7 +309,7 @@ async def on_rp(cm: utils.cm.CommandMessage):
                 else:
                     res.append("RP-2 commands can't be executed without second user mention")
     if res:
-        await cm.int_cur.reply('\n'.join(res))
+        await cm.int_cur.reply('\n'.join(res), link_preview=False)
 
 
 handler_list = [utils.ch.CommandHandler("role", re.compile(""), ["role", "рп"], on_rp)]
