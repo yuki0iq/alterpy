@@ -75,7 +75,7 @@ def on_set_pronouns(lang: str = "en"):
             return
         pns_s = cm.arg
         pns_i = utils.pronouns.from_str(pns_s)
-        pns = utils.pronouns.to_str(pns_i)
+        pns = utils.pronouns.to_str(pns_i, lang)
         cm.sender.set_pronouns(pns_i)
         await cm.int_cur.reply(eval(LOC.get('set_pronouns', lang)))
     return impl
@@ -114,7 +114,7 @@ def on_get(lang: str = "en"):
         user = mentioned or cm.reply_sender or cm.sender
         name = await user.get_display_name()
         has_name = bool(user.get_name())
-        pns = utils.pronouns.to_str(user.get_pronouns())
+        pns = utils.pronouns.to_str(user.get_pronouns(), lang)
         rid = user.get_redirect() or 'NOT SET'
         await cm.int_cur.reply(eval(LOC.get('get', lang)))
     return impl
