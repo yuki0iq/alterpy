@@ -32,7 +32,7 @@ async def main():
     telethon_config = utils.config.load("telethon_config.toml")
     try:
         client = telethon.TelegramClient("alterpy", telethon_config['api_id'], telethon_config['api_hash'])
-        await client.start(bot_token=telethon_config['bot_token'])
+        client.start(bot_token=telethon_config['bot_token'])
         log.info("Started telethon instance")
 
         global the_bot_id

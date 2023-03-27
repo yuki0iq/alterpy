@@ -12,8 +12,8 @@ import telethon.client
 class CommandMessage(typing.NamedTuple):
     arg: str  # message text
     rep: str  # message text with reply attached
-    media: typing.Any  # media if exist
-    reply_media: typing.Any # reply media if exist
+    media: utils.media.Media  # media if exist
+    reply_media: utils.media.Media # reply media if exist
     time: datetime.datetime  # UTC time when sent
     local_time: datetime.datetime  # UTC time when recv
     sender: utils.user.User  # sender
@@ -53,7 +53,7 @@ async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMe
     rep = unmd2(msg_prev.message, msg_prev.entities) if has_reply and msg_prev.message else None
 
     # if no media is given then Media(None)
-    media = utils.media.Media(msg_cur) if msg_cur.media else utils.media.Media(msg_prev)
+    media = utils.media.Media(msg_cur)
     reply_media = utils.media.Media(msg_prev)
 
     time = msg_cur.date

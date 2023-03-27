@@ -13,8 +13,12 @@ class Media(typing.NamedTuple):
             file.seek(0)
             return file
 
+    def poll(self):
+        return self.message.poll
+
     def type(self) -> str:
         if not (self.message and self.message.media): return ""
+        if self.message.poll: return "poll"
         if self.message.photo: return "photo"
         if self.message.video: return "video"
         if self.message.video_note: return "round"

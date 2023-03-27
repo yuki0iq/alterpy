@@ -24,6 +24,7 @@ async def init():
 
 
 async def process_command_message(cm: utils.cm.CommandMessage):
+    media_type = cm.media.type()
     tasks = [
         asyncio.create_task(handler.invoke(
             utils.ch.apply(cm, handler) if handler.is_prefix else cm
@@ -31,7 +32,7 @@ async def process_command_message(cm: utils.cm.CommandMessage):
         for handler in filter(
             lambda handler:
             bool(re.search(handler.pattern, cm.arg))
-                and (cm.media.type() in handler.required_media_type
+                and (media_type in handler.required_media_type
                      or not handler.required_media_type),
             ch_list
         )

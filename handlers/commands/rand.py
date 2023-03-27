@@ -58,6 +58,10 @@ async def on_choose_en(cm: utils.cm.CommandMessage):
     await cm.int_cur.reply(f"{random.choice(prefs_en)} {random.choice(opts).strip()}")
 
 
+async def on_poll(cm: utils.cm.CommandMessage):
+    await cm.int_cur.reply(f"{random.choice(prefs_ru)} {random.choice(list(x.text for x in cm.media.poll().poll.answers)).strip()}")
+
+
 handler_list.append(utils.ch.CommandHandler(
     name='шанс',
     pattern=utils.regex.command(utils.regex.unite('инфа', 'шанс', 'вер' + utils.regex.optional('оятность'))),
@@ -86,4 +90,13 @@ handler_list.append(utils.ch.CommandHandler(
     help_page=["random", "случайность"],
     handler_impl=on_choose_en,
     is_prefix=True
+))
+
+handler_list.append(utils.ch.CommandHandler(
+    name='poll-choose-ru',
+    pattern=utils.regex.ignore_case(""),
+    help_page=["random", "случайность"],
+    handler_impl=on_poll,
+    required_media_type={"poll"},
+    is_arg_current=True
 ))
