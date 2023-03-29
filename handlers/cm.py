@@ -6,10 +6,10 @@ import telethon.tl.custom.message
 import asyncio
 import utils.mod
 import utils.help
-import main
+import context
 
 
-the_bot_id = main.the_bot_id
+the_bot_id = context.the_bot_id
 ch_list = []
 
 utils.help.add(ch_list, "commands", "help", "command", "commands", is_eng=True)

@@ -6,10 +6,10 @@ import asyncio
 import telethon.events
 import telethon.tl.custom.message
 import rich.traceback
+import context
 
 
 log = utils.log.get("main")
-the_bot_id = 0
 message_handlers = []
 
 
@@ -29,23 +29,29 @@ async def event_handler(event: telethon.events.NewMessage):
 async def main():
     log.info("AlterPy")
 
+    config = utils.config.load("config.toml")
+    for el in config["admins"]: context.admins.add(el)
+    for el in config["banned"]: context.banned.add(el)
+    del config
+    del el
+    log.info("loaded config")
+
     telethon_config = utils.config.load("telethon_config.toml")
     try:
         client = telethon.TelegramClient("alterpy", telethon_config['api_id'], telethon_config['api_hash'])
-        client.start(bot_token=telethon_config['bot_token'])
-        log.info("Started telethon instance")
-
-        global the_bot_id
-        the_bot_id = int(telethon_config['bot_token'].split(':')[0])
-        del telethon_config
-
-        global message_handlers
-        await utils.mod.load_handlers([], message_handlers, "handlers", True)
-
-        client.add_event_handler(event_handler, telethon.events.NewMessage)
-
-        log.info("Started!")
+        await client.start(bot_token=telethon_config['bot_token'])
         async with client:
+            log.info("Started telethon instance")
+
+            context.the_bot_id = int(telethon_config['bot_token'].split(':')[0])
+            del telethon_config
+
+            global message_handlers
+            await utils.mod.load_handlers([], message_handlers, "handlers", True)
+
+            client.add_event_handler(event_handler, telethon.events.NewMessage)
+
+            log.info("Started!")
             await client.run_until_disconnected()
     except sqlite3.OperationalError:
         log.error("Another instance of this bot is already running!")

@@ -1,9 +1,9 @@
+import context
 import utils.config
 import utils.str
 import utils.log
 import utils.regex
 import re
-
 import typing
 import telethon.tl.types
 import telethon.utils
@@ -25,7 +25,7 @@ class User(typing.NamedTuple):
     client: telethon.client.TelegramClient
 
     def is_admin(self) -> bool:  # check if in admins list
-        return self.sender.id in utils.config.load("config.toml")["admins"]
+        return self.sender.id in context.admins
 
     async def get_display_name(self) -> str:
         display_name = self.get('name')
