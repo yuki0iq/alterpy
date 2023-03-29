@@ -4,3 +4,4 @@ user/
 .git/
 *.session
 *.session-journal
+/config.toml
