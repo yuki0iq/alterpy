@@ -11,7 +11,7 @@ handler_list = []
 
 async def on_layout(cm: utils.cm.CommandMessage):
     if cm.arg:
-        await cm.int_cur.reply(utils.str.change_layout(cm.arg))
+        await cm.int_cur.reply(utils.str.escape(utils.str.change_layout(cm.arg)))
 
 
 async def on_trl(cm: utils.cm.CommandMessage):
@@ -22,7 +22,7 @@ async def on_trl(cm: utils.cm.CommandMessage):
                 res.append(utils.locale.lang('ru').tr(part))
             else:
                 res.append(utils.locale.lang('en').tr(part))
-        await cm.int_cur.reply(utils.kiri43i.parse(''.join(res)))
+        await cm.int_cur.reply(utils.str.escape(utils.kiri43i.parse(''.join(res))))
 
 
 async def on_me(cm: utils.cm.CommandMessage):

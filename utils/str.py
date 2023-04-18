@@ -68,5 +68,5 @@ def rjust(s: str, n: int) -> str:
 
 
 def escape(s: str) -> str:
-    return s.replace('\\', '\\\\').replace('_', r'\_').replace('[', r'\[').replace(']', r'\]').replace('*', r'\*')
+    return s.replace('\\', '\\\\').replace('_', r'\_').replace('[', r'\[').replace(']', r'\]').replace('*', r'\*').replace('`', r'\`')
 

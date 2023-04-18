@@ -346,7 +346,7 @@ async def on_role(cm: utils.cm.CommandMessage):
             mentions.extend(default_mention)
             line = f"{line} MENTION1"
 
-        if len(mentions) == 1:
+        if need_second_mention and len(mentions) == 1:
             res.append("newRP-2 commands can't be executed without second user mention")  # TODO lang
         else:
             for i in range(len(mentions) - 1, -1, -1):

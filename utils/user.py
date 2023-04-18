@@ -139,8 +139,12 @@ async def from_str(arg: str, chat_id: int, client: telethon.client.TelegramClien
 
     if vars['username'] is not None:
         username, arg = m[1:], arg[len(m):]
-        cur_user = await utils.user.from_telethon(username, chat=chat_id, client=client)
-        mention = await cur_user.get_mention()
+        try:
+            cur_user = await utils.user.from_telethon(username, chat=chat_id, client=client)
+            mention = await cur_user.get_mention()
+        except ValueError:
+            cur_user = None
+            mention = f"@{username}"
     else:
         uid = int(vars['uid'])
         l = int(vars['len'])

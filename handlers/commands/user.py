@@ -57,6 +57,7 @@ def on_set_name(lang: str = "en"):
             return
         name = cm.arg
         cm.sender.set_name(name)
+        name = utils.str.escape(name)
         await cm.int_cur.reply(eval(LOC.get('set_name', lang)))
     return impl
 
@@ -112,7 +113,7 @@ def on_get(lang: str = "en"):
     async def impl(cm: utils.cm.CommandMessage):
         _, mentioned, _, _ = await utils.user.from_str(cm.arg, cm.sender.chat_id, cm.client)
         user = mentioned or cm.reply_sender or cm.sender
-        name = await user.get_display_name()
+        name = utils.str.escape(await user.get_display_name())
         has_name = bool(user.get_name())
         pns = utils.pronouns.to_str(user.get_pronouns(), lang)
         rid = user.get_redirect() or 'NOT SET'
