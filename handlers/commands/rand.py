@@ -59,7 +59,7 @@ async def on_choose_en(cm: utils.cm.CommandMessage):
 
 
 async def on_poll(cm: utils.cm.CommandMessage):
-    await cm.int_cur.reply(f"{random.choice(prefs_ru)} {random.choice(list(x.text for x in cm.media.poll().poll.answers)).strip()}")
+    await cm.int_cur.reply(f"{random.choice(prefs_ru)} {utils.str.escape(random.choice(list(x.text for x in cm.media.poll().poll.answers)).strip())}")
 
 
 handler_list.append(utils.ch.CommandHandler(
