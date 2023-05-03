@@ -73,6 +73,17 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
+        utils.regex.command("выебать"),
+        [
+            utils.common.wrap("😈 | {0} выебал(а) {1} {2}"),
+            utils.common.wrap("😈 | {0} выебал {1} {2}"),
+            utils.common.wrap("😈 | {0} выебала {1} {2}"),
+            utils.common.wrap("😈 | {0} выебало {1} {2}"),
+            utils.common.wrap("😈 | {0} выебало {1} {2}"),
+            utils.common.wrap("😈 | {0} выебали {1} {2}"),
+        ]
+    ),
+    RP2Handler(
         utils.regex.command("дать"),
         [
             utils.common.wrap("🎁 | {0} дал(а) {1} {2}"),
