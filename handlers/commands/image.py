@@ -385,6 +385,6 @@ handler_list = [utils.ch.CommandHandler(
     required_media_type={'photo', 'file'}
 )]
 
-utils.help.add(handler_list, "PIE", "piehelp", "piecmd", "../pie", is_eng=True)
-utils.help.add(handler_list, "PIE", "состав пирога", "состав", "../pie", is_eng=False)
+utils.help.add(handler_list, "PIE", "piehelp", "piecmd", "pie", is_eng=True)
+utils.help.add(handler_list, "PIE", "подушка пирога", "подушка", "pie", is_eng=False)
 
