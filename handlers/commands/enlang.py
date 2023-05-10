@@ -14,6 +14,19 @@ except:
     dic = wn.Wordnet('omw-en')
 
 
+pos_names = {
+    'n': 'noun',
+    'v': 'verb',
+    'a': 'adj',
+    'r': 'adv',
+    's': 'adj-sat',
+    'c': 'conj',
+    'p': 'adpos',
+    'x': 'other',
+    'u': 'unknown'
+}
+
+
 async def define(cm: utils.cm.CommandMessage):
     if cm.arg:
         res = dic.synsets(cm.arg)
@@ -23,7 +36,7 @@ async def define(cm: utils.cm.CommandMessage):
         _arg = utils.str.escape(cm.arg)
         ss = [f"*{_arg}*"]
         for i, e in enumerate(res):
-            _pos = utils.str.escape(e.pos)
+            _pos = utils.str.escape(pos_names[e.pos])
             _def = utils.str.escape(e.definition()) 
             ss.append(f"{i+1}. _{_pos}_, {_def}")
         await cm.int_cur.reply('\n'.join(ss))
