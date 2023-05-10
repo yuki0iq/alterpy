@@ -28,7 +28,8 @@ class MorphAnalyzer:
         self.morph = morph
 
     def parse(self, word):
-        return [el._replace(word=utils.str.equal_capitalize(el.word, word)) for el in self.morph.parse(word)]
+        E = lambda x: utils.str.equal_capitalize(x, word)
+        return [el._replace(word=E(el.word), normal_form=E(el.normal_form)) for el in self.morph.parse(word)]
 
 
 def parse_inflect(word, form):
