@@ -20,7 +20,7 @@ handlers_dir = "handlers/commands"
 
 
 async def init():
-    await utils.mod.load_handlers(initial_handlers, ch_list, handlers_dir)
+    await utils.mod.load_handlers(initial_handlers, ch_list, handlers_dir, True)
 
 
 async def process_command_message(cm: utils.cm.CommandMessage):
