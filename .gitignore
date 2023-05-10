@@ -5,3 +5,4 @@ user/
 *.session
 *.session-journal
 /config.toml
+__pycache__
