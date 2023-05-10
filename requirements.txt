@@ -13,5 +13,5 @@ sortedcollections
 rich
 requests
 spacy
-aiobalaboba
+wn
 aiohttp
