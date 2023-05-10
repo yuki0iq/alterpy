@@ -1,5 +1,6 @@
 import unicodedata
 import utils.common
+import urllib.parse
 
 
 def change_layout(s: str) -> str:
@@ -69,4 +70,8 @@ def rjust(s: str, n: int) -> str:
 
 def escape(s: str) -> str:
     return s.replace('\\', '\\\\').replace('_', r'\_').replace('[', r'\[').replace(']', r'\]').replace('*', r'\*').replace('`', r'\`')
+
+
+def urlencode(s: str) -> str:
+    return urllib.parse.quote(s)
 
