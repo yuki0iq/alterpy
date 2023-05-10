@@ -4,39 +4,29 @@ import utils.log
 import utils.regex
 import utils.str
 
-import random
-import requests
+import aiohttp
 import json
 
 handler_list = []
+session = None
 
 
-async def advice(cm: utils.cm.CommandMessage):
-    await cm.int_cur.reply(r"@yuki\_the\_girl temporarily disabled this")
-    return
+async def init():
+    global session
+    session = aiohttp.ClientSession()
 
-    adv = "Не досупен"
-    try:
-        adv_json = requests.get(
-            'http://fucking-great-advice.ru/api/random',
-            headers={
-                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:101.0) Gecko/20100101 Firefox/101.0'
-            }
-        ).text
-        adv = json.loads(adv_json)['text']
-    except:
-        await cm.int_cur.reply("Advice API down")
-        utils.log.get("adv").exception("API down")
 
-    await cm.int_cur.reply(f'{random.choice(["Охуенный", "Хуёвый"])} блять совет{" " + utils.str.escape(cm.arg) if cm.arg else ""}: {adv}')
+async def calend_ru(cm: utils.cm.CommandMessage):
+    async with session.get('https://www.calend.ru/img/export/informer.png') as response:
+        await cm.int_cur.reply('Праздники сегодня', await response.read())
 
 
 handler_list.append(
     utils.ch.CommandHandler(
-        name='advice',
-        pattern=utils.regex.ignore_case(utils.regex.pat_starts_with(utils.regex.only_prefix() + utils.regex.unite('adv', 'совет'))),
-        help_page=['advice', 'совет'],
-        handler_impl=advice,
+        name='calend_ru',
+        pattern=utils.regex.ignore_case(utils.regex.pat_starts_with(utils.regex.prefix() + utils.regex.unite('holidays', 'праздники'))),
+        help_page=['holidays', 'праздники'],
+        handler_impl=calend_ru,
         is_prefix=True
     )
 )
