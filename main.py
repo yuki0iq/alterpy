@@ -31,7 +31,6 @@ async def main():
 
     config = utils.config.load("config.toml")
     for el in config["admins"]: context.admins.add(el)
-    for el in config["banned"]: context.banned.add(el)
     del config
     del el
     log.info("loaded config")
