@@ -22,6 +22,9 @@ async def init():
 
 
 async def balaboba(cm: utils.cm.CommandMessage):
+    if not cm.arg:
+        await cm.int_cur.reply("Пустой запрос не хорошо")
+        return
     await cm.int_cur.reply("Запрос обрабатывается, подождите...")
     try:
         res = await bb.balaboba(cm.arg, text_type=text_types[0])
