@@ -2,6 +2,7 @@ import utils.log
 import utils.config
 import utils.mod
 import sqlite3
+import aiohttp
 import asyncio
 import telethon.events
 import telethon.tl.custom.message
@@ -37,21 +38,22 @@ async def main():
 
     telethon_config = utils.config.load("telethon_config.toml")
     try:
-        client = telethon.TelegramClient("alterpy", telethon_config['api_id'], telethon_config['api_hash'])
-        await client.start(bot_token=telethon_config['bot_token'])
-        async with client:
-            log.info("Started telethon instance")
+        async with aiohttp.ClientSession() as context.session:
+            client = telethon.TelegramClient("alterpy", telethon_config['api_id'], telethon_config['api_hash'])
+            await client.start(bot_token=telethon_config['bot_token'])
+            async with client:
+                log.info("Started telethon instance")
 
-            context.the_bot_id = int(telethon_config['bot_token'].split(':')[0])
-            del telethon_config
+                context.the_bot_id = int(telethon_config['bot_token'].split(':')[0])
+                del telethon_config
 
-            global message_handlers
-            await utils.mod.load_handlers([], message_handlers, "handlers", True)
+                global message_handlers
+                await utils.mod.load_handlers([], message_handlers, "handlers", True)
 
-            client.add_event_handler(event_handler, telethon.events.NewMessage)
+                client.add_event_handler(event_handler, telethon.events.NewMessage)
 
-            log.info("Started!")
-            await client.run_until_disconnected()
+                log.info("Started!")
+                await client.run_until_disconnected()
     except sqlite3.OperationalError:
         log.error("Another instance of this bot is already running!")
 
