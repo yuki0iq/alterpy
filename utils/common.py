@@ -9,6 +9,9 @@ def wrap(val: typing.Any) -> typing.Callable[[], typing.Any]:
     return lambda: val
 
 
+def starts_with(greater, lesser):
+    return len(lesser) <= len(greater) and all(x == y for x, y in zip(lesser, greater))
+
 def to_async(func):
     async def to_async_impl(*args, **kwargs):
         return func(*args, **kwargs)
