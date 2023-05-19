@@ -32,6 +32,10 @@ translations = {
     'err': {
         'ru': 'Место не найдено',
         'en': 'Place not found',
+    },
+    'wait': {
+        'ru': 'Запрос обрабатывается, подождите...',
+        'en': 'Please wait for weather report to generate...',
     }
 }
 LOC = utils.locale.Localizator(translations)
@@ -42,10 +46,11 @@ def weather(lang: str):
         if not cm.arg:
             await cm.int_cur.reply(LOC.obj('no', lang))
             return
+        await cm.int_cur.reply(LOC.obj('wait', lang))
         words = ' '.join(cm.arg.split()).lower()
         other_dic = {True: cm.arg} | dict([(words.startswith(w), words[len(w):]) for w in LOC.obj('in', lang)]) | dict([(words.startswith(w), '~' + words[len(w):]) for w in LOC.obj('near', lang)])
         arg = other_dic[True]
-        argp = arg.replace(' ', '+')
+        argp = arg.strip().replace(' ', '+')
         error_str = '>>>   404'
         async with context.session.get(f'https://v1.wttr.in/{argp}?T0') as v1:
             data_v1 = await v1.read()
