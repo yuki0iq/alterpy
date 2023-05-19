@@ -6,6 +6,7 @@ import telethon.tl.custom.message
 import asyncio
 import utils.mod
 import utils.help
+import utils.aiospeller
 import context
 
 
@@ -25,13 +26,15 @@ async def init():
 
 async def process_command_message(cm: utils.cm.CommandMessage):
     media_type = cm.media.type()
+    # TODO fix prefix commands...
+    fixed_arg = await utils.aiospeller.correct(context.session, cm.arg)
     tasks = [
         asyncio.create_task(handler.invoke(
             utils.ch.apply(cm, handler) if handler.is_prefix else cm
         ))
         for handler in filter(
             lambda handler:
-            bool(re.search(handler.pattern, cm.arg))
+            bool(re.search(handler.pattern, fixed_arg))
                 and (media_type in handler.required_media_type
                      or not handler.required_media_type),
             ch_list
@@ -39,6 +42,7 @@ async def process_command_message(cm: utils.cm.CommandMessage):
     ]
     if tasks:
         await asyncio.wait(tasks)
+        # todo exception handle?
 
 
 async def on_command_message(msg: telethon.tl.custom.message.Message):
