@@ -221,7 +221,7 @@ class Transliterator:
                 else self.__COMBINATED_E_PHONEMES[segment] if segment.lower() in self.IOT_VOWELS \
                 else self.__inverted_phonemes[segment]
             res = self.__transliterate_vowels_sequence(text, answer, elems, i)
-        elif segment.lower() in ['ij', 'iy', 'yi', 'yj'] and not text[i + 2].isalnum():
+        elif segment.lower() in ['ij', 'iy', 'yi', 'yj'] and (i + 2 == len(text) or not text[i + 2].isalnum()):
             res = self.__transliterate_vowel_ending(text, elems, i)
         elif segment.lower() in ['ij', 'iy', 'yi', 'yj']:
             res = self.__inverted_phonemes[text[i:i + 1]]
