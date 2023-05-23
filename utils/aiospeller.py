@@ -11,16 +11,12 @@ async def correct(session: aiohttp.ClientSession, text: str) -> str:
     async with session.post(url, data={'text': text}) as resp:
         data = await resp.json()
     
-    data.sort(key=lambda x: (x['row'], x['col']), reverse=True)
+    data.sort(key=lambda x: x['pos'], reverse=True)
     
-    newlines = [0]
-    for i in range(len(text)-1):
-        if text[i] == '\n':
-            newlines.append(i+1)
-
-    pos = lambda r, c: newlines[r] + c
     for el in data:
-        p = pos(el['row'], el['col'])
+        p = el['pos']
+        if p and text[p-1] == '@':
+            continue
         l = el['len']
         s = el['s'][0]
         text = text[:p] + s + text[p+l:]
