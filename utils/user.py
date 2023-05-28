@@ -14,7 +14,7 @@ import io
 default_user_config = {
     'name': '',
     'pronoun_set': 0,
-    'anon': [],
+    'lang': 'en',
     'replace_id': 0
 }
 
@@ -62,19 +62,14 @@ class User(typing.NamedTuple):
         except:
             return None
 
-    def config_name(self) -> str:
-        return f"user/{self.sender.id}.toml"
+    def config_name(self) -> str: return f"user/{self.sender.id}.toml"
 
-    def load_user_config(self, check_anon: bool = True):
-        return default_user_config | (utils.config.load(self.config_name()) if not self.is_self_anon(check_anon) else {})
+    def load_user_config(self): return default_user_config | utils.config.load(self.config_name())
+    def save_user_config(self, conf): utils.config.save(self.config_name(), conf)
 
-    def save_user_config(self, conf, check_anon: bool = True):
-        if not self.is_self_anon(check_anon):
-            utils.config.save(self.config_name(), conf)
-
-    def get(self, param, check_anon: bool = True): return self.load_user_config(check_anon)[param]
-    def set(self, param, val, check_anon: bool = True): self.save_user_config(self.load_user_config(check_anon) | {param: val}, check_anon)
-    def reset(self, param, check_anon: bool = True): self.set(param, default_user_config[param], check_anon)
+    def get(self, param): return self.load_user_config()[param]
+    def set(self, param, val): self.save_user_config(self.load_user_config() | {param: val})
+    def reset(self, param): self.set(param, default_user_config[param])
 
     def get_pronouns(self) -> int | list[int]: return self.get('pronoun_set')
     def set_pronouns(self, pronoun_set: int | list[int]): self.set('pronoun_set', pronoun_set)
@@ -88,13 +83,9 @@ class User(typing.NamedTuple):
     def set_redirect(self, uid: int): self.set('replace_id', uid)
     def reset_redirect(self): self.reset('replace_id')
 
-    def get_anon_chats(self) -> typing.Set[int]: return self.get('anon', False)
-    def add_anon_chat(self, id: int): self.set('anon', list(set(self.get_anon_chats()) | {id}))
-    def del_anon_chat(self, id: int): self.set('anon', list(set(self.get_anon_chats()) - {id}))
-    def reset_anon_chats(self): self.reset('anon')
-
-    def is_anon(self, id: int) -> bool: return id in self.get_anon_chats()
-    def is_self_anon(self, check_anon: bool = True): return check_anon and self.is_anon(self.chat_id)
+    def get_lang(self) -> str: return self.get('lang')
+    def set_lang(self, lang: str) -> str: return self.set('lang', lang)
+    def reset_lang(self): self.reset('lang')
 
 
 async def from_telethon(user: telethon.tl.types.User | telethon.tl.types.Channel | str | int | None,

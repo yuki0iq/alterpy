@@ -46,6 +46,18 @@ def pre_command(a: str) -> re.Pattern:
     return raw_command(only_prefix() + a)
 
 
+def add_command(a: str) -> re.Pattern:
+    return raw_command(r'\+' + a)
+
+
+def del_command(a: str) -> re.Pattern:
+    return raw_command('-' + a)
+
+
+def ask_command(a: str) -> re.Pattern:
+    return raw_command(r'\?' + a)
+
+
 def word_border() -> str:
     return r'\b'
 

@@ -41,6 +41,22 @@ translations = {
         'en': 'Mention redirect set to {rid}',
         'ru': 'Перенаправление упоминаний установлено на {rid}',
     },
+    'reset_redirect': { 
+        'en': 'Redirect set to nothing',
+        'ru': 'Перенаправление упоминаний сброшено',
+    },
+    'set_lang_empty': {
+        'en': 'Can not set lang to empty. To reset use `-lang`',
+        'ru': 'Невозможно установить пустой язык. Для сброса используйте `-язык`',
+    },
+    'set_lang': {
+        'en': 'Language set to {lang}',
+        'ru': 'Установлен язык {lang}',
+    },
+    'reset_lang': {
+        'en': 'Language is reset',
+        'ru': 'Язык сброшен',
+    },
     'get': {  # TODO
         'en': "{name}'s pronouns are {pns}. Name set? {has_name}. Redirect? {rid}",
         'ru': "Набор местоимений {name} — {pns}. Установлено имя? {has_name}. Перенаправление? {rid}",
@@ -50,91 +66,89 @@ translations = {
 LOC = utils.locale.Localizator(translations)
 
 
-def on_set_name(lang: str = "en"):
-    async def impl(cm: utils.cm.CommandMessage):
-        if not cm.arg:
-            await cm.int_cur.reply(LOC.obj('set_name_empty', lang))
-            return
-        name = cm.arg
-        cm.sender.set_name(name)
-        name = utils.str.escape(name)
-        await cm.int_cur.reply(eval(LOC.get('set_name', lang)))
-    return impl
+async def on_set_name(cm: utils.cm.CommandMessage):
+    if not cm.arg:
+        await cm.int_cur.reply(LOC.obj('set_name_empty', cm.lang))
+        return
+    name = cm.arg
+    cm.sender.set_name(name)
+    name = utils.str.escape(name)
+    await cm.int_cur.reply(eval(LOC.get('set_name', cm.lang)))
 
 
-def on_reset_name(lang: str = "en"):
-    async def impl(cm: utils.cm.CommandMessage):
-        cm.sender.reset_name()
-        await cm.int_cur.reply(LOC.obj('reset_name', lang))
-    return impl
+async def on_reset_name(cm: utils.cm.CommandMessage):
+    cm.sender.reset_name()
+    await cm.int_cur.reply(LOC.obj('reset_name', cm.lang))
 
 
-def on_set_pronouns(lang: str = "en"):
-    async def impl(cm: utils.cm.CommandMessage):
-        if not cm.arg:
-            await cm.int_cur.reply(LOC.obj('set_pronouns_empty', lang))
-            return
-        pns_s = cm.arg
-        pns_i = utils.pronouns.from_str(pns_s)
-        pns = utils.pronouns.to_str(pns_i, lang)
-        cm.sender.set_pronouns(pns_i)
-        await cm.int_cur.reply(eval(LOC.get('set_pronouns', lang)))
-    return impl
+async def on_set_pronouns(cm:utils.cm.CommandMessage):
+    if not cm.arg:
+        await cm.int_cur.reply(LOC.obj('set_pronouns_empty', cm.lang))
+        return
+    pns_s = cm.arg
+    pns_i = utils.pronouns.from_str(pns_s)
+    pns = utils.pronouns.to_str(pns_i, cm.lang)
+    cm.sender.set_pronouns(pns_i)
+    await cm.int_cur.reply(eval(LOC.get('set_pronouns', cm.lang)))
 
 
-def on_reset_pronouns(lang: str = "en"):
-    async def impl(cm: utils.cm.CommandMessage):
-        cm.sender.reset_pronouns()
-        await cm.int_cur.reply(LOC.obj('reset_pronouns', lang))
-    return impl
+
+async def on_reset_pronouns(cm: utils.cm.CommandMessage):
+    cm.sender.reset_pronouns()
+    await cm.int_cur.reply(LOC.obj('reset_pronouns', cm.lang))
 
 
-def on_set_redirect(lang: str = "en"):
-    async def impl(cm: utils.cm.CommandMessage):
-        _, mentioned, _, _ = await utils.user.from_str(cm.arg, cm.sender.chat_id, cm.client)
-        user = mentioned or cm.reply_sender
-        if not user:
-            await cm.int_cur.reply(LOC.obj('set_redirect_empty', lang))
-            return
-        rid = user.sender.id
-        cm.sender.set_redirect(rid)
-        await cm.int_cur.reply(eval(LOC.get('set_redirect', lang)))
-    return impl
+async def on_set_redirect(cm: utils.cm.CommandMessage):
+    _, mentioned, _, _ = await utils.user.from_str(cm.arg, cm.sender.chat_id, cm.client)
+    user = mentioned or cm.reply_sender
+    if not user:
+        await cm.int_cur.reply(LOC.obj('set_redirect_empty', cm.lang))
+        return
+    rid = user.sender.id
+    cm.sender.set_redirect(rid)
+    await cm.int_cur.reply(eval(LOC.get('set_redirect', cm.lang)))
 
 
-def on_reset_redirect(lang: str = "en"):
-    async def impl(cm: utils.cm.CommandMessage):
-        cm.sender.reset_redirect()
-        await cm.int_cur.reply(LOC.obj('reset_redirect', lang))
-    return impl
+async def on_reset_redirect(cm: utils.cm.CommandMessage):
+    cm.sender.reset_redirect()
+    await cm.int_cur.reply(LOC.obj('reset_redirect', cm.lang))
 
 
-def on_get(lang: str = "en"):
-    async def impl(cm: utils.cm.CommandMessage):
-        _, mentioned, _, _ = await utils.user.from_str(cm.arg, cm.sender.chat_id, cm.client)
-        user = mentioned or cm.reply_sender or cm.sender
-        name = utils.str.escape(await user.get_display_name())
-        has_name = bool(user.get_name())
-        pns = utils.pronouns.to_str(user.get_pronouns(), lang)
-        rid = user.get_redirect() or 'NOT SET'
-        await cm.int_cur.reply(eval(LOC.get('get', lang)))
-    return impl
+async def on_set_lang(cm: utils.cm.CommandMessage):
+    if not cm.arg:
+        await cm.int_cur.reply(LOC.obj('set_lang_empty', cm.lang))
+        return
+    # TODO check if supported, maybe add lang preference list (likely to be slow but this is python, nothing new)
+    lang = cm.arg
+    cm.sender.set_lang(lang)
+    await cm.int_cur.reply(eval(LOC.get('set_lang', cm.lang)))
 
 
-handler_list.append(utils.ch.CommandHandler("+name",  utils.regex.raw_command(r"\+name"),  "name", on_set_name('en'), is_prefix=True, is_arg_current=True))
-handler_list.append(utils.ch.CommandHandler("+имя",   utils.regex.raw_command(r"\+имя"),   "имя",  on_set_name('ru'), is_prefix=True, is_arg_current=True))
-handler_list.append(utils.ch.CommandHandler("-name",  utils.regex.raw_command("-name"),    "name", on_reset_name('en')))
-handler_list.append(utils.ch.CommandHandler("-имя",   utils.regex.raw_command("-имя"),     "имя",  on_reset_name('ru')))
-handler_list.append(utils.ch.CommandHandler("+pn",    utils.regex.raw_command(r"\+pn"),    "name", on_set_pronouns('en'), is_prefix=True, is_arg_current=True))
-handler_list.append(utils.ch.CommandHandler("+мест",  utils.regex.raw_command(r"\+мест"),  "имя",  on_set_pronouns('ru'), is_prefix=True, is_arg_current=True))
-handler_list.append(utils.ch.CommandHandler("-pn",    utils.regex.raw_command(r"-pn"),     "name", on_reset_pronouns('en')))
-handler_list.append(utils.ch.CommandHandler("-мест",  utils.regex.raw_command(r"-мест"),   "имя",  on_reset_pronouns('ru')))
-handler_list.append(utils.ch.CommandHandler("+redir", utils.regex.raw_command(r"\+redir"), "name", on_set_redirect('en'), is_prefix=True, is_arg_current=True))
-handler_list.append(utils.ch.CommandHandler("+напр",  utils.regex.raw_command(r"\+напр"),  "имя",  on_set_redirect('ru'), is_prefix=True, is_arg_current=True))
-handler_list.append(utils.ch.CommandHandler("-redir", utils.regex.raw_command(r"-redir"),  "name", on_reset_redirect('en')))
-handler_list.append(utils.ch.CommandHandler("-напр",  utils.regex.raw_command(r"-напр"),   "имя",  on_reset_redirect('ru')))
+async def on_reset_lang(cm: utils.cm.CommandMessage):
+    cm.sender.reset_lang()
+    await cm.int_cur.reply(LOC.obj('reset_lang'))
 
-handler_list.append(utils.ch.CommandHandler("?name", utils.regex.raw_command(r"\?name"), "name", on_get('en'), is_prefix=True, is_arg_current=True))
-handler_list.append(utils.ch.CommandHandler("?имя",  utils.regex.raw_command(r"\?имя"),  "имя",  on_get('ru'), is_prefix=True, is_arg_current=True))
-handler_list.append(utils.ch.CommandHandler("?pn",   utils.regex.raw_command(r"\?pn"),   "name", on_get('en'), is_prefix=True, is_arg_current=True))
-handler_list.append(utils.ch.CommandHandler("?мест", utils.regex.raw_command(r"\?мест"), "имя",  on_get('ru'), is_prefix=True, is_arg_current=True))
+
+async def on_get(cm: utils.cm.CommandMessage):
+    _, mentioned, _, _ = await utils.user.from_str(cm.arg, cm.sender.chat_id, cm.client)
+    user = mentioned or cm.reply_sender or cm.sender
+    name = utils.str.escape(await user.get_display_name())
+    has_name = bool(user.get_name())
+    pns = utils.pronouns.to_str(user.get_pronouns(), cm.lang)
+    rid = user.get_redirect() or 'NOT SET'
+    await cm.int_cur.reply(eval(LOC.get('get', cm.lang)))
+
+
+for add, sub, get, cmd, cmds in [
+    (on_set_name,     on_reset_name,     on_get, 'name',  ['name',  'имя']),
+    (on_set_pronouns, on_reset_pronouns, on_get, 'pn',    ['pn',    'мест']),
+    (on_set_redirect, on_reset_redirect, on_get, 'redir', ['redir', 'напр']),
+    (on_set_lang,     on_reset_lang,     on_get, 'lang',  ['lang',  'язык']),
+]:
+    cmds = utils.regex.union(cmds)
+    handler_list.extend([
+        utils.ch.CommandHandler(f'+{cmd}', utils.regex.add_command(cmds), 'name', add, is_prefix=True, is_arg_current=True),
+        utils.ch.CommandHandler(f'-{cmd}', utils.regex.del_command(cmds), 'name', sub),
+        utils.ch.CommandHandler(f'?{cmd}', utils.regex.ask_command(cmds), 'name', get),
+    ])
+
