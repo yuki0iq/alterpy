@@ -12,7 +12,7 @@ handler_list = [utils.ch.simple_reply(
     "Пинг до бота: `/ping`\n" +
     "\n" +
     "В разработке принимали участие: t.me/yuki\_the\_girl",
-    ["start", "начало"],
+    "start",
     utils.regex.raw_command("/start(@alterpy_bot)?")
 )]
 

@@ -67,7 +67,7 @@ handler_list.extend(
     utils.ch.CommandHandler(
         name=f'weather-{lang}',
         pattern=utils.regex.ignore_case(utils.regex.pat_starts_with(utils.regex.prefix() + command)),
-        help_page=[command],
+        help_page='wttrin',
         handler_impl=weather(lang),
         is_prefix=True
     )

@@ -18,7 +18,7 @@ async def on_reload(cm: utils.cm.CommandMessage):
 handler_list = [utils.ch.CommandHandler(
     name="reload",
     pattern=utils.regex.command(utils.regex.unite("перезапуск", "reload")),
-    help_page=["elevated", "повышенные"],
+    help_page='elevated',
     handler_impl=on_reload,
     is_elevated=True
 )]

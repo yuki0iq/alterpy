@@ -107,7 +107,7 @@ handler_list.extend(
     utils.ch.CommandHandler(
         name=msg,
         pattern=utils.regex.command(msg + '$'),
-        help_page=["ping", "пинг"],
+        help_page="ping",
         handler_impl=on_ping_wrapper(s, lang),
         is_elevated=False
     ) for msg, s, lang in [
@@ -122,7 +122,7 @@ handler_list.extend(
     utils.ch.CommandHandler(
         name=msg,
         pattern=utils.regex.command(msg + '$'),
-        help_page=["stat", "стат"],
+        help_page='ping',
         handler_impl=on_stat_wrapper(lang),
         is_elevated=False
     ) for msg, lang in [
@@ -132,7 +132,7 @@ handler_list.extend(
 )
 
 handler_list.extend(
-    utils.ch.simple_reply(msg, ans, help_page=["ping", "пинг"], pattern=utils.regex.ignore_case(pat))
+    utils.ch.simple_reply(msg, ans, help_page="ping", pattern=utils.regex.ignore_case(pat))
     for msg, ans, pat in [
         ("bot", "I'm here!", utils.regex.pat_starts_with("bot$")),
         ("бот", "На месте!", utils.regex.pat_starts_with("бот$")),

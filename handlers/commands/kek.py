@@ -11,7 +11,7 @@ handler_list = [
             (1, 'винда'),
             (7, '')
         ]),
-        ["кеки", "kek"],
+        "kek",
         pattern="(?i)\\bда$"
     ),
     utils.ch.simple_reply(
@@ -21,14 +21,14 @@ handler_list = [
             (1, 'лунышка ответ'),
             (3, '')
         ]),
-        ["кеки", "kek"],
+        "kek",
         pattern="(?i)\\bнет$"
     ),
     utils.ch.simple_reply('дура', utils.rand.rand_or_null_fun('а может ты 🤨?', 1, 3),
-        ["кеки", "kek"], pattern="(?i)\\bдура$"),
+        "kek", pattern="(?i)\\bдура$"),
 
     utils.ch.simple_reply('спокойной ночи', 'Cладких снов 🥺',
-        ["кеки", "kek"], pattern="(?i)^((всем ){0,1}спокойной ночи)"),
+        "kek", pattern="(?i)^((всем ){0,1}спокойной ночи)"),
 
     utils.ch.simple_reply('law-en', r'''*First Law*
 A robot may not injure a human being or, through inaction, allow a human being to come to harm.
@@ -38,6 +38,6 @@ A robot must obey the orders given it by human beings except where such orders w
 
 *Third Law*
 A robot must protect its own existence as long as such protection does not conflict with the First or Second Law.''',
-                          ["кеки", "kek"], pattern=utils.regex.pre_command('laws'))
+                          "kek", pattern=utils.regex.pre_command('laws'))
 ]
 

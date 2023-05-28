@@ -65,21 +65,21 @@ async def on_poll(cm: utils.cm.CommandMessage):
 handler_list.append(utils.ch.CommandHandler(
     name='шанс',
     pattern=utils.regex.command(utils.regex.unite('инфа', 'шанс', 'вер' + utils.regex.optional('оятность'))),
-    help_page=["random", "случайность"],
+    help_page="random",
     handler_impl=on_prob_ru
 ))
 
 handler_list.append(utils.ch.CommandHandler(
     name='prob',
     pattern=utils.regex.command(utils.regex.unite('prob', 'chance')),
-    help_page=["random", "случайность"],
+    help_page="random",
     handler_impl=on_prob_en
 ))
 
 handler_list.append(utils.ch.CommandHandler(
     name='выбери',
     pattern=utils.regex.command('выбери'),
-    help_page=["random", "случайность"],
+    help_page="random",
     handler_impl=on_choose_ru,
     is_prefix=True
 ))
@@ -87,7 +87,7 @@ handler_list.append(utils.ch.CommandHandler(
 handler_list.append(utils.ch.CommandHandler(
     name='choose',
     pattern=utils.regex.command(utils.regex.unite('choose', 'select')),
-    help_page=["random", "случайность"],
+    help_page="random",
     handler_impl=on_choose_en,
     is_prefix=True
 ))
@@ -95,7 +95,7 @@ handler_list.append(utils.ch.CommandHandler(
 handler_list.append(utils.ch.CommandHandler(
     name='poll-choose-ru',
     pattern=utils.regex.ignore_case(""),
-    help_page=["random", "случайность"],
+    help_page="random",
     handler_impl=on_poll,
     required_media_type={"poll"},
     is_arg_current=True

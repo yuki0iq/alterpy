@@ -278,7 +278,7 @@ rp2handlers = [
 
 
 async def on_rp(cm: utils.cm.CommandMessage):
-    cm = cm._replace(arg=await utils.aiospeller.correct(context.session, cm.arg))
+    # cm = cm._replace(arg=await utils.aiospeller.correct(context.session, cm.arg))
     user = await cm.sender.get_mention()
     pronoun_set = cm.sender.get_pronouns()
     default_mention = [(cm.reply_sender, await cm.reply_sender.get_mention())] if cm.reply_sender is not None else []
@@ -326,7 +326,7 @@ async def on_rp(cm: utils.cm.CommandMessage):
         await cm.int_cur.reply('\n'.join(res), link_preview=False)
 
 
-handler_list = [utils.ch.CommandHandler("role", re.compile(""), ["role", "рп"], on_rp)]
+handler_list = [utils.ch.CommandHandler("role", re.compile(""), "role", on_rp)]
 
 
 
@@ -370,4 +370,4 @@ async def on_role(cm: utils.cm.CommandMessage):
         await cm.int_cur.reply('\n'.join(res), link_preview=False)
 
 
-handler_list.append(utils.ch.CommandHandler("role-new", utils.regex.ignore_case("(^|\n)~"), ["role", "рп"], on_role))
+handler_list.append(utils.ch.CommandHandler("role-new", utils.regex.ignore_case("(^|\n)~"), "role", on_role))

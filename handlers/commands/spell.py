@@ -19,7 +19,7 @@ handler_list.append(
     utils.ch.CommandHandler(
         name='speller',
         pattern=utils.regex.ignore_case(utils.regex.pat_starts_with(utils.regex.prefix() + utils.regex.unite('typo', 'исправь'))),
-        help_page=['typo', 'опечатки'],
+        help_page='speller',
         handler_impl=spell,
         is_prefix=True
     )

@@ -283,3 +283,9 @@ _Hfcrkflrf и transliteratsiya_
 ### lang
 
 Тут что-то про то, что `is_eng: bool` это плохо
+
+
+### help
+
+Тут про то как работает справка
+

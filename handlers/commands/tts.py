@@ -27,7 +27,7 @@ def on_tts_wrapper(lang: str):
 
 
 def tts_handler(name: str, lang: str) -> utils.ch.CommandHandler:
-    return utils.ch.CommandHandler(f"tts-{lang}", utils.regex.command(name), ["tts", "озвучка"], on_tts_wrapper(lang), is_prefix=True)
+    return utils.ch.CommandHandler(f"tts-{lang}", utils.regex.command(name), "tts", on_tts_wrapper(lang), is_prefix=True)
 
 
 handler_list = [

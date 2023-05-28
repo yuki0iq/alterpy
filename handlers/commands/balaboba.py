@@ -38,7 +38,7 @@ handler_list.append(
     utils.ch.CommandHandler(
         name='yalm-ru',
         pattern=utils.regex.ignore_case(utils.regex.pat_starts_with(utils.regex.only_prefix() + utils.regex.unite('yalm', 'бб'))),
-        help_page=['yalm', 'балабоба'],
+        help_page='yalm',
         handler_impl=balaboba,
         is_prefix=True
     )

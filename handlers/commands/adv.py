@@ -2,6 +2,7 @@ import utils.cm
 import utils.ch
 import utils.log
 import utils.regex
+import utils.str
 
 import random
 import requests
@@ -11,6 +12,9 @@ handler_list = []
 
 
 async def advice(cm: utils.cm.CommandMessage):
+    await cm.int_cur.reply(r"@yuki\_the\_girl temporarily disabled this")
+    return
+
     adv = "Не досупен"
     try:
         adv_json = requests.get(
@@ -24,14 +28,14 @@ async def advice(cm: utils.cm.CommandMessage):
         await cm.int_cur.reply("Advice API down")
         utils.log.get("adv").exception("API down")
 
-    await cm.int_cur.reply(f'{random.choice(["Охуенный", "Хуёвый"])} блять совет{" " + cm.arg if cm.arg else ""}: {adv}')
+    await cm.int_cur.reply(f'{random.choice(["Охуенный", "Хуёвый"])} блять совет{" " + utils.str.escape(cm.arg) if cm.arg else ""}: {adv}')
 
 
 handler_list.append(
     utils.ch.CommandHandler(
         name='advice',
         pattern=utils.regex.ignore_case(utils.regex.pat_starts_with(utils.regex.only_prefix() + utils.regex.unite('adv', 'совет'))),
-        help_page=['advice', 'совет'],
+        help_page='advice',
         handler_impl=advice,
         is_prefix=True
     )

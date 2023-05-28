@@ -18,7 +18,7 @@ handler_list.append(
     utils.ch.CommandHandler(
         name='ru_xi',
         pattern=utils.regex.ignore_case(utils.regex.pat_starts_with(utils.regex.prefix() + utils.regex.unite('кси'))),
-        help_page=['кси'],
+        help_page='кси',
         handler_impl=xi,
         is_prefix=True
     )

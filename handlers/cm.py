@@ -13,8 +13,7 @@ import context
 the_bot_id = context.the_bot_id
 ch_list = []
 
-utils.help.add(ch_list, "commands", "help", "command", "commands", is_eng=True)
-utils.help.add(ch_list, "commands", "справка", "команда", "commands", is_eng=False)
+utils.help.add(ch_list, ['man', 'ман'], ['help', 'command'])
 
 initial_handlers = ch_list[:]
 handlers_dir = "handlers/commands"
@@ -27,7 +26,8 @@ async def init():
 async def process_command_message(cm: utils.cm.CommandMessage):
     media_type = cm.media.type()
     # TODO fix prefix commands...
-    fixed_arg = await utils.aiospeller.correct(context.session, cm.arg)
+    # fixed_arg = await utils.aiospeller.correct(context.session, cm.arg)
+    fixed_arg = cm.arg  # FIXME
     tasks = [
         asyncio.create_task(handler.invoke(
             utils.ch.apply(cm, handler) if handler.is_prefix else cm

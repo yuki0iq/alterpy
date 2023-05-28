@@ -139,16 +139,16 @@ async def on_get(cm: utils.cm.CommandMessage):
     await cm.int_cur.reply(eval(LOC.get('get', cm.lang)))
 
 
-for add, sub, get, cmd, cmds in [
-    (on_set_name,     on_reset_name,     on_get, 'name',  ['name',  'имя']),
-    (on_set_pronouns, on_reset_pronouns, on_get, 'pn',    ['pn',    'мест']),
-    (on_set_redirect, on_reset_redirect, on_get, 'redir', ['redir', 'напр']),
-    (on_set_lang,     on_reset_lang,     on_get, 'lang',  ['lang',  'язык']),
+for add, sub, get, cmd, hlp, cmds in [
+    (on_set_name,     on_reset_name,     on_get, 'name',  'pronouns', ['name',  'имя']),
+    (on_set_pronouns, on_reset_pronouns, on_get, 'pn',    'pronouns', ['pn',    'мест']),
+    (on_set_redirect, on_reset_redirect, on_get, 'redir', 'redirect', ['redir', 'напр']),
+    (on_set_lang,     on_reset_lang,     on_get, 'lang',  'lang',     ['lang',  'язык']),
 ]:
     cmds = utils.regex.union(cmds)
     handler_list.extend([
-        utils.ch.CommandHandler(f'+{cmd}', utils.regex.add_command(cmds), 'name', add, is_prefix=True, is_arg_current=True),
-        utils.ch.CommandHandler(f'-{cmd}', utils.regex.del_command(cmds), 'name', sub),
-        utils.ch.CommandHandler(f'?{cmd}', utils.regex.ask_command(cmds), 'name', get),
+        utils.ch.CommandHandler(f'+{cmd}', utils.regex.add_command(cmds), hlp, add, is_prefix=True, is_arg_current=True),
+        utils.ch.CommandHandler(f'-{cmd}', utils.regex.del_command(cmds), hlp, sub),
+        utils.ch.CommandHandler(f'?{cmd}', utils.regex.ask_command(cmds), hlp, get),
     ])
 
