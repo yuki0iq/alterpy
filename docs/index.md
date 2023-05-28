@@ -1,5 +1,5 @@
 ---
-name: AlterPy — a telegram bot
+title: AlterPy — a telegram bot
 ---
 
 
