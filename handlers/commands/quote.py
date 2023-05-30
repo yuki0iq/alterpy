@@ -30,7 +30,7 @@ async def on_quote(cm: utils.cm.CommandMessage):
 
 handler_list = [utils.ch.CommandHandler(
     name="quote",
-    pattern=utils.regex.command(utils.regex.unite('q', 'й')),
+    pattern=utils.regex.cmd(utils.regex.unite('q', 'й')),
     help_page="quote",
     handler_impl=on_quote,
     is_arg_current=True,

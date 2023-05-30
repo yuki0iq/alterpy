@@ -26,7 +26,7 @@ async def on_bmi(cm: utils.cm.CommandMessage):
 
 handler_list.append(utils.ch.CommandHandler(
     name="bmi",
-    pattern=utils.regex.command(utils.regex.unite('bmi', 'имт')),
+    pattern=utils.regex.cmd(utils.regex.unite('bmi', 'имт')),
     help_page="bmi",
     handler_impl=on_bmi,
     is_prefix=True

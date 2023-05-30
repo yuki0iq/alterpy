@@ -38,6 +38,6 @@ A robot must obey the orders given it by human beings except where such orders w
 
 *Third Law*
 A robot must protect its own existence as long as such protection does not conflict with the First or Second Law.''',
-                          "kek", pattern=utils.regex.pre_command('laws'))
+                          "kek", pattern=utils.regex.pre('laws')),
 ]
 

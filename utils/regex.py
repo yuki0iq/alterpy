@@ -34,28 +34,28 @@ def optional(a: str) -> str:
     return f"({a})?"
 
 
-def raw_command(a: str) -> re.Pattern:
+def raw(a: str) -> re.Pattern:
     return ignore_case(pat_starts_with(a))
 
 
-def command(a: str) -> re.Pattern:
-    return raw_command(prefix() + a)
+def cmd(a: str) -> re.Pattern:
+    return raw(prefix() + a)
 
 
-def pre_command(a: str) -> re.Pattern:
-    return raw_command(only_prefix() + a)
+def pre(a: str) -> re.Pattern:
+    return raw(only_prefix() + a)
 
 
-def add_command(a: str) -> re.Pattern:
-    return raw_command(r'\+' + a)
+def add(a: str) -> re.Pattern:
+    return raw(r'\+' + a)
 
 
-def del_command(a: str) -> re.Pattern:
-    return raw_command('-' + a)
+def sub(a: str) -> re.Pattern:
+    return raw('-' + a)
 
 
-def ask_command(a: str) -> re.Pattern:
-    return raw_command(r'\?' + a)
+def ask(a: str) -> re.Pattern:
+    return raw(r'\?' + a)
 
 
 def word_border() -> str:

@@ -147,8 +147,8 @@ for add, sub, get, cmd, hlp, cmds in [
 ]:
     cmds = utils.regex.union(cmds)
     handler_list.extend([
-        utils.ch.CommandHandler(f'+{cmd}', utils.regex.add_command(cmds), hlp, add, is_prefix=True, is_arg_current=True),
-        utils.ch.CommandHandler(f'-{cmd}', utils.regex.del_command(cmds), hlp, sub),
-        utils.ch.CommandHandler(f'?{cmd}', utils.regex.ask_command(cmds), hlp, get),
+        utils.ch.CommandHandler(f'+{cmd}', utils.regex.add(cmds), hlp, add, is_prefix=True, is_arg_current=True),
+        utils.ch.CommandHandler(f'-{cmd}', utils.regex.sub(cmds), hlp, sub),
+        utils.ch.CommandHandler(f'?{cmd}', utils.regex.ask(cmds), hlp, get),
     ])
 

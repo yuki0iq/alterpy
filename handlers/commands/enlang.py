@@ -45,7 +45,7 @@ async def define(cm: utils.cm.CommandMessage):
 handler_list.append(
     utils.ch.CommandHandler(
         name='en_def',
-        pattern=utils.regex.ignore_case(utils.regex.pat_starts_with(utils.regex.prefix() + utils.regex.unite('def', 'define'))),
+        pattern=utils.regex.cmd(utils.regex.unite('def', 'define')),
         help_page='define',
         handler_impl=define,
         is_prefix=True

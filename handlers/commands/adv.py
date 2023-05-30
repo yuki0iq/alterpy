@@ -34,7 +34,7 @@ async def advice(cm: utils.cm.CommandMessage):
 handler_list.append(
     utils.ch.CommandHandler(
         name='advice',
-        pattern=utils.regex.ignore_case(utils.regex.pat_starts_with(utils.regex.only_prefix() + utils.regex.unite('adv', 'совет'))),
+        pattern=utils.regex.pre(utils.regex.unite('adv', 'совет')),
         help_page='advice',
         handler_impl=advice,
         is_prefix=True

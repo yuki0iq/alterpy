@@ -84,7 +84,7 @@ def image_denoise(img: PIL.Image.Image) -> PIL.Image.Image:
     return ans
 
 
-def re_build(arg: str) -> re.Pattern: return utils.regex.raw_command(arg + '$')
+def re_build(arg: str) -> re.Pattern: return utils.regex.raw(arg + '$')
 def re_letter() -> str: return '[a-zа-яё]'
 def re_space() -> str: return "\\s*"
 def re_var() -> str: return re_letter() + utils.regex.unite(re_letter(), '\\d') + '*'
@@ -378,7 +378,7 @@ async def on_image_prog(cm: utils.cm.CommandMessage):
 
 handler_list = [utils.ch.CommandHandler(
     name="image-prog",
-    pattern=utils.regex.pre_command(utils.regex.unite('pie', 'пирог')),
+    pattern=utils.regex.pre(utils.regex.unite('pie', 'пирог')),
     help_page=["pie", "пирог"],
     handler_impl=on_image_prog,
     is_prefix=True,

@@ -18,7 +18,7 @@ async def spell(cm: utils.cm.CommandMessage):
 handler_list.append(
     utils.ch.CommandHandler(
         name='speller',
-        pattern=utils.regex.ignore_case(utils.regex.pat_starts_with(utils.regex.prefix() + utils.regex.unite('typo', 'исправь'))),
+        pattern=utils.regex.cmd(utils.regex.unite('typo', 'исправь')),
         help_page='speller',
         handler_impl=spell,
         is_prefix=True

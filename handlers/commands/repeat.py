@@ -14,7 +14,7 @@ async def on_repeat(cm: utils.cm.CommandMessage):
 
 handler_list = [utils.ch.CommandHandler(
     name="repeat",
-    pattern=utils.regex.command(utils.regex.unite("повтор", "заново", "repeat")),
+    pattern=utils.regex.cmd(utils.regex.unite("повтор", "заново", "repeat")),
     help_page="repeat",
     handler_impl=on_repeat
 )]

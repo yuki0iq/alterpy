@@ -15,3 +15,7 @@ requests
 spacy
 wn
 aiohttp
+aiodns
+cchardet
+Brotli
+lemminflect

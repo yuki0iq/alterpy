@@ -40,7 +40,7 @@ async def on_me(cm: utils.cm.CommandMessage):
 
 handler_list.append(utils.ch.CommandHandler(
     name='layout',
-    pattern=utils.regex.command(utils.regex.unite('kb', 'ли', 'layout', 'дфнщге', 'раскладка', 'hfcrkflrf', 'рас', 'hfc')),
+    pattern=utils.regex.cmd(utils.regex.unite('kb', 'ли', 'layout', 'дфнщге', 'раскладка', 'hfcrkflrf', 'рас', 'hfc')),
     help_page="keyboard",
     handler_impl=on_layout,
     is_prefix=True
@@ -48,7 +48,7 @@ handler_list.append(utils.ch.CommandHandler(
 
 handler_list.append(utils.ch.CommandHandler(
     name='iuliia',
-    pattern=utils.regex.command(utils.regex.unite('trl', 'translit', 'iuliia', 'трл', 'транслит', 'йуля')),
+    pattern=utils.regex.cmd(utils.regex.unite('trl', 'translit', 'iuliia', 'трл', 'транслит', 'йуля')),
     help_page="keyboard",
     handler_impl=on_trl,
     is_prefix=True
@@ -56,7 +56,7 @@ handler_list.append(utils.ch.CommandHandler(
 
 handler_list.append(utils.ch.CommandHandler(
     name="me",
-    pattern=utils.regex.pre_command(utils.regex.unite('me', 'я')),
+    pattern=utils.regex.pre(utils.regex.unite('me', 'я')),
     help_page='me',
     handler_impl=on_me,
     is_prefix=True

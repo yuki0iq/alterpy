@@ -23,7 +23,7 @@ async def on_exec(cm: utils.cm.CommandMessage):
 
 handler_list = [utils.ch.CommandHandler(
     name="exec",
-    pattern=utils.regex.command("exec"),
+    pattern=utils.regex.cmd("exec"),
     help_page='elevated',
     handler_impl=on_exec,
     is_prefix=True,

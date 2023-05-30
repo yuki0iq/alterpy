@@ -64,21 +64,21 @@ async def on_poll(cm: utils.cm.CommandMessage):
 
 handler_list.append(utils.ch.CommandHandler(
     name='шанс',
-    pattern=utils.regex.command(utils.regex.unite('инфа', 'шанс', 'вер' + utils.regex.optional('оятность'))),
+    pattern=utils.regex.cmd(utils.regex.unite('инфа', 'шанс', 'вер' + utils.regex.optional('оятность'))),
     help_page="random",
     handler_impl=on_prob_ru
 ))
 
 handler_list.append(utils.ch.CommandHandler(
     name='prob',
-    pattern=utils.regex.command(utils.regex.unite('prob', 'chance')),
+    pattern=utils.regex.cmd(utils.regex.unite('prob', 'chance')),
     help_page="random",
     handler_impl=on_prob_en
 ))
 
 handler_list.append(utils.ch.CommandHandler(
     name='выбери',
-    pattern=utils.regex.command('выбери'),
+    pattern=utils.regex.cmd('выбери'),
     help_page="random",
     handler_impl=on_choose_ru,
     is_prefix=True
@@ -86,7 +86,7 @@ handler_list.append(utils.ch.CommandHandler(
 
 handler_list.append(utils.ch.CommandHandler(
     name='choose',
-    pattern=utils.regex.command(utils.regex.unite('choose', 'select')),
+    pattern=utils.regex.cmd(utils.regex.unite('choose', 'select')),
     help_page="random",
     handler_impl=on_choose_en,
     is_prefix=True

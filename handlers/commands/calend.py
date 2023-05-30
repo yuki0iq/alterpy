@@ -19,7 +19,7 @@ async def calend_ru(cm: utils.cm.CommandMessage):
 handler_list.append(
     utils.ch.CommandHandler(
         name='calend_ru',
-        pattern=utils.regex.ignore_case(utils.regex.pat_starts_with(utils.regex.prefix() + utils.regex.unite('holidays', 'праздники'))),
+        pattern=utils.regex.cmd(utils.regex.unite('holidays', 'праздники')),
         help_page='calend',
         handler_impl=calend_ru,
         is_prefix=True

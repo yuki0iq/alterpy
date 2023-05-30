@@ -50,7 +50,7 @@ class RP2Handler(typing.NamedTuple):
 
 rp1handlers = [
     RP1Handler(
-        utils.regex.command("задолбало"),
+        utils.regex.cmd("задолбало"),
         [
             utils.rand.rand_or_null_fun("😭 | {0} успешно выпилился(ась) {1}", 1, 6, "🎉 | {0} не смог(ла) выпилиться {1}"),
             utils.rand.rand_or_null_fun("😭 | {0} успешно выпилился {1}", 1, 6, "🎉 | {0} не смог выпилиться {1}"),
@@ -64,7 +64,7 @@ rp1handlers = [
 
 rp2handlers = [
     RP2Handler(
-        utils.regex.command("обнять"),
+        utils.regex.cmd("обнять"),
         [
             utils.common.wrap("🤗 | {0} обнял(а) {1} {2}"),
             utils.common.wrap("🤗 | {0} обнял {1} {2}"),
@@ -75,7 +75,7 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
-        utils.regex.command("выебать"),
+        utils.regex.cmd("выебать"),
         [
             utils.common.wrap("😈 | {0} выебал(а) {1} {2}"),
             utils.common.wrap("😈 | {0} выебал {1} {2}"),
@@ -86,7 +86,7 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
-        utils.regex.command("дать"),
+        utils.regex.cmd("дать"),
         [
             utils.common.wrap("🎁 | {0} дал(а) {1} {2}"),
             utils.common.wrap("🎁 | {0} дал {1} {2}"),
@@ -98,7 +98,7 @@ rp2handlers = [
         form="datv",
     ),
     RP2Handler(
-        utils.regex.command("сломать"),
+        utils.regex.cmd("сломать"),
         [
             utils.common.wrap("🔧 | {0} сломал(а) {1} {2}"),
             utils.common.wrap("🔧 | {0} сломал {1} {2}"),
@@ -109,7 +109,7 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
-        utils.regex.command("убить"),
+        utils.regex.cmd("убить"),
         [
             utils.common.wrap("☠ | {0} убил(а) {1} {2}"),
             utils.common.wrap("☠ | {0} убил {1} {2}"),
@@ -120,7 +120,7 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
-        utils.regex.command("расстрелять"),
+        utils.regex.cmd("расстрелять"),
         [
             utils.common.wrap("🔫 | {0} расстрелял(а) {1} {2}"),
             utils.common.wrap("🔫 | {0} расстрелял {1} {2}"),
@@ -131,7 +131,7 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
-        utils.regex.command("поцеловать"),
+        utils.regex.cmd("поцеловать"),
         [
             utils.common.wrap("😘 | {0} поцеловал(а) {1} {2}"),
             utils.common.wrap("😘 | {0} поцеловал {1} {2}"),
@@ -142,7 +142,7 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
-        utils.regex.command("кусь(нуть){0,1}|укусить"),
+        utils.regex.cmd("кусь(нуть){0,1}|укусить"),
         [
             utils.common.wrap("😬 | {0} кусьнул(а) {1} {2}"),
             utils.common.wrap("😬 | {0} кусьнул {1} {2}"),
@@ -153,7 +153,7 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
-        utils.regex.command("пнуть"),
+        utils.regex.cmd("пнуть"),
         [
             utils.common.wrap("👞 | {0} пнул(а) {1} {2}"),
             utils.common.wrap("👞 | {0} пнул {1} {2}"),
@@ -164,7 +164,7 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
-        utils.regex.command("прижать"),
+        utils.regex.cmd("прижать"),
         [
             utils.common.wrap("🤲 | {0} прижал(а) {1} {2}"),
             utils.common.wrap("🤲 | {0} прижал {1} {2}"),
@@ -175,7 +175,7 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
-        utils.regex.command("погладить"),
+        utils.regex.cmd("погладить"),
         [
             utils.common.wrap("🤲 | {0} погладил(а) {1} {2}"),
             utils.common.wrap("🤲 | {0} погладил {1} {2}"),
@@ -186,7 +186,7 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
-        utils.regex.command("потрогать"),
+        utils.regex.cmd("потрогать"),
         [
             utils.common.wrap("🙌 | {0} потрогал(а) {1} {2}"),
             utils.common.wrap("🙌 | {0} потрогал {1} {2}"),
@@ -197,7 +197,7 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
-        utils.regex.command("лизнуть"),
+        utils.regex.cmd("лизнуть"),
         [
             utils.common.wrap("👅 | {0} лизнул(а) {1} {2}"),
             utils.common.wrap("👅 | {0} лизнул {1} {2}"),
@@ -208,7 +208,7 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
-        utils.regex.command("понюхать"),
+        utils.regex.cmd("понюхать"),
         [
             utils.common.wrap("👃 | {0} понюхал(а) {1} {2}"),
             utils.common.wrap("👃 | {0} понюхал {1} {2}"),
@@ -219,7 +219,7 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
-        utils.regex.command("ударить"),
+        utils.regex.cmd("ударить"),
         [
             utils.common.wrap("🤜😵 | {0} ударил(а) {1} {2}"),
             utils.common.wrap("🤜😵 | {0} ударил {1} {2}"),
@@ -230,7 +230,7 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
-        utils.regex.command("шлепнуть"),
+        utils.regex.cmd("шлепнуть"),
         [
             utils.common.wrap("👏 | {0} шлепнул(а) {1} {2}"),
             utils.common.wrap("👏 | {0} шлепнул {1} {2}"),
@@ -241,7 +241,7 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
-        utils.regex.command("шлёпнуть"),
+        utils.regex.cmd("шлёпнуть"),
         [
             utils.common.wrap("👏 | {0} шлёпнул(а) {1} {2}"),
             utils.common.wrap("👏 | {0} шлёпнул {1} {2}"),
@@ -252,7 +252,7 @@ rp2handlers = [
         ]
     ),
     RP2Handler(
-        utils.regex.command("предложить пива"),
+        utils.regex.cmd("предложить пива"),
         [
             utils.common.wrap("🍻 | {0} предложил(а) пива {1} {2}"),
             utils.common.wrap("🍻 | {0} предложил пива {1} {2}"),
@@ -264,7 +264,7 @@ rp2handlers = [
         form="datv"
     ),
     RP2Handler(
-        utils.regex.command("дефенестрировать"),
+        utils.regex.cmd("дефенестрировать"),
         [
             utils.rand.rand_or_null_fun("🏠 | {0} отправил(а) в свободное падение {1} {2}", 1, 2, "🪟 | {0} измучил(а) виндой {1} {2}"),
             utils.rand.rand_or_null_fun("🏠 | {0} отправил в свободное падение {1} {2}", 1, 2, "🪟 | {0} измучил виндой {1} {2}"),

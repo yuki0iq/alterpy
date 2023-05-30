@@ -13,6 +13,6 @@ handler_list = [utils.ch.simple_reply(
     "\n" +
     "В разработке принимали участие: t.me/yuki\_the\_girl",
     "start",
-    utils.regex.raw_command("/start(@alterpy_bot)?")
+    utils.regex.raw("/start(@alterpy_bot)?")
 )]
 

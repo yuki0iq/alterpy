@@ -106,7 +106,7 @@ def on_stat_wrapper(lang: str):
 handler_list.extend(
     utils.ch.CommandHandler(
         name=msg,
-        pattern=utils.regex.command(msg + '$'),
+        pattern=utils.regex.cmd(msg + '$'),
         help_page="ping",
         handler_impl=on_ping_wrapper(s, lang),
         is_elevated=False
@@ -121,7 +121,7 @@ handler_list.extend(
 handler_list.extend(
     utils.ch.CommandHandler(
         name=msg,
-        pattern=utils.regex.command(msg + '$'),
+        pattern=utils.regex.cmd(msg + '$'),
         help_page='ping',
         handler_impl=on_stat_wrapper(lang),
         is_elevated=False

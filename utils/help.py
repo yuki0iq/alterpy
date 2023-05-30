@@ -55,7 +55,7 @@ def add(handlers: list, man_cmds: list[str] = ["man"], help_cmds: list[str] = ["
         path += '_'
     help_page = 'help'
     handlers.extend([
-        utils.ch.CommandHandler(name=name, pattern=utils.regex.command(utils.regex.union(commands)), help_page=help_page, handler_impl=handler, is_prefix=True, is_arg_current=True)
+        utils.ch.CommandHandler(name=name, pattern=utils.regex.cmd(utils.regex.union(commands)), help_page=help_page, handler_impl=handler, is_prefix=True, is_arg_current=True)
         for name, commands, handler in [
             (f'man{path}',  man_cmds,  forward_handler(path)),
             (f'help{path}', help_cmds, reverse_handler(handlers, help_cmds, path))
