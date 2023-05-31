@@ -4,21 +4,9 @@ import utils.str
 import utils.log
 import utils.transliterator
 import utils.kiri43i
-import spacy
 
 
 log = utils.log.get("lang-ru")
-
-spacy_model_name = "ru_core_news_md"
-log.info("Probing spaCy-ru...")
-try:
-    nlp = spacy.load(spacy_model_name)
-except OSError:
-    log.info("Model not found, downloading...")
-    import spacy.cli.download
-    spacy.cli.download(spacy_model_name)
-    nlp = spacy.load(spacy_model_name)
-log.info("spaCy-ru OK!")
 
 
 class MorphAnalyzer:
@@ -41,6 +29,34 @@ def parse_inflect(word, form):
 
 morph = MorphAnalyzer(pymorphy3.MorphAnalyzer())
 pi = utils.pyphrasy3.PhraseInflector(morph, parse_inflect)
+
+
+def merge(a, b):
+    a, b = a(), b()
+    res = []
+    i = 0
+    while i < len(a) and i < len(b) and a[i] == b[i]:
+        res.append(a[i])
+    res.extend([a[i:], '(', b[i:], ')'])
+    return ''.join(res)
+
+
+def past(parse, p: int):
+    masc = lambda: parse_inflect(parse, {'past', 'sing', 'masc'}).word
+    femn = lambda: parse_inflect(parse, {'past', 'sing', 'femn'}).word
+    neut = lambda: parse_inflect(parse, {'past', 'sing', 'neut'}).word
+    plur = lambda: parse_inflect(parse, {'past', 'plur'}).word
+    _neu = lambda: merge(masc, femn)
+    return [_neu, masc, femn, neut, neut, plur][p]()
+
+
+def try_verb_past(w: str, p: int):
+    parse = morph.parse(w)[0]
+    tag = parse.tag
+    if 'INFN' not in tag:
+        return w
+    return past(parse, p)
+    return parse_inflect(parse, {'past', 'plur'}).word  # TODO respect pronouns!!
 
 
 def inflect(s, form):

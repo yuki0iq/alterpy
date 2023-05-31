@@ -1,5 +1,5 @@
 import utils.str
-import importlib
+import utils.lang.ru, utils.lang.en
 
 
 class Localizator:
@@ -22,6 +22,23 @@ class Localizator:
         return str(utils.str.FStr(self.obj(s, lang)))
 
 
+langs = {
+    'ru': utils.lang.ru,
+    'en': utils.lang.en,
+}
+
+
 def lang(lg: str):
-    mod = importlib.import_module(f"utils.lang.{lg}")
-    return mod
+    return langs[lg]
+
+
+def detect(s: str):
+    if not s: return 'en'
+    if 'а' <= s[0].lower() <= 'я': return 'ru'
+    if 'a' <= s[0].lower() <= 'z': return 'en'
+    return 'en'  # lmao
+
+
+def try_verb_past(w: str, p: int):
+    return lang(detect(w)).try_verb_past(w, p)
+

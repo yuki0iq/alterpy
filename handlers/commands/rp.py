@@ -330,9 +330,13 @@ handler_list = [utils.ch.CommandHandler("role", re.compile(""), "role", on_rp)]
 
 
 
+def to_role(words: list[str], p: int) -> str:
+    return ''.join(utils.locale.try_verb_past(w, p) for w in words)
+
+
 async def on_role(cm: utils.cm.CommandMessage):
     self_mention = [(cm.sender, await cm.sender.get_mention())]
-    pronoun_set = cm.sender.get_pronouns()
+    pronoun_set = cm.sender.get_pronouns
     default_mention = [(cm.reply_sender, await cm.reply_sender.get_mention())] if cm.reply_sender is not None else []
     chat_id = cm.sender.chat_id
     client = cm.client
@@ -350,7 +354,9 @@ async def on_role(cm: utils.cm.CommandMessage):
             mentions.append((user, mention))
             pre, user, mention, post = await utils.user.from_str(line, chat_id, client)
 
-        line, need_second_mention = utils.locale.lang('en').to_role(line)  # TODO lang
+        words = utils.regex.split_by_word_border(line)
+        line = to_role(words, pronoun_set())  # TODO 'single', inflect mentions!!
+        need_second_mention = len(words) <= 5
 
         if '%' in line and default_mention:
             line = line.replace('%', f'MENTION{len(mentions)}')
@@ -371,3 +377,4 @@ async def on_role(cm: utils.cm.CommandMessage):
 
 
 handler_list.append(utils.ch.CommandHandler("role-new", utils.regex.ignore_case("(^|\n)~"), "role", on_role))
+
