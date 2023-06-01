@@ -27,7 +27,7 @@ class HTTPSession:
         self.session = session
 
     async def get_response(
-        self, *, method: str, endpoint: str, json: Any = None, headers: dict | None = None
+        self, *, method: str, endpoint: str, json: Any = None, headers: Optional[dict] = None
     ) -> Any:
         if isinstance(self.session, ClientSession) and not self.session.closed:
             response = await self._fetch(
@@ -41,7 +41,7 @@ class HTTPSession:
         return await response.json()
 
     async def _fetch(
-        self, *, method: str, endpoint: str, json: Any, session: ClientSession, headers: dict | None
+        self, *, method: str, endpoint: str, json: Any, session: ClientSession, headers: Optional[dict]
     ) -> ClientResponse:
         async with session.request(
             method,

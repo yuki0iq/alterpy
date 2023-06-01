@@ -1,5 +1,6 @@
 import random
 import re
+import typing
 
 import utils.regex
 import utils.locale
@@ -42,13 +43,13 @@ pronouns_name = {
 pronouns_name_getter = utils.locale.Localizator(pronouns_name)
 
 
-def to_str(pns: int | list[int], lang: str = "ru") -> str:
+def to_str(pns: typing.Union[int, list[int]], lang: str = "ru") -> str:
     if type(pns) == int:
         return pronouns_name_getter.obj(pns, lang)
     return pronouns_name_getter.obj('list', lang) + ' ' + ', '.join(to_str(pn, lang) for pn in pns)
 
 
-def from_str(s: str) -> int | list[int]:
+def from_str(s: str) -> typing.Union[int, list[int]]:
     if re.search(any_pronouns_regex, s):
         return -1
     ans = []
@@ -62,7 +63,7 @@ def from_str(s: str) -> int | list[int]:
     return ans
 
 
-def to_int(pns: int | list[int]) -> int:
+def to_int(pns: typing.Union[int, list[int]]) -> int:
     if pns == -1:
         return random.randint(0, 5)  # TODO 6
     if pns == 6:

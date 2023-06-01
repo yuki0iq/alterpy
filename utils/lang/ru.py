@@ -4,6 +4,7 @@ import utils.str
 import utils.log
 import utils.transliterator
 import utils.kiri43i
+import os.path
 
 
 log = utils.log.get("lang-ru")
@@ -32,7 +33,8 @@ pi = utils.pyphrasy3.PhraseInflector(morph, parse_inflect)
 
 
 def merge(a, b):
-    a, b = a(), b()
+    return f'{a}({b[os.path.commonprefix(a, b):]})'
+
     res = []
     i = 0
     while i < len(a) and i < len(b) and a[i] == b[i]:
@@ -41,13 +43,16 @@ def merge(a, b):
     return ''.join(res)
 
 
+pasts = [frozenset({'past', 'sing', 'masc'}), frozenset({'past', 'sing', 'femn'}), frozenset({'past', 'sing', 'neut'}), frozenset({'past', 'plur'})]
+pn_to_pi = [0, 0, 1, 2, 2, 3]
+
+def _past(parse, i: int):
+    return parse_inflect(parse, pasts[i]).word
+
+
 def past(parse, p: int):
-    masc = lambda: parse_inflect(parse, {'past', 'sing', 'masc'}).word
-    femn = lambda: parse_inflect(parse, {'past', 'sing', 'femn'}).word
-    neut = lambda: parse_inflect(parse, {'past', 'sing', 'neut'}).word
-    plur = lambda: parse_inflect(parse, {'past', 'plur'}).word
-    _neu = lambda: merge(masc, femn)
-    return [_neu, masc, femn, neut, neut, plur][p]()
+    # if p == 0: return merge(_past(parse, 0), _past(parse, 1))
+    return _past(parse, pn_to_pi[p])
 
 
 def try_verb_past(w: str, p: int):

@@ -20,7 +20,7 @@ default_user_config = {
 
 
 class User(typing.NamedTuple):
-    sender: telethon.tl.types.User | telethon.tl.types.Channel | telethon.tl.types.Chat
+    sender: typing.Union[telethon.tl.types.User, telethon.tl.types.Channel, telethon.tl.types.Chat]
     chat_id: int
     client: telethon.client.TelegramClient
 
@@ -53,7 +53,7 @@ class User(typing.NamedTuple):
             return f"[{utils.str.escape(name)}](t.me/{username})"
         return f"[{utils.str.escape(name)}](tg://user?id={uid})"
 
-    async def userpic(self) -> PIL.Image.Image | None:
+    async def userpic(self) -> typing.Optional[PIL.Image.Image]:
         by = io.BytesIO()
         await self.client.download_profile_photo(self.sender, file=by)
         by.seek(0)
@@ -71,8 +71,8 @@ class User(typing.NamedTuple):
     def set(self, param, val): self.save_user_config(self.load_user_config() | {param: val})
     def reset(self, param): self.set(param, default_user_config[param])
 
-    def get_pronouns(self) -> int | list[int]: return self.get('pronoun_set')
-    def set_pronouns(self, pronoun_set: int | list[int]): self.set('pronoun_set', pronoun_set)
+    def get_pronouns(self) -> typing.Union[int, list[int]]: return self.get('pronoun_set')
+    def set_pronouns(self, pronoun_set: typing.Union[int, list[int]]): self.set('pronoun_set', pronoun_set)
     def reset_pronouns(self): self.reset('pronoun_set')
 
     def get_name(self) -> str: return self.get('name')
@@ -88,8 +88,8 @@ class User(typing.NamedTuple):
     def reset_lang(self): self.reset('lang')
 
 
-async def from_telethon(user: telethon.tl.types.User | telethon.tl.types.Channel | str | int | None,
-                        chat: telethon.tl.types.Chat | int | None,
+async def from_telethon(user: typing.Union[telethon.tl.types.User, telethon.tl.types.Channel, str, int],
+                        chat: typing.Union[telethon.tl.types.Chat, int, None],
                         client: telethon.client.TelegramClient) -> User:
     if type(user) == str or type(user) == int:
         return await from_telethon(await client.get_entity(await client.get_input_entity(user)), chat, client)
@@ -115,7 +115,7 @@ mention_pattern = utils.regex.ignore_case(
 )
 
 
-async def from_str(arg: str, chat_id: int, client: telethon.client.TelegramClient) -> tuple[str, User|None, str, str]:
+async def from_str(arg: str, chat_id: int, client: telethon.client.TelegramClient) -> tuple[str, typing.Optional[User], str, str]:
     match = re.search(utils.user.mention_pattern, arg)
     if not match:
         return arg, None, '', ''

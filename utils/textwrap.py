@@ -1,5 +1,5 @@
 # textwrap adapted for fullwidth support from https://github.com/python/cpython/blob/3.11/Lib/textwrap.py
-import re
+import re, typing
 import utils.str
 
 
@@ -95,7 +95,7 @@ class TextWrapper:
                  break_on_hyphens: bool = True,
                  tabsize: int = 8,
                  *,
-                 max_lines: int | None = None,
+                 max_lines: typing.Optional[int] = None,
                  placeholder: str = ' [...]'):
         self.width = width
         self.initial_indent = initial_indent

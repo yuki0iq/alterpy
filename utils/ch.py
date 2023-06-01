@@ -12,7 +12,7 @@ import inspect
 class CommandHandler(typing.NamedTuple):
     name: str  # command name
     pattern: re.Pattern  # regex pattern
-    help_page: str | typing.List[str]
+    help_page: str
     handler_impl: typing.Callable[[utils.cm.CommandMessage], typing.Awaitable]
     is_prefix: bool = False  # should a command be deleted from its message when passed to handler
     is_elevated: bool = False  # should a command be invoked only if user is admin
@@ -41,8 +41,8 @@ def apply(cm: utils.cm.CommandMessage, ch: CommandHandler) -> utils.cm.CommandMe
 
 def simple_reply(
         msg: str,
-        ans: typing.Union[str, typing.Callable[[], typing.Awaitable | str]],
-        help_page: str | typing.List[str] = "",
+        ans: typing.Union[str, typing.Callable[[], typing.Union[typing.Awaitable, str]]],
+        help_page: str = "",
         pattern: typing.Union[str, re.Pattern] = ""
 ) -> CommandHandler:
     """

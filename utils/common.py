@@ -1,7 +1,7 @@
 import typing
 
 
-def one_of_in(a: typing.Iterable, x: typing.Container | typing.Iterable):
+def one_of_in(a: typing.Iterable, x: typing.Container):
     return any(map(lambda el: el in x, a))
 
 
@@ -34,10 +34,6 @@ def to_float(val: typing.Any, default: float = 0) -> float:
 
 def identity(x):
     return x
-
-
-def values(a: list[tuple[int, typing.Any]]) -> list[typing.Any]:
-    return [el[1] for el in a]
 
 
 def split_by_func(s: str, f: callable) -> list[str]:

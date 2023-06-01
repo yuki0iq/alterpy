@@ -12,7 +12,6 @@ unidic
 sortedcollections
 rich
 requests
-spacy
 wn
 aiohttp
 aiodns

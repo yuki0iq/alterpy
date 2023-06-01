@@ -8,15 +8,16 @@ import utils.user
 import utils.str
 import utils.textwrap
 import utils.media
+import typing
 
 
 class Message(typing.NamedTuple):
     name: str
-    avatar: PIL.Image.Image | None  # TODO use
+    avatar: typing.Optional[PIL.Image.Image]  # TODO use
     id: int
-    reply_id: int | None
+    reply_id: typing.Optional[int]
     media: utils.media.Media  # TODO use
-    message: str | None
+    message: typing.Optional[str]
 
 
 def message_to_string(message: Message, max_name: int, max_id: int) -> str:
