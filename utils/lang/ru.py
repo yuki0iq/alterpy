@@ -33,14 +33,7 @@ pi = utils.pyphrasy3.PhraseInflector(morph, parse_inflect)
 
 
 def merge(a, b):
-    return f'{a}({b[os.path.commonprefix(a, b):]})'
-
-    res = []
-    i = 0
-    while i < len(a) and i < len(b) and a[i] == b[i]:
-        res.append(a[i])
-    res.extend([a[i:], '(', b[i:], ')'])
-    return ''.join(res)
+    return f'{a}({b[len(os.path.commonprefix([a, b])):]})'
 
 
 pasts = [frozenset({'past', 'sing', 'masc'}), frozenset({'past', 'sing', 'femn'}), frozenset({'past', 'sing', 'neut'}), frozenset({'past', 'plur'})]
@@ -51,7 +44,7 @@ def _past(parse, i: int):
 
 
 def past(parse, p: int):
-    # if p == 0: return merge(_past(parse, 0), _past(parse, 1))
+    if p == 0: return merge(_past(parse, 0), _past(parse, 1))
     return _past(parse, pn_to_pi[p])
 
 
