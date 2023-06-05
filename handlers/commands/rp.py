@@ -342,7 +342,7 @@ async def on_role(cm: utils.cm.CommandMessage):
     client = cm.client
     res = []
     for line in cm.arg.split('\n'):
-        if line[0] != '~':
+        if line[0] != '~' or line[-1] == '~':
             continue
 
         line = f"MENTION0 {line[1:]}"
@@ -376,5 +376,5 @@ async def on_role(cm: utils.cm.CommandMessage):
         await cm.int_cur.reply('\n'.join(res), link_preview=False)
 
 
-handler_list.append(utils.ch.CommandHandler("role-new", utils.regex.ignore_case("(^|\n)~"), "role", on_role))
+handler_list.append(utils.ch.CommandHandler("role-new", utils.regex.ignore_case("(^|\n)~.*(?<!~)($|\n)"), "role", on_role))
 
