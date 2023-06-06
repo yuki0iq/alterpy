@@ -36,6 +36,13 @@ async def main():
     del el
     log.info("loaded config")
 
+    try:
+        with open('restarter.txt') as f:
+            _chat, _reply = map(int, f.read().split())
+        os.remove('restarter.txt')
+    except:
+        _chat, _reply = next(iter(context.admins)), None
+
     telethon_config = utils.config.load("telethon_config.toml")
     try:
         async with aiohttp.ClientSession() as context.session:
@@ -43,12 +50,14 @@ async def main():
             await client.start(bot_token=telethon_config['bot_token'])
             async with client:
                 log.info("Started telethon instance")
+                await client.send_message(_chat, "← alterpy is starting...", reply_to=_reply)
 
                 context.the_bot_id = int(telethon_config['bot_token'].split(':')[0])
                 del telethon_config
 
                 global message_handlers
-                await utils.mod.load_handlers([], message_handlers, "handlers", True)
+                res = await utils.mod.load_handlers([], message_handlers, "handlers", True)
+                await client.send_message(_chat, f"← alterpy start: {res}. Check logs for further info", reply_to=_reply)
 
                 client.add_event_handler(event_handler, telethon.events.NewMessage)
 

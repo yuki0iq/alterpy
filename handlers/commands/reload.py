@@ -3,6 +3,8 @@ import utils.mod
 import utils.ch
 import utils.regex
 import handlers.cm
+import os, sys
+import PyGitUp.gitup
 
 
 async def on_reload(cm: utils.cm.CommandMessage):
@@ -15,10 +17,17 @@ async def on_reload(cm: utils.cm.CommandMessage):
     await cm.int_cur.reply(res)
 
 
-handler_list = [utils.ch.CommandHandler(
-    name="reload",
-    pattern=utils.regex.cmd(utils.regex.unite("перезапуск", "reload")),
-    help_page='elevated',
-    handler_impl=on_reload,
-    is_elevated=True
-)]
+async def on_hard_reload(cm: utils.cm.CommandMessage):
+    # TODO: other way/
+    with open('restarter.txt', 'w') as f:
+        print(cm.sender.chat_id, cm.id, file=f)
+    PyGitUp.gitup.GitUp().run()
+    await cm.int_cur.reply('→ Restarting...')
+    os.execv(sys.executable, [sys.executable] + sys.argv)
+
+
+handler_list = [
+    utils.ch.CommandHandler(name="reload", pattern=utils.regex.cmd(utils.regex.unite("перезапуск", "reload")), help_page='elevated', handler_impl=on_reload, is_elevated=True),
+    utils.ch.CommandHandler(name="reload", pattern=utils.regex.cmd(utils.regex.unite("рестарт", "reboot")), help_page='elevated', handler_impl=on_hard_reload, is_elevated=True),
+]
+

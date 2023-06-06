@@ -24,7 +24,7 @@ def get(name="unknown") -> logging.Logger:
     # ti = ti.split(" ")
     # ti = "_".join(ti[1:3])
 
-    h_file = logging.FileHandler(f"log/{name}.log", encoding="utf-8")
+    h_file = logging.FileHandler(f"log/alterpy.log", encoding="utf-8")
     h_file.setFormatter(logging_formatter)
     log.addHandler(h_file)
     # log.addHandler(logging_handler_stderr)

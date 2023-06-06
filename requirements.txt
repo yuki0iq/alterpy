@@ -18,3 +18,4 @@ aiodns
 cchardet
 Brotli
 lemminflect
+git-up
