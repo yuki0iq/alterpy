@@ -6,12 +6,13 @@ import io
 class Media(typing.NamedTuple):
     message: telethon.tl.custom.message.Message
 
-    async def get(self) -> io.BytesIO:
+    async def get(self) -> typing.Optional[io.BytesIO]:
         file = io.BytesIO()
         if self.message:
             await self.message.download_media(file)
             file.seek(0)
             return file
+        return None
 
     def poll(self):
         return self.message.poll

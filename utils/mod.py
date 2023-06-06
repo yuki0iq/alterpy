@@ -1,15 +1,15 @@
 import asyncio
-
 import utils.log
 import utils.file
 import utils.common
-
+import utils.cm
 import importlib
+import typing
 
 log = utils.log.get("modloader")
 
 
-async def load_handlers_from_name(name: str, do_reload: bool) -> tuple[bool, list]:
+async def load_handlers_from_name(name: str, do_reload: bool) -> tuple[bool, list[typing.Any]]:
     try:
         mod = importlib.import_module(name)
         if do_reload:
@@ -24,11 +24,11 @@ async def load_handlers_from_name(name: str, do_reload: bool) -> tuple[bool, lis
         return False, []
 
 
-async def load_handlers_from_filename(filename: str, do_reload: bool) -> tuple[bool, list]:
+async def load_handlers_from_filename(filename: str, do_reload: bool) -> tuple[bool, list[typing.Any]]:
     return await load_handlers_from_name(filename[:-3].replace('/', '.'), do_reload)
 
 
-async def load_handlers(initial_handlers: list, handlers: list, path: str, do_reload: bool = False) -> str:
+async def load_handlers(initial_handlers: list[typing.Any], handlers: list[typing.Any], path: str, do_reload: bool = False) -> str:
     """
     load all .py files from given path and merge all of their "handlers" into given with initial
     returns log message

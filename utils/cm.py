@@ -20,7 +20,7 @@ class CommandMessage(typing.NamedTuple):
     reply_sender: utils.user.User  # reply sender if applicable
     int_cur: utils.interactor.MessageInteractor  # for current message
     int_prev: utils.interactor.MessageInteractor  # for attached reply
-    client: telethon.client.TelegramClient
+    client: telethon.client.telegramclient.TelegramClient
     id: int
     reply_id: int  # -1 if no reply
     msg: telethon.tl.custom.message.Message

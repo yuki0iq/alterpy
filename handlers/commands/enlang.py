@@ -27,7 +27,7 @@ pos_names = {
 }
 
 
-async def define(cm: utils.cm.CommandMessage):
+async def define(cm: utils.cm.CommandMessage) -> None:
     if cm.arg:
         res = dic.synsets(cm.arg)
         if not res:

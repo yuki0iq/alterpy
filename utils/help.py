@@ -3,27 +3,27 @@ import utils.cm
 import utils.ch
 import utils.regex
 import utils.str
-
+import typing
 import re
 
 
-def entry(lang: str, path: str = '', name: str = ''):
+def entry(lang: str, path: str = '', name: str = '') -> str:
     return utils.str.escape(f'https://yuki0iq.github.io/alterpy/{path}{lang}#{name}')
 
 
-def link(lang: str, path: str = '', name: str = ''):
+def link(lang: str, path: str = '', name: str = '') -> str:
     ent = entry(lang, path, name)
     return f'[{name or "Help"}]({ent})'
 
 
-def forward_handler(path: str):
-    async def on_help(cm: utils.cm.CommandMessage):
+def forward_handler(path: str) -> typing.Callable[[utils.cm.CommandMessage], typing.Awaitable[None]]:
+    async def on_help(cm: utils.cm.CommandMessage) -> None:
         # TODO add check exists.
         await cm.int_cur.reply(link(cm.lang, path, cm.arg))
     return on_help
 
 
-def on_reverse_help_impl(handlers: list, arg: str, help_cmds: list[str], path: str, lang: str) -> str:
+def on_reverse_help_impl(handlers: list[typing.Any], arg: str, help_cmds: list[str], path: str, lang: str) -> str:
     if not arg:
         return f"Type `{help_cmds} [command]` to view help page for command"
 
@@ -44,13 +44,13 @@ def on_reverse_help_impl(handlers: list, arg: str, help_cmds: list[str], path: s
     return res
 
 
-def reverse_handler(handlers: list, help_cmds: list[str], path: str):
-    async def on_help(cm: utils.cm.CommandMessage):
+def reverse_handler(handlers: list[typing.Any], help_cmds: list[str], path: str) -> typing.Callable[[utils.cm.CommandMessage], typing.Awaitable[None]]:
+    async def on_help(cm: utils.cm.CommandMessage) -> None:
         await cm.int_cur.reply(on_reverse_help_impl(handlers, cm.arg, help_cmds, path, cm.lang))
     return on_help
 
 
-def add(handlers: list, man_cmds: list[str] = ["man"], help_cmds: list[str] = ["help"], path: str = ""):
+def add(handlers: list[typing.Any], man_cmds: list[str] = ["man"], help_cmds: list[str] = ["help"], path: str = "") -> None:
     if path:
         path += '_'
     help_page = 'help'

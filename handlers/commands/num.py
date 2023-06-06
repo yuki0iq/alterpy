@@ -5,7 +5,7 @@ import utils.regex
 handler_list = []
 
 
-async def on_bmi(cm: utils.cm.CommandMessage):
+async def on_bmi(cm: utils.cm.CommandMessage) -> None:
     try:
         h, m = map(float, cm.arg.split())
     except:

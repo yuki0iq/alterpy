@@ -7,11 +7,13 @@ import asyncio
 import utils.mod
 import utils.help
 import utils.aiospeller
+import utils.ch
 import context
+import typing
 
 
 the_bot_id = context.the_bot_id
-ch_list = []
+ch_list: list[utils.ch.CommandHandler] = []
 
 utils.help.add(ch_list, ['man', 'ман'], ['help', 'command'])
 
@@ -19,11 +21,11 @@ initial_handlers = ch_list[:]
 handlers_dir = "handlers/commands"
 
 
-async def init():
+async def init() -> None:
     await utils.mod.load_handlers(initial_handlers, ch_list, handlers_dir, True)
 
 
-async def process_command_message(cm: utils.cm.CommandMessage):
+async def process_command_message(cm: utils.cm.CommandMessage) -> None:
     media_type = cm.media.type()
     # TODO fix prefix commands...
     # fixed_arg = await utils.aiospeller.correct(context.session, cm.arg)
@@ -42,10 +44,10 @@ async def process_command_message(cm: utils.cm.CommandMessage):
     ]
     if tasks:
         await asyncio.wait(tasks)
-        # todo exception handle?
+        # TODO exception handle?
 
 
-async def on_command_message(msg: telethon.tl.custom.message.Message):
+async def on_command_message(msg: telethon.tl.custom.message.Message) -> None:
     if msg.sender_id == the_bot_id:  # Ignore messages from self
         return
     if msg.fwd_from is not None:  # Ignore forwarded messages

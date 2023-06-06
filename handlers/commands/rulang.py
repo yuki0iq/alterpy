@@ -9,7 +9,7 @@ import random
 handler_list = []
 
 
-async def xi(cm: utils.cm.CommandMessage):
+async def xi(cm: utils.cm.CommandMessage) -> None:
     if cm.arg:
         await cm.int_cur.reply(utils.str.escape(''.join(random.choice(utils.lang.ru.morph.parse(part)).normal_form for part in utils.regex.split_by_word_border(cm.arg))))
 

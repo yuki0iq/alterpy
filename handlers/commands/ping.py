@@ -6,11 +6,12 @@ import utils.regex
 import utils.locale
 import utils.lang.ru
 import utils.common
-
+import typing
 import datetime
 import zoneinfo
 
-handler_list = []
+
+handler_list: list[utils.ch.CommandHandler] = []
 
 start_time = datetime.datetime.now(datetime.timezone.utc)
 
@@ -69,7 +70,7 @@ ID чата — `{cm.sender.chat_id}`
 LOC = utils.locale.Localizator(translations)
 
 
-def get_ping_times(cm: utils.cm.CommandMessage, lang: str):
+def get_ping_times(cm: utils.cm.CommandMessage, lang: str) -> tuple[str, str, str]:
     """return ping, handle and up formatted times"""
     cur_time = datetime.datetime.now(datetime.timezone.utc)
 
@@ -83,8 +84,8 @@ def get_ping_times(cm: utils.cm.CommandMessage, lang: str):
     return ping_s, handle_s, up_s
 
 
-def on_ping_wrapper(s: str, lang: str):
-    async def on_ping(cm: utils.cm.CommandMessage):
+def on_ping_wrapper(s: str, lang: str) -> typing.Callable[[utils.cm.CommandMessage], typing.Awaitable[None]]:
+    async def on_ping(cm: utils.cm.CommandMessage) -> None:
         ping, handle, up = get_ping_times(cm, lang)
         rep = eval(LOC.get(s + '_reply', lang))
         msg = eval(LOC.get('ping_message', lang))
@@ -92,8 +93,8 @@ def on_ping_wrapper(s: str, lang: str):
     return on_ping
 
 
-def on_stat_wrapper(lang: str):
-    async def on_stat(cm: utils.cm.CommandMessage):
+def on_stat_wrapper(lang: str) -> typing.Callable[[utils.cm.CommandMessage], typing.Awaitable[None]]:
+    async def on_stat(cm: utils.cm.CommandMessage) -> None:
         cur_time = datetime.datetime.now(datetime.timezone.utc)
         ping, handle, up = get_ping_times(cm, lang=lang)
         speed = utils.system.perf_test_compute()

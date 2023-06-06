@@ -21,7 +21,7 @@ def inflect_mention(mention: str, form: str, lang: str = "ru") -> str:
     return mention[:le] + lt.inflect(lt.tr(mention[le:ri]), form) + mention[ri:]
 
 
-def inflect_mentions(mentions: [str], form: str, lang: str = "ru") -> str:
+def inflect_mentions(mentions: list[str], form: str, lang: str = "ru") -> str:
     if not mentions:
         return ""
     lt = utils.locale.lang(lang)
@@ -29,20 +29,20 @@ def inflect_mentions(mentions: [str], form: str, lang: str = "ru") -> str:
 
 
 class RP1Handler(typing.NamedTuple):
-    pattern: re.Pattern
+    pattern: re.Pattern[str]
     ans: list[typing.Callable[[], str]]
 
-    def invoke(self, user, pronouns, comment):
+    def invoke(self, user: str, pronouns: typing.Union[int, list[int]], comment: str) -> str:
         return self.ans[utils.pronouns.to_int(pronouns)]().format(user, comment).strip()
 
 
 class RP2Handler(typing.NamedTuple):
-    pattern: re.Pattern
+    pattern: re.Pattern[str]
     ans: list[typing.Callable[[], str]]
     lang: str = "ru"
     form: str = "accs"
 
-    def invoke(self, user, pronouns, mention, comment):
+    def invoke(self, user: str, pronouns: typing.Union[int, list[int]], mention, comment: str) -> str:
         return self.ans[utils.pronouns.to_int(pronouns)]().format(
             user, inflect_mentions(list(m[1] for m in mention), self.form, self.lang), comment
         ).strip().replace('  ', ' ', 1)
@@ -277,7 +277,7 @@ rp2handlers = [
 ]
 
 
-async def on_rp(cm: utils.cm.CommandMessage):
+async def on_rp(cm: utils.cm.CommandMessage) -> None:
     # cm = cm._replace(arg=await utils.aiospeller.correct(context.session, cm.arg))
     user = await cm.sender.get_mention()
     pronoun_set = cm.sender.get_pronouns()
@@ -334,7 +334,7 @@ def to_role(words: list[str], p: int) -> str:
     return ''.join(utils.locale.try_verb_past(w, p) for w in words)
 
 
-async def on_role(cm: utils.cm.CommandMessage):
+async def on_role(cm: utils.cm.CommandMessage) -> None:
     self_mention = [(cm.sender, await cm.sender.get_mention())]
     pronoun_set = cm.sender.get_pronouns
     default_mention = [(cm.reply_sender, await cm.reply_sender.get_mention())] if cm.reply_sender is not None else []

@@ -84,7 +84,7 @@ def image_denoise(img: PIL.Image.Image) -> PIL.Image.Image:
     return ans
 
 
-def re_build(arg: str) -> re.Pattern: return utils.regex.raw(arg + '$')
+def re_build(arg: str) -> re.Pattern[str]: return utils.regex.raw(arg + '$')
 def re_letter() -> str: return '[a-zа-яё]'
 def re_space() -> str: return "\\s*"
 def re_var() -> str: return re_letter() + utils.regex.unite(re_letter(), '\\d') + '*'
@@ -97,7 +97,7 @@ def re_or(*args) -> str: return re_space() + utils.regex.unite(*args)
 
 class ImageProgrammableHandler(typing.NamedTuple):
     name: str
-    pattern: re.Pattern
+    pattern: re.Pattern[str]
     help_pages: list[str]
     handler_impl: str
 

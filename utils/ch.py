@@ -11,15 +11,15 @@ import inspect
 
 class CommandHandler(typing.NamedTuple):
     name: str  # command name
-    pattern: re.Pattern  # regex pattern
+    pattern: re.Pattern[str]  # regex pattern
     help_page: str
-    handler_impl: typing.Callable[[utils.cm.CommandMessage], typing.Awaitable]
+    handler_impl: typing.Callable[[utils.cm.CommandMessage], typing.Awaitable[None]]
     is_prefix: bool = False  # should a command be deleted from its message when passed to handler
     is_elevated: bool = False  # should a command be invoked only if user is admin
     is_arg_current: bool = False  # don't take arg from reply if set
-    required_media_type: typing.Set[str] = {}
+    required_media_type: typing.Set[str] = set()
 
-    async def invoke(self, cm: utils.cm.CommandMessage):
+    async def invoke(self, cm: utils.cm.CommandMessage) -> None:
         if not self.is_elevated or cm.sender.is_admin():
             try:
                 await self.handler_impl(cm)
@@ -41,9 +41,9 @@ def apply(cm: utils.cm.CommandMessage, ch: CommandHandler) -> utils.cm.CommandMe
 
 def simple_reply(
         msg: str,
-        ans: typing.Union[str, typing.Callable[[], typing.Union[typing.Awaitable, str]]],
+        ans: typing.Union[str, typing.Callable[[], typing.Union[typing.Awaitable[str], str]]],
         help_page: str = "",
-        pattern: typing.Union[str, re.Pattern] = ""
+        pattern: typing.Union[str, re.Pattern[str]] = ""
 ) -> CommandHandler:
     """
     Simple reply handler. [In]msg -> [Out]ans
@@ -51,23 +51,23 @@ def simple_reply(
     ans: str -- simple replier
     ans: Callable[[], maybe Awaitable str] -- call before reply
 
-    pattern: str OR re.Pattern
+    pattern: str OR re.Pattern[str]
     """
 
     if type(ans) == str:
-        async def on_simple_reply_str(cm: utils.cm.CommandMessage):
+        async def on_simple_reply_str(cm: utils.cm.CommandMessage) -> None:
             await cm.int_cur.reply(ans)
 
         on_simple_reply = on_simple_reply_str
     elif inspect.iscoroutinefunction(ans):
-        async def on_simple_reply_async(cm: utils.cm.CommandMessage):
+        async def on_simple_reply_async(cm: utils.cm.CommandMessage) -> None:
             ret = await ans()
             if ret:
                 await cm.int_cur.reply(ret)
 
         on_simple_reply = on_simple_reply_async
     elif inspect.isfunction(ans):
-        async def on_simple_reply_fun(cm: utils.cm.CommandMessage):
+        async def on_simple_reply_fun(cm: utils.cm.CommandMessage) -> None:
             ret = ans()
             if ret:
                 await cm.int_cur.reply(ret)

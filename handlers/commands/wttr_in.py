@@ -5,11 +5,9 @@ import utils.regex
 import utils.str
 import utils.locale
 import context
-
+import typing
 import aiohttp
 import json
-
-handler_list = []
 
 
 translations = {
@@ -41,8 +39,8 @@ translations = {
 LOC = utils.locale.Localizator(translations)
 
 
-def weather(lang: str):
-    async def weather_impl(cm: utils.cm.CommandMessage):
+def weather(lang: str) -> typing.Callable[[utils.cm.CommandMessage], typing.Awaitable[None]]:
+    async def weather_impl(cm: utils.cm.CommandMessage) -> None:
         if not cm.arg:
             await cm.int_cur.reply(LOC.obj('no', lang))
             return
@@ -63,7 +61,7 @@ def weather(lang: str):
     return weather_impl
 
 
-handler_list.extend(
+handler_list = [
     utils.ch.CommandHandler(
         name=f'weather-{lang}',
         pattern=utils.regex.cmd(command),
@@ -75,4 +73,4 @@ handler_list.extend(
         ('ru', 'погода'),
         ('en', 'weather'),
     ]
-)
+]

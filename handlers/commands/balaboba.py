@@ -15,13 +15,13 @@ bb = utils.aiobalaboba.Balaboba(bbsession)
 text_types = []
 
 
-async def init():
+async def init() -> None:
     global text_types
     text_types = await bb.get_text_types(language="ru")
     utils.log.get("balaboba").info(f"Got types: {chr(10).join(map(str, text_types))}")
 
 
-async def balaboba(cm: utils.cm.CommandMessage):
+async def balaboba(cm: utils.cm.CommandMessage) -> None:
     if not cm.arg:
         await cm.int_cur.reply("Пустой запрос не хорошо")
         return

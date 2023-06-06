@@ -9,12 +9,12 @@ import utils.kiri43i
 handler_list = []
 
 
-async def on_layout(cm: utils.cm.CommandMessage):
+async def on_layout(cm: utils.cm.CommandMessage) -> None:
     if cm.arg:
         await cm.int_cur.reply(utils.str.escape(utils.str.change_layout(cm.arg)))
 
 
-async def on_trl(cm: utils.cm.CommandMessage):
+async def on_trl(cm: utils.cm.CommandMessage) -> None:
     if cm.arg:
         res = []
         for part in utils.common.split_by_func(cm.arg, utils.str.is_eng):
@@ -25,7 +25,7 @@ async def on_trl(cm: utils.cm.CommandMessage):
         await cm.int_cur.reply(utils.str.escape(utils.kiri43i.parse(''.join(res))))
 
 
-async def on_me(cm: utils.cm.CommandMessage):
+async def on_me(cm: utils.cm.CommandMessage) -> None:
     if cm.arg:
         msg = f"\* _{await cm.sender.get_display_name()} {utils.str.escape(cm.arg)}_"
         if cm.int_prev:

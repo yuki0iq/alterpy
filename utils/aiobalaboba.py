@@ -11,7 +11,7 @@ class TextType(NamedTuple):
     name: str
     description: str
 
-def get_headers(input: str, style_id: int = 0, lang: str = 'ru'):
+def get_headers(input: str, style_id: int = 0, lang: str = 'ru') -> dict[str, str]:
     user_agent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0"
     origin = "https://yandex.ru" if lang == 'ru' else "https://yandex.com"
     referer = f"https://yandex.ru/lab/yalm?style={style_id}" if lang == 'ru' else f"https://yandex.com/lab/yalm-en?style={style_id}"
@@ -27,7 +27,7 @@ class HTTPSession:
         self.session = session
 
     async def get_response(
-        self, *, method: str, endpoint: str, json: Any = None, headers: Optional[dict] = None
+        self, *, method: str, endpoint: str, json: Any = None, headers: Optional[dict[str, str]] = None
     ) -> Any:
         if isinstance(self.session, ClientSession) and not self.session.closed:
             response = await self._fetch(
@@ -41,7 +41,7 @@ class HTTPSession:
         return await response.json()
 
     async def _fetch(
-        self, *, method: str, endpoint: str, json: Any, session: ClientSession, headers: Optional[dict]
+        self, *, method: str, endpoint: str, json: Any, session: ClientSession, headers: Optional[dict[str, str]]
     ) -> ClientResponse:
         async with session.request(
             method,

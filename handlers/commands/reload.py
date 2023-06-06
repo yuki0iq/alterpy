@@ -7,7 +7,7 @@ import os, sys
 import PyGitUp.gitup
 
 
-async def on_reload(cm: utils.cm.CommandMessage):
+async def on_reload(cm: utils.cm.CommandMessage) -> None:
     res = await utils.mod.load_handlers(
         handlers.cm.initial_handlers,
         handlers.cm.ch_list,
@@ -17,7 +17,7 @@ async def on_reload(cm: utils.cm.CommandMessage):
     await cm.int_cur.reply(res)
 
 
-async def on_hard_reload(cm: utils.cm.CommandMessage):
+async def on_hard_reload(cm: utils.cm.CommandMessage) -> None:
     # TODO: other way/
     with open('restarter.txt', 'w') as f:
         print(cm.sender.chat_id, cm.id, file=f)

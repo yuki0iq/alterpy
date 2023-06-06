@@ -10,7 +10,7 @@ import utils.aiospeller
 handler_list = []
 
 
-async def spell(cm: utils.cm.CommandMessage):
+async def spell(cm: utils.cm.CommandMessage) -> None:
     if cm.arg:
         await cm.int_cur.reply(utils.str.escape(await utils.aiospeller.correct(context.session, cm.arg)))
 

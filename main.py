@@ -1,20 +1,23 @@
 import utils.log
 import utils.config
 import utils.mod
+import utils.file
 import sqlite3
 import aiohttp
 import asyncio
-import telethon.events
+import telethon.events.newmessage
 import telethon.tl.custom.message
 import rich.traceback
 import context
+import typing
+import os
 
 
 log = utils.log.get("main")
-message_handlers = []
+message_handlers: list[typing.Any] = []
 
 
-async def process_message(msg: telethon.tl.custom.message.Message):
+async def process_message(msg: telethon.tl.custom.message.Message) -> None:
     tasks = [
         asyncio.create_task(handler.invoke(msg))
         for handler in message_handlers
@@ -23,11 +26,11 @@ async def process_message(msg: telethon.tl.custom.message.Message):
         await asyncio.wait(tasks)
 
 
-async def event_handler(event: telethon.events.NewMessage):
+async def event_handler(event: telethon.events.newmessage.NewMessage) -> None:
     await process_message(event.message)
 
 
-async def main():
+async def main() -> None:
     log.info("AlterPy")
 
     config = utils.config.load("config.toml")
@@ -59,7 +62,7 @@ async def main():
                 res = await utils.mod.load_handlers([], message_handlers, "handlers", True)
                 await client.send_message(_chat, f"← alterpy start: {res}. Check logs for further info", reply_to=_reply)
 
-                client.add_event_handler(event_handler, telethon.events.NewMessage)
+                client.add_event_handler(event_handler, telethon.events.newmessage.NewMessage)
 
                 log.info("Started!")
                 await client.run_until_disconnected()

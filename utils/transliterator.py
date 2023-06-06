@@ -31,7 +31,7 @@ class Transliterator:
         'ri': 'к'
     }
 
-    def __init__(self, need_spell=False):
+    def __init__(self, need_spell: bool = False) -> None:
         self.__RU_VOWELS = 'аeёиоуыэюя'
         self.__AFFIXES = re.compile(
             r'(^|\s+)(pod|raz|iz|pred|ot|ob|bez|in|trans|(sver|dvu|tr([yj][ёo]|ё))k?h)$',

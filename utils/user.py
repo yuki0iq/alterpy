@@ -22,7 +22,7 @@ default_user_config = {
 class User(typing.NamedTuple):
     sender: typing.Union[telethon.tl.types.User, telethon.tl.types.Channel, telethon.tl.types.Chat]
     chat_id: int
-    client: telethon.client.TelegramClient
+    client: telethon.client.telegramclient.TelegramClient
 
     def is_admin(self) -> bool:  # check if in admins list
         return self.sender.id in context.admins
@@ -33,10 +33,9 @@ class User(typing.NamedTuple):
             return display_name
         if type(self.sender) == telethon.tl.types.Channel:
             return self.sender.title
-        try:
+        if type(self.sender) != telethon.tl.types.Chat:
             return self.sender.first_name
-        except:
-            return 'null'
+        return 'null'
 
     async def get_mention(self) -> str:
         name = await self.get_display_name()
@@ -64,37 +63,41 @@ class User(typing.NamedTuple):
 
     def config_name(self) -> str: return f"user/{self.sender.id}.toml"
 
-    def load_user_config(self): return default_user_config | utils.config.load(self.config_name())
-    def save_user_config(self, conf): utils.config.save(self.config_name(), conf)
+    def load_user_config(self) -> dict[str, typing.Any]: return default_user_config | utils.config.load(self.config_name())
+    def save_user_config(self, conf: dict[str, typing.Any]): utils.config.save(self.config_name(), conf)
 
-    def get(self, param): return self.load_user_config()[param]
-    def set(self, param, val): self.save_user_config(self.load_user_config() | {param: val})
-    def reset(self, param): self.set(param, default_user_config[param])
+    def get(self, param: str) -> typing.Any: return self.load_user_config()[param]
+    def set(self, param: str, val: typing.Any) -> None: self.save_user_config(self.load_user_config() | {param: val})
+    def reset(self, param: str) -> None: self.set(param, default_user_config[param])
 
     def get_pronouns(self) -> typing.Union[int, list[int]]: return self.get('pronoun_set')
-    def set_pronouns(self, pronoun_set: typing.Union[int, list[int]]): self.set('pronoun_set', pronoun_set)
-    def reset_pronouns(self): self.reset('pronoun_set')
+    def set_pronouns(self, pronoun_set: typing.Union[int, list[int]]) -> None: self.set('pronoun_set', pronoun_set)
+    def reset_pronouns(self) -> None: self.reset('pronoun_set')
 
     def get_name(self) -> str: return self.get('name')
-    def set_name(self, name: str): self.set('name', name)
-    def reset_name(self): self.reset('name')
+    def set_name(self, name: str) -> None: self.set('name', name)
+    def reset_name(self) -> None: self.reset('name')
 
     def get_redirect(self) -> str: return self.get('replace_id')
-    def set_redirect(self, uid: int): self.set('replace_id', uid)
-    def reset_redirect(self): self.reset('replace_id')
+    def set_redirect(self, uid: int) -> None: self.set('replace_id', uid)
+    def reset_redirect(self) -> None: self.reset('replace_id')
 
     def get_lang(self) -> str: return self.get('lang')
-    def set_lang(self, lang: str) -> str: return self.set('lang', lang)
-    def reset_lang(self): self.reset('lang')
+    def set_lang(self, lang: str) -> None: self.set('lang', lang)
+    def reset_lang(self) -> None: self.reset('lang')
 
 
-async def from_telethon(user: typing.Union[telethon.tl.types.User, telethon.tl.types.Channel, str, int],
+async def from_telethon(user: typing.Union[telethon.tl.types.User, telethon.tl.types.Channel, telethon.tl.types.Chat, str, int],
                         chat: typing.Union[telethon.tl.types.Chat, int, None],
-                        client: telethon.client.TelegramClient) -> User:
+                        client: telethon.client.telegramclient.TelegramClient) -> User:
     if type(user) == str or type(user) == int:
         return await from_telethon(await client.get_entity(await client.get_input_entity(user)), chat, client)
     if user is not None:
-        return User(user, (chat.id if type(chat) != int else chat) if chat else 0, client)
+        if type(chat) == int:
+            chat_id = chat
+        else:
+            chat_id = chat.id if chat else 0
+        return User(user, chat_id, client)
     return await from_telethon(chat, chat, client)
 
 
@@ -115,7 +118,7 @@ mention_pattern = utils.regex.ignore_case(
 )
 
 
-async def from_str(arg: str, chat_id: int, client: telethon.client.TelegramClient) -> tuple[str, typing.Optional[User], str, str]:
+async def from_str(arg: str, chat_id: int, client: telethon.client.telegramclient.TelegramClient) -> tuple[str, typing.Optional[User], str, str]:
     match = re.search(utils.user.mention_pattern, arg)
     if not match:
         return arg, None, '', ''

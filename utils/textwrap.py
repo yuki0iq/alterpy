@@ -10,7 +10,7 @@ banned_first = ''.join([r"""·»‐–—†‡•›‼⁇⁈⁉℃∶、。〃
 banned_last = ''.join([r"""«·‵々〇〈《「『【〔〖〘〝︴︵︷︹︻︽︿﹁﹃﹏﹙﹛＄（．［｛｟￡￥￦"""])
 
 
-def to_chunks(s: str, break_on_hyphens: bool = True):
+def to_chunks(s: str, break_on_hyphens: bool = True) -> list[str]:
     """
     Split string into chunks so that line break may ocurr between any pair of subsequent chunks
     """
@@ -137,7 +137,7 @@ class TextWrapper:
         """
         return to_chunks(text, self.break_on_hyphens)
 
-    def _fix_sentence_endings(self, chunks: list[str]):
+    def _fix_sentence_endings(self, chunks: list[str]) -> None:
         """
         Correct for sentence endings buried in 'chunks'. E.g. when the original text contains "... foo.\\nBar ...",
         munge_whitespace() and split() will convert that to [..., "foo.", " ", "Bar", ...]
@@ -152,7 +152,7 @@ class TextWrapper:
             else:
                 i += 1
 
-    def _handle_long_word(self, reversed_chunks: list[str], cur_line: list[str], cur_len: int, width: int):
+    def _handle_long_word(self, reversed_chunks: list[str], cur_line: list[str], cur_len: int, width: int) -> None:
         """
         Handle a chunk of text (most likely a word, not whitespace) that is too long to fit in any line.
         """
@@ -196,7 +196,7 @@ class TextWrapper:
         Chunks should not have internal whitespace; i.e. a chunk is either all whitespace or a "word". Whitespace
         chunks will be removed from the beginning and end of lines, but apart from that whitespace is preserved.
         """
-        lines = []
+        lines: list[str] = []
         if self.width <= 0:
             raise ValueError("invalid width %r (must be > 0)" % self.width)
         if self.max_lines is not None:
@@ -307,7 +307,7 @@ class TextWrapper:
 
 # -- Convenience interface ---------------------------------------------
 
-def wrap(text: str, width: int = 70, **kwargs):
+def wrap(text: str, width: int = 70, **kwargs: typing.Any) -> list[str]:
     """
     Wrap a single paragraph of text, returning a list of wrapped lines.
 
@@ -320,7 +320,7 @@ def wrap(text: str, width: int = 70, **kwargs):
     return w.wrap(text)
 
 
-def fill(text: str, width: int = 70, **kwargs):
+def fill(text: str, width: int = 70, **kwargs: typing.Any) -> str:
     """
     Fill a single paragraph of text, returning a new string.
 
@@ -332,7 +332,7 @@ def fill(text: str, width: int = 70, **kwargs):
     return w.fill(text)
 
 
-def shorten(text: str, width: int, **kwargs):
+def shorten(text: str, width: int, **kwargs: typing.Any) -> str:
     """
     Collapse and truncate the given text to fit in the given width.
 
@@ -347,7 +347,7 @@ def shorten(text: str, width: int, **kwargs):
     return w.fill(' '.join(text.strip().split()))
 
 
-def text(s: str, width: int = 70, initial_indent: str = "", subsequent_indent: str = "", **kwargs):
+def text(s: str, width: int = 70, initial_indent: str = "", subsequent_indent: str = "", **kwargs: typing.Any) -> str:
     res = []
     first = True
     for line in s.split('\n'):
@@ -363,3 +363,4 @@ def text(s: str, width: int = 70, initial_indent: str = "", subsequent_indent: s
             res.append(indent)
         first = False
     return '\n'.join(res)
+
