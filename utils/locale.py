@@ -41,5 +41,7 @@ def detect(s: str) -> str:
 
 
 def try_verb_past(w: str, p: int) -> str:
-    return lang(detect(w)).try_verb_past(w, p)
+    ret = lang(detect(w)).try_verb_past(w, p)
+    assert isinstance(ret, str)
+    return ret
 

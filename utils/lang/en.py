@@ -30,7 +30,9 @@ def try_verb_past(w: str, p: int) -> str:
 
 
 def inflect(s: str, form: str) -> str:
-    return lemminflect.getInflection(s, form)[0]
+    ret = lemminflect.getInflection(s, form)[0]
+    assert isinstance(ret, str)
+    return ret
 
 
 def inflector(form: str) -> typing.Callable[[str], str]:
@@ -44,5 +46,7 @@ def agree_with_number(s: str, num: int, _: typing.Any) -> str:
 
 
 def tr(s: str) -> str:
-    return iuliia.translate(s, iuliia.WIKIPEDIA)
+    ret = iuliia.translate(s, iuliia.WIKIPEDIA)
+    assert isinstance(ret, str)
+    return ret
 

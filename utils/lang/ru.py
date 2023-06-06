@@ -7,22 +7,21 @@ import utils.kiri43i
 import os.path
 import typing
 
-
 log = utils.log.get("lang-ru")
 
 
 class MorphAnalyzer:
     __slots__ = ['morph']
 
-    def __init__(self, morph):
+    def __init__(self, morph: pymorphy3.MorphAnalyzer) -> None:
         self.morph = morph
 
-    def parse(self, word):
+    def parse(self, word: str) -> list[pymorphy3.analyzer.Parse]:
         E = lambda x: utils.str.equal_capitalize(x, word)
         return [el._replace(word=E(el.word), normal_form=E(el.normal_form)) for el in self.morph.parse(word)]
 
 
-def parse_inflect(word, form: typing.Union[str, set[str], frozenset[str]]):
+def parse_inflect(word: pymorphy3.analyzer.Parse, form: typing.Union[str, set[str], frozenset[str]]) -> pymorphy3.analyzer.Parse:
     if type(form) == str:
         form = {form}
     res = word.inflect(form)
@@ -40,11 +39,11 @@ def merge(a: str, b: str) -> str:
 pasts = [frozenset({'past', 'sing', 'masc'}), frozenset({'past', 'sing', 'femn'}), frozenset({'past', 'sing', 'neut'}), frozenset({'past', 'plur'})]
 pn_to_pi = [0, 0, 1, 2, 2, 3]
 
-def _past(parse, i: int) -> str:
+def _past(parse: pymorphy3.analyzer.Parse, i: int) -> str:
     return parse_inflect(parse, pasts[i]).word
 
 
-def past(parse, p: int) -> str:
+def past(parse: pymorphy3.analyzer.Parse, p: int) -> str:
     if p == 0: return merge(_past(parse, 0), _past(parse, 1))
     return _past(parse, pn_to_pi[p])
 

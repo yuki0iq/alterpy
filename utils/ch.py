@@ -54,7 +54,7 @@ def simple_reply(
     pattern: str OR re.Pattern[str]
     """
 
-    if type(ans) == str:
+    if isinstance(ans, str):
         async def on_simple_reply_str(cm: utils.cm.CommandMessage) -> None:
             await cm.int_cur.reply(ans)
 
@@ -66,22 +66,17 @@ def simple_reply(
                 await cm.int_cur.reply(ret)
 
         on_simple_reply = on_simple_reply_async
-    elif inspect.isfunction(ans):
+    else:
         async def on_simple_reply_fun(cm: utils.cm.CommandMessage) -> None:
             ret = ans()
             if ret:
                 await cm.int_cur.reply(ret)
 
         on_simple_reply = on_simple_reply_fun
-    else:
-        async def on_simple_reply(cm: utils.cm.CommandMessage):
-            await cm.int_cur.reply("Broken handler!")
-
-        utils.log.get("handler").exception("Wrong reply answer passed")
 
     if not pattern:
         pattern = utils.regex.pat_starts_with(msg)
-    if type(pattern) == str:
+    if isinstance(pattern, str):
         pattern = utils.regex.ignore_case(pattern)
 
     return CommandHandler(
