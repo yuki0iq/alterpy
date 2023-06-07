@@ -41,7 +41,7 @@ async def load_handlers(initial_handlers: list[typing.Any], handlers: list[typin
     log.info(f"Started loading from ./{path}")
 
     handlers[:] = initial_handlers[:]
-    filenames = list(filter(lambda fn: fn[-3:] == ".py", sorted(utils.file.list_filenames(path))))
+    filenames = list(filter(lambda fn: fn[-3:] == ".py" and '__' not in fn, sorted(utils.file.list_filenames(path))))
 
     cnt_ok, cnt = 0, len(filenames)
 
