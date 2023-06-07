@@ -59,9 +59,9 @@ def timedelta_to_str(d: datetime.timedelta, is_short: bool = False, lang: str = 
 
     def is_not_null(el: typing.Tuple[typing.Union[int, float], str]) -> bool:
         cnt, _ = el
-        if type(cnt) == int:
+        if isinstance(cnt, int):
             return cnt != 0
-        return abs(cnt) < 0.05
+        return abs(cnt) > 0.05
 
     def short(val: typing.Union[int, float], name: str) -> str:
         word = LOC.obj(name, lang)[0]

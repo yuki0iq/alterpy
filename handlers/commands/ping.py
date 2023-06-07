@@ -96,7 +96,7 @@ def on_ping_wrapper(s: str, lang: str) -> typing.Callable[[utils.cm.CommandMessa
 def on_stat_wrapper(lang: str) -> typing.Callable[[utils.cm.CommandMessage], typing.Awaitable[None]]:
     async def on_stat(cm: utils.cm.CommandMessage) -> None:
         cur_time = datetime.datetime.now(datetime.timezone.utc)
-        ping, handle, up = get_ping_times(cm, lang=lang)
+        ping, handle, up = get_ping_times(cm, lang)
         speed = utils.system.perf_test_compute()
         system_info = utils.system.system_info()
         msg = eval(LOC.get('stat_message', lang))
