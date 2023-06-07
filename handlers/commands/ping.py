@@ -104,13 +104,18 @@ def on_stat_wrapper(lang: str) -> typing.Callable[[utils.cm.CommandMessage], typ
     return on_stat
 
 
+def replier(ans: str) -> typing.Callable[[utils.cm.CommandMessage], typing.Awaitable[None]]:
+    async def on_reply(cm: utils.cm.CommandMessage) -> None:
+        await cm.int_cur.reply(ans)
+    return on_reply
+
+
 handler_list.extend(
     utils.ch.CommandHandler(
         name=msg,
         pattern=utils.regex.cmd(msg + '$'),
         help_page="ping",
-        handler_impl=on_ping_wrapper(s, lang),
-        is_elevated=False
+        handler_impl=on_ping_wrapper(s, lang)
     ) for msg, s, lang in [
         ("ping", "ping", 'en'),
         ("пинг", "ping", 'ru'),
@@ -124,8 +129,7 @@ handler_list.extend(
         name=msg,
         pattern=utils.regex.cmd(msg + '$'),
         help_page='ping',
-        handler_impl=on_stat_wrapper(lang),
-        is_elevated=False
+        handler_impl=on_stat_wrapper(lang)
     ) for msg, lang in [
         ("stat", 'en'),
         ("стат", 'ru'),
@@ -133,8 +137,12 @@ handler_list.extend(
 )
 
 handler_list.extend(
-    utils.ch.simple_reply(msg, ans, help_page="ping", pattern=utils.regex.ignore_case(pat))
-    for msg, ans, pat in [
+    utils.ch.CommandHandler(
+        name=msg,
+        pattern=utils.regex.ignore_case(pat),
+        help_page="ping",
+        handler_impl=replier(ans)
+    ) for msg, ans, pat in [
         ("bot", "I'm here!", utils.regex.pat_starts_with("bot$")),
         ("бот", "На месте!", utils.regex.pat_starts_with("бот$")),
         ("ты где", "Я тут", utils.regex.pat_starts_with("(ты где)|(где ты)$")),

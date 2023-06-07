@@ -1,4 +1,5 @@
 import telethon.tl.custom.message
+import telethon.tl.types
 import typing
 import io
 
@@ -14,7 +15,7 @@ class Media(typing.NamedTuple):
             return file
         return None
 
-    def poll(self):
+    def poll(self) -> telethon.tl.types.MessageMediaPoll:
         return self.message.poll
 
     def type(self) -> str:

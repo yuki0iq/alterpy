@@ -32,9 +32,9 @@ class User(typing.NamedTuple):
         if display_name:
             return display_name
         if isinstance(self.sender, telethon.tl.types.Channel):
-            return self.sender.title
+            return str(self.sender.title)
         if not isinstance(self.sender, telethon.tl.types.Chat):
-            return self.sender.first_name
+            return str(self.sender.first_name)
         return 'null'
 
     async def get_mention(self) -> str:
@@ -72,10 +72,14 @@ class User(typing.NamedTuple):
 
     def get_pronouns(self) -> typing.Union[int, list[int]]:
         ret = self.get('pronoun_set')
-        assert isinstance(ret, (int, list))
-        if isinstance(ret, list):
-            for el in ret: assert isinstance(el, int)
-        return ret
+        if isinstance(ret, int):
+            return ret
+        elif isinstance(ret, list):
+            for el in ret:
+                assert isinstance(el, int)
+            return ret
+        else:
+            assert False
     def set_pronouns(self, pronoun_set: typing.Union[int, list[int]]) -> None: self.set('pronoun_set', pronoun_set)
     def reset_pronouns(self) -> None: self.reset('pronoun_set')
 
