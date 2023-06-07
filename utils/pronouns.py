@@ -45,8 +45,12 @@ pronouns_name_getter = utils.locale.Localizator(pronouns_name)
 
 def to_str(pns: typing.Union[int, list[int]], lang: str = "ru") -> str:
     if isinstance(pns, int):
-        return pronouns_name_getter.obj(pns, lang)
-    return pronouns_name_getter.obj('list', lang) + ' ' + ', '.join(to_str(pn, lang) for pn in pns)
+        single = pronouns_name_getter.obj(pns, lang)
+        assert isinstance(single, str)
+        return single
+    mult = pronouns_name_getter.obj('list', lang)
+    assert isinstance(mult, str)
+    return mult + ' ' + ', '.join(to_str(pn, lang) for pn in pns)
 
 
 def from_str(s: str) -> typing.Union[int, list[int]]:

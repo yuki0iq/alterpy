@@ -64,7 +64,7 @@ fix_vowels = {
 }
 
 
-def re_sub(s: str, rule: dict[str, typing.Union[re.Pattern[str], str]]) -> str:
+def re_sub(s: str, rule: dict[re.Pattern[str], str]) -> str:
     for f, t in rule.items():
         s = re.sub(f, t, s)
     return s
@@ -162,7 +162,7 @@ def to(s: str) -> str:
     s = fast_replace(s, K_to_H)
     s = fast_replace(s, normalize)
     s = fix_long_vowels(s)
-    s = replace(s, zero_special_n)
+    s = re_sub(s, zero_special_n)
     s = replace(s, first_special_n)
     s = fast_replace(s, kana_to_ru)
     s = replace(s, second_special_n)

@@ -17,8 +17,16 @@ class MorphAnalyzer:
         self.morph = morph
 
     def parse(self, word: str) -> list[pymorphy3.analyzer.Parse]:
-        E = lambda x: utils.str.equal_capitalize(x, word)
-        return [el._replace(word=E(el.word), normal_form=E(el.normal_form)) for el in self.morph.parse(word)]
+        def make_equal(x: str) -> str:
+            return utils.str.equal_capitalize(x, word)
+
+        return [
+            el._replace(
+                word=make_equal(el.word),
+                normal_form=make_equal(el.normal_form)
+            )
+            for el in self.morph.parse(word)
+        ]
 
 
 def parse_inflect(word: pymorphy3.analyzer.Parse, form: typing.Union[str, set[str], frozenset[str]]) -> pymorphy3.analyzer.Parse:
@@ -26,6 +34,22 @@ def parse_inflect(word: pymorphy3.analyzer.Parse, form: typing.Union[str, set[st
         form = {form}
     res = word.inflect(form)
     return res._replace(word=utils.str.equal_capitalize(res.word, word.word))
+
+
+def word_inflect_parse(word: str, form: typing.Union[str, set[str], frozenset[str]]) -> pymorphy3.analyzer.Parse:
+    return parse_inflect(morph.parse(word)[0], form)
+
+
+def word_inflect(word: str, form: typing.Union[str, set[str], frozenset[str]]) -> str:
+    ret = word_inflect_parse(word, form).word
+    assert isinstance(ret, str)
+    return ret
+
+
+def parse_inflect_word(word: pymorphy3.analyzer.Parse, form: typing.Union[str, set[str], frozenset[str]]) -> str:
+    ret = parse_inflect(word, form).word
+    assert isinstance(ret, str)
+    return ret
 
 
 morph = MorphAnalyzer(pymorphy3.MorphAnalyzer())
@@ -40,7 +64,7 @@ pasts = [frozenset({'past', 'sing', 'masc'}), frozenset({'past', 'sing', 'femn'}
 pn_to_pi = [0, 0, 1, 2, 2, 3]
 
 def _past(parse: pymorphy3.analyzer.Parse, i: int) -> str:
-    return parse_inflect(parse, pasts[i]).word
+    return parse_inflect_word(parse, pasts[i])
 
 
 def past(parse: pymorphy3.analyzer.Parse, p: int) -> str:
@@ -56,11 +80,11 @@ def try_verb_past(w: str, p: int) -> str:
     return past(parse, p)
 
 
-def inflect(s: str, form: typing.Union[str, set[str], frozenset[str]]):
+def inflect(s: str, form: typing.Union[str, set[str], frozenset[str]]) -> str:
     try:
         return pi.inflect(s, form)
     except:
-        return parse_inflect(morph.parse(s)[0], form).word
+        return word_inflect(s, form)
 
 
 def inflector(form: typing.Union[str, set[str], frozenset[str]]) -> typing.Callable[[str], str]:
@@ -68,7 +92,9 @@ def inflector(form: typing.Union[str, set[str], frozenset[str]]) -> typing.Calla
 
 
 def agree_with_number(s: str, num: int, form: typing.Union[str, set[str], frozenset[str]]) -> str:
-    return morph.parse(s)[0].inflect(form).make_agree_with_number(num).word
+    ret = word_inflect_parse(s, form).make_agree_with_number(num).word
+    assert isinstance(ret, str)
+    return ret
 
 
 translit = utils.transliterator.Transliterator()
