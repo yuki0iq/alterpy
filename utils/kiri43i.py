@@ -1,5 +1,6 @@
 # http://web.archive.org/web/20130617172843/https://ru.wikipedia.org/wiki/Участник:Tassadar/киричзи
 import re
+import typing
 import utils.mecab
 import utils.common
 import utils.str
@@ -161,7 +162,7 @@ def to(s: str) -> str:
     s = fast_replace(s, K_to_H)
     s = fast_replace(s, normalize)
     s = fix_long_vowels(s)
-    s = re_sub(s, zero_special_n)
+    s = replace(s, zero_special_n)
     s = replace(s, first_special_n)
     s = fast_replace(s, kana_to_ru)
     s = replace(s, second_special_n)
