@@ -3,7 +3,7 @@ import utils.cm
 import utils.regex
 
 
-async def on_start(cm: utils.cm.CommandMessage):
+async def on_start(cm: utils.cm.CommandMessage) -> None:
     await cm.int_cur.reply(
         "Привет! На связи alterpy - быстрый, потому что никому не нужный телеграм-бот!\n" +
         "\n" +

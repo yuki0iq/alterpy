@@ -12,8 +12,9 @@ handler_list = []
 
 
 async def calend_ru(cm: utils.cm.CommandMessage) -> None:
-    async with context.session.get('https://www.calend.ru/img/export/informer.png') as response:
-        await cm.int_cur.reply('Праздники сегодня', await response.read())
+    if isinstance(context.session, aiohttp.ClientSession):
+        async with context.session.get('https://www.calend.ru/img/export/informer.png') as response:
+            await cm.int_cur.reply('Праздники сегодня', await response.read())
 
 
 handler_list.append(
