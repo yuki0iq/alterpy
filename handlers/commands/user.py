@@ -126,7 +126,7 @@ async def on_set_lang(cm: utils.cm.CommandMessage) -> None:
 
 async def on_reset_lang(cm: utils.cm.CommandMessage) -> None:
     cm.sender.reset_lang()
-    await cm.int_cur.reply(LOC.obj('reset_lang'))
+    await cm.int_cur.reply(LOC.obj('reset_lang', cm.lang))
 
 
 async def on_get(cm: utils.cm.CommandMessage) -> None:
