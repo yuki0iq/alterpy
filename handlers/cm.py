@@ -8,11 +8,11 @@ import utils.mod
 import utils.help
 import utils.aiospeller
 import utils.ch
-import context
+import alterpy.context
 import typing
 
 
-the_bot_id = context.the_bot_id
+the_bot_id = alterpy.context.the_bot_id
 ch_list: list[utils.ch.CommandHandler] = []
 
 utils.help.add(ch_list, ['man', 'ман'], ['help', 'command'])
@@ -28,7 +28,7 @@ async def init() -> None:
 async def process_command_message(cm: utils.cm.CommandMessage) -> None:
     media_type = cm.media.type()
     # TODO fix prefix commands...
-    # fixed_arg = await utils.aiospeller.correct(context.session, cm.arg)
+    # fixed_arg = await utils.aiospeller.correct(alterpy.context.session, cm.arg)
     fixed_arg = cm.arg  # FIXME
     tasks = [
         asyncio.create_task(handler.invoke(

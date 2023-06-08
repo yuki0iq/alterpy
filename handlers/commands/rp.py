@@ -8,7 +8,6 @@ import utils.user
 import utils.str
 import utils.pronouns
 import utils.aiospeller
-import context
 import typing
 import re
 
@@ -282,7 +281,7 @@ rp2handlers = [
 
 
 async def on_rp(cm: utils.cm.CommandMessage) -> None:
-    # cm = cm._replace(arg=await utils.aiospeller.correct(context.session, cm.arg))
+    # cm = cm._replace(arg=await utils.aiospeller.correct(alterpy.context.session, cm.arg))
     user = await cm.sender.get_mention()
     pronoun_set = cm.sender.get_pronouns()
     default_mention = [(cm.reply_sender, await cm.reply_sender.get_mention())] if cm.reply_sender is not None else []

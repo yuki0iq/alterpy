@@ -7,20 +7,17 @@ import aiohttp
 import asyncio
 import telethon.events.newmessage
 import telethon.tl.custom.message
-import rich.traceback
-import context
+import logging
 import typing
 import os
 
-
-log = utils.log.get("main")
-message_handlers: list[typing.Any] = []
+from . import context
 
 
 async def process_message(msg: telethon.tl.custom.message.Message) -> None:
     tasks = [
         asyncio.create_task(handler.invoke(msg))
-        for handler in message_handlers
+        for handler in context.message_handlers
     ]
     if tasks:
         await asyncio.wait(tasks)
@@ -30,10 +27,10 @@ async def event_handler(event: telethon.events.newmessage.NewMessage) -> None:
     await process_message(event.message)
 
 
-async def main() -> None:
+async def main(log: logging.Logger) -> None:
     log.info("AlterPy")
 
-    config = utils.config.load("config.toml")
+    config = utils.config.load("config")
     for el in config["admins"]: context.admins.add(el)
     del config
     del el
@@ -46,7 +43,7 @@ async def main() -> None:
     except:
         _chat, _reply = next(iter(context.admins)), None
 
-    telethon_config = utils.config.load("telethon_config.toml")
+    telethon_config = utils.config.load("telethon")
     try:
         async with aiohttp.ClientSession() as context.session:
             client = telethon.TelegramClient("alterpy", telethon_config['api_id'], telethon_config['api_hash'])
@@ -58,8 +55,7 @@ async def main() -> None:
                 context.the_bot_id = int(telethon_config['bot_token'].split(':')[0])
                 del telethon_config
 
-                global message_handlers
-                res = await utils.mod.load_handlers([], message_handlers, "handlers", True)
+                res = await utils.mod.load_handlers([], context.message_handlers, "handlers", True)
                 await client.send_message(_chat, f"← alterpy start: {res}. Check logs for further info", reply_to=_reply)
 
                 client.add_event_handler(event_handler, telethon.events.newmessage.NewMessage)
@@ -69,11 +65,4 @@ async def main() -> None:
     except sqlite3.OperationalError:
         log.error("Another instance of this bot is already running!")
 
-
-if __name__ == '__main__':
-    rich.traceback.install(show_locals=True)
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        log.info("Stopping... [KeyboardInterrupt]")
 

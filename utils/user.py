@@ -1,4 +1,4 @@
-import context
+import alterpy.context
 import utils.config
 import utils.str
 import utils.log
@@ -25,7 +25,7 @@ class User(typing.NamedTuple):
     client: telethon.client.telegramclient.TelegramClient
 
     def is_admin(self) -> bool:  # check if in admins list
-        return self.sender.id in context.admins
+        return self.sender.id in alterpy.context.admins
 
     async def get_display_name(self) -> str:
         display_name = self.get_name()
@@ -61,7 +61,7 @@ class User(typing.NamedTuple):
         except:
             return None
 
-    def config_name(self) -> str: return f"user/{self.sender.id}.toml"
+    def config_name(self) -> str: return f"../user/{self.sender.id}"
 
     def load_user_config(self) -> dict[str, typing.Any]: return default_user_config | utils.config.load(self.config_name())
     def save_user_config(self, conf: dict[str, typing.Any]) -> None: utils.config.save(self.config_name(), conf)

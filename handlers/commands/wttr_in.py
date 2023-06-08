@@ -4,7 +4,7 @@ import utils.log
 import utils.regex
 import utils.str
 import utils.locale
-import context
+import alterpy.context
 import typing
 import aiohttp
 import json
@@ -41,7 +41,7 @@ LOC = utils.locale.Localizator(translations)
 
 def weather(lang: str) -> typing.Callable[[utils.cm.CommandMessage], typing.Awaitable[None]]:
     async def weather_impl(cm: utils.cm.CommandMessage) -> None:
-        if not isinstance(context.session, aiohttp.ClientSession):
+        if not isinstance(alterpy.context.session, aiohttp.ClientSession):
             return
 
         if not cm.arg:
@@ -57,14 +57,14 @@ def weather(lang: str) -> typing.Callable[[utils.cm.CommandMessage], typing.Awai
         argp = arg.strip().replace(' ', '+')
 
         error_str = '>>>   404'
-        async with context.session.get(f'https://v1.wttr.in/{argp}?T0') as v1:
+        async with alterpy.context.session.get(f'https://v1.wttr.in/{argp}?T0') as v1:
             data_v1 = await v1.read()
 
         if error_str in data_v1.decode():
             await cm.int_cur.reply(LOC.obj('err', lang))
             return
 
-        async with context.session.get(f'https://v2.wttr.in/{argp}_lang={lang}.png') as v2:
+        async with alterpy.context.session.get(f'https://v2.wttr.in/{argp}_lang={lang}.png') as v2:
             data_v2 = await v2.read()
 
         await cm.int_cur.reply(' '.join([LOC.obj('weather', lang), utils.str.escape(cm.arg)]), data_v2)
