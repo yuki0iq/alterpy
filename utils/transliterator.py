@@ -4,6 +4,7 @@
 # -*- coding: utf-8 -*-
 import re
 import string
+import typing
 
 
 # from src.russian.NaiveTokenizer import NaiveTokenizer
@@ -134,7 +135,8 @@ class Transliterator:
         self.__inverted_phonemes['iy'] = 'ый'
         self.__inverted_phonemes['ij'] = 'ый'
 
-        self.__inverted_phonemes.update(self.__COMPLEX_PHONEMES)
+        for key, vals in self.__COMPLEX_PHONEMES.items():
+            self.__inverted_phonemes[key] = ''.join(vals)
 
         self.__keys = str.maketrans(self.__straight_phonemes)
 
