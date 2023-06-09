@@ -12,6 +12,13 @@ python3 -m pip install -r requirements.txt
 python3 -m alterpy.init
 ```
 
-Start: `python3 -m alterpy`
+Start:
+
+```
+source venv/bin/activate
+python3 -m alterpy
+```
+
+[dev version](https://alterpy_dev_bot.t.me), [stable version](https://alterpy_bot.t.me), [alterpy test chat](https://alterpy.t.me)
 
 
