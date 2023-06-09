@@ -32,6 +32,7 @@ async def main(log: logging.Logger) -> None:
 
     config = utils.config.load("config")
     for el in config["admins"]: context.admins.add(el)
+    log_id = config.get("log", 0)
     del config
     del el
     log.info("loaded config")
@@ -41,7 +42,7 @@ async def main(log: logging.Logger) -> None:
             _chat, _reply = map(int, f.read().split())
         os.remove('restarter.txt')
     except:
-        _chat, _reply = next(iter(context.admins)), None
+        _chat, _reply = log_id, None
 
     telethon_config = utils.config.load("telethon")
     try:
@@ -50,7 +51,8 @@ async def main(log: logging.Logger) -> None:
             await client.start(bot_token=telethon_config['bot_token'])
             async with client:
                 log.info("Started telethon instance")
-                await client.send_message(_chat, "← alterpy is starting...", reply_to=_reply)
+                if log_id:
+                    await client.send_message(_chat, "← alterpy is starting...", reply_to=_reply)
 
                 context.the_bot_id = int(telethon_config['bot_token'].split(':')[0])
                 del telethon_config
