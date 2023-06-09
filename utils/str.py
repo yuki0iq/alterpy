@@ -1,6 +1,7 @@
 import unicodedata
 import utils.common
 import urllib.parse
+import typing
 
 
 def change_layout(s: str) -> str:
@@ -23,27 +24,28 @@ def is_eng(s: str) -> bool:
 
 
 def equal_capitalize(word: str, pattern: str) -> str:
-    def pat(idx: int):
+    def pat(idx: int) -> bool:
         if idx >= len(pattern):
             return pattern[-1].islower()
         return pattern[idx].islower()
 
-    word = list(word)
-    for i in range(len(word)):
-        word[i] = word[i].lower() if pat(i) else word[i].upper()
-    return ''.join(word)
+    words = list(word)
+    for i in range(len(words)):
+        words[i] = words[i].lower() if pat(i) else words[i].upper()
+    return ''.join(words)
 
 
 class FStr:
     __slots__ = ['_s']
 
-    def __init__(self, s):
+    def __init__(self, s: str) -> None:
         self._s = s
 
-    def __repr__(self):
+    # Actual return value is `str`
+    def __repr__(self) -> typing.Any:
         return eval(str(self))
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"""f'''{self._s}'''"""
 
 

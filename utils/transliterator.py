@@ -1,8 +1,10 @@
 # https://github.com/roddar92/linguistics_problems/blob/master/src/russian/NaiveTransliterator.py
+# TODO rewrite!!
 
 # -*- coding: utf-8 -*-
 import re
 import string
+import typing
 
 
 # from src.russian.NaiveTokenizer import NaiveTokenizer
@@ -31,7 +33,7 @@ class Transliterator:
         'ri': 'к'
     }
 
-    def __init__(self, need_spell=False):
+    def __init__(self, need_spell: bool = False) -> None:
         self.__RU_VOWELS = 'аeёиоуыэюя'
         self.__AFFIXES = re.compile(
             r'(^|\s+)(pod|raz|iz|pred|ot|ob|bez|in|trans|(sver|dvu|tr([yj][ёo]|ё))k?h)$',
@@ -133,40 +135,41 @@ class Transliterator:
         self.__inverted_phonemes['iy'] = 'ый'
         self.__inverted_phonemes['ij'] = 'ый'
 
-        self.__inverted_phonemes.update(self.__COMPLEX_PHONEMES)
+        for key, vals in self.__COMPLEX_PHONEMES.items():
+            self.__inverted_phonemes[key] = ''.join(vals)
 
         self.__keys = str.maketrans(self.__straight_phonemes)
 
-    def __is_shch_exceptions(self, word):
+    def __is_shch_exceptions(self, word: str) -> bool:
         return word in self.SHCH_EXCEPTIONS
 
     @staticmethod
-    def __is_solid_or_soft_sign(letter):
+    def __is_solid_or_soft_sign(letter: str) -> bool:
         return letter in 'ъь'
 
     @staticmethod
-    def __is_of_word_start(elems, i):
+    def __is_of_word_start(elems: list[str], i: int) -> bool:
         return i == 0 or not elems[-1].isalpha()
 
-    def __has_s_affix(self, text, i):
-        return text[i:i + 2] in ['ie', 'ye', 'je'] and self.__E_AFFIX.search(text[:i])
+    def __has_s_affix(self, text: str, i: int) -> bool:
+        return bool(text[i:i + 2] in ['ie', 'ye', 'je'] and self.__E_AFFIX.search(text[:i]))
 
-    def __iot_must_changed(self, text, i):
+    def __iot_must_changed(self, text: str, i: int) -> bool:
         return text[i:i + 2].lower() in self.IOT_VOWELS and text[i + 2] in 'tdga'
 
-    def __starts_with_affix(self, text):
-        return self.__AFFIXES.search(text)
+    def __starts_with_affix(self, text: str) -> bool:
+        return bool(self.__AFFIXES.search(text))
 
-    def __is_solid_sign_possible(self, text, i):
+    def __is_solid_sign_possible(self, text: str, i: int) -> bool:
         return self.__starts_with_affix(text[:i]) or self.__has_s_affix(text, i)
 
-    def __is_iot_combination(self, charseq):
+    def __is_iot_combination(self, charseq: str) -> bool:
         return charseq.lower() in self.IAT_VOWELS + self.IET_VOWELS + self.IUT_VOWELS + self.IOT_VOWELS
 
-    def __is_vowel(self, character):
+    def __is_vowel(self, character: str) -> bool:
         return character.lower() in self.__RU_VOWELS
 
-    def __transliterate_ij_ending(self, text, elems, i):
+    def __transliterate_ij_ending(self, text: str, elems: list[str], i: int) -> str:
         symbol = text[i]
         if symbol == 'i' and self.__is_vowel(elems[-1]):
             return 'й'
@@ -175,7 +178,7 @@ class Transliterator:
         else:
             return symbol
 
-    def __transliterate_vowels_sequence(self, text, answer, elems, i):
+    def __transliterate_vowels_sequence(self, text: str, answer: str, elems: list[str], i: int) -> str:
         segment = text[i:i + 2]
 
         if self.__is_of_word_start(elems, i) or self.__is_vowel(elems[-1]) or elems[-1] == 'ь':
@@ -189,7 +192,7 @@ class Transliterator:
         else:
             return answer
 
-    def __transliterate_ch_sequence(self, text, i):
+    def __transliterate_ch_sequence(self, text: str, i: int) -> str:
         segment = text[i:i + 2]
 
         if i + 4 < len(text) and text[i + 2:i + 4] in self.CH_AFTER_SEQ:
@@ -198,18 +201,18 @@ class Transliterator:
         else:
             return self.__inverted_phonemes[segment]
 
-    def __transliterate_ch_end_sequence(self, text, elems, i, is_upper):
-        if ''.join(elems[-2:]) in ['ви', 'ны'] and is_upper == 1:
+    def __transliterate_ch_end_sequence(self, text: str, elems: list[str], i: int, is_upper: bool) -> str:
+        if ''.join(elems[-2:]) in ['ви', 'ны'] and is_upper:
             return self.__inverted_phonemes[text[i:i + 2]]
         elif elems[-1] in 'иы':
             return 'х'
         else:
             return 'ч'
 
-    def __transliterate_vowel_ending(self, text, elems, i):
+    def __transliterate_vowel_ending(self, text: str, elems: list[str], i: int) -> str:
         return 'ий' if re.search(r'[гджкцчшщ]$', elems[-1]) else self.__inverted_phonemes[text[i:i + 2]]
 
-    def transliterate_two_letter_sequence(self, text, elems, i, is_upper):
+    def transliterate_two_letter_sequence(self, text: str, elems: list[str], i: int, is_upper: bool) -> tuple[str, int]:
         segment = text[i:i + 2]
 
         if self.__CH_START_REGEX.search(text[:i + 2]):
@@ -230,23 +233,23 @@ class Transliterator:
             res = self.__inverted_phonemes[segment]
         return res, i
 
-    def simple_spell_euristic(self, word):
+    def simple_spell_euristic(self, word: str) -> str:
         if not self.__is_shch_exceptions(word):
             for phoneme, replaced in self.__UNCORRECTED_PHONEMES.items():
                 word = phoneme.sub(replaced, word, re.IGNORECASE)
         return word
 
-    def transliterate(self, text):
+    def transliterate(self, text: str) -> str:
         return text.translate(self.__keys)
 
-    def inverse_transliterate(self, text):
-        elems = []
+    def inverse_transliterate(self, text: str) -> str:
+        elems: list[str] = []
         i = 0
-        is_upper = 0
+        is_upper = False
 
         while i < len(text):
             if i == 0 or text[i - 1].isspace() or text[i - 1] in string.punctuation:
-                is_upper = 1 if text[i].isupper() else 0
+                is_upper = text[i].isupper()
 
             if i == len(text) - 1 or text[i + 1] in string.punctuation or text[i + 1].isspace():
                 elems += [self.__transliterate_ij_ending(text, elems, i)]

@@ -44,9 +44,13 @@ pronouns_name_getter = utils.locale.Localizator(pronouns_name)
 
 
 def to_str(pns: typing.Union[int, list[int]], lang: str = "ru") -> str:
-    if type(pns) == int:
-        return pronouns_name_getter.obj(pns, lang)
-    return pronouns_name_getter.obj('list', lang) + ' ' + ', '.join(to_str(pn, lang) for pn in pns)
+    if isinstance(pns, int):
+        single = pronouns_name_getter.obj(pns, lang)
+        assert isinstance(single, str)
+        return single
+    mult = pronouns_name_getter.obj('list', lang)
+    assert isinstance(mult, str)
+    return mult + ' ' + ', '.join(to_str(pn, lang) for pn in pns)
 
 
 def from_str(s: str) -> typing.Union[int, list[int]]:
@@ -68,7 +72,7 @@ def to_int(pns: typing.Union[int, list[int]]) -> int:
         return random.randint(0, 5)  # TODO 6
     if pns == 6:
         return 4  # TODO fix mirror!!
-    if type(pns) == int:
+    if isinstance(pns, int):
         return pns
     return random.choice(pns)
 

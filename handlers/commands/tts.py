@@ -3,12 +3,12 @@ import utils.ch
 import utils.file
 import utils.regex
 import utils.log
-
+import typing
 import gtts
 
 
-def on_tts_wrapper(lang: str):
-    async def on_tts(cm: utils.cm.CommandMessage):
+def on_tts_wrapper(lang: str) -> typing.Callable[[utils.cm.CommandMessage], typing.Awaitable[None]]:
+    async def on_tts(cm: utils.cm.CommandMessage) -> None:
         filename = f"{utils.file.temp_filename()}.mp3"
         if not cm.arg:
             await cm.int_cur.reply("Empty messages can't be TTSd")

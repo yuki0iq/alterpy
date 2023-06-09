@@ -17,10 +17,10 @@ class CommandMessage(typing.NamedTuple):
     time: datetime.datetime  # UTC time when sent
     local_time: datetime.datetime  # UTC time when recv
     sender: utils.user.User  # sender
-    reply_sender: utils.user.User  # reply sender if applicable
+    reply_sender: typing.Optional[utils.user.User]  # reply sender if applicable
     int_cur: utils.interactor.MessageInteractor  # for current message
-    int_prev: utils.interactor.MessageInteractor  # for attached reply
-    client: telethon.client.TelegramClient
+    int_prev: typing.Optional[utils.interactor.MessageInteractor]  # for attached reply
+    client: telethon.client.telegramclient.TelegramClient
     id: int
     reply_id: int  # -1 if no reply
     msg: telethon.tl.custom.message.Message
@@ -37,12 +37,12 @@ async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMe
     reply_id = msg_prev.id if msg_prev else -1
 
     # TODO handle markdownv2 properly
-    def unmd2(s: str, es) -> str:
+    def unmd2(s: typing.Optional[str], es: list[typing.Any]) -> str:
         if not s: return ""
         s = s.replace('\\_', '_').replace('\\(', '(').replace('\\)', ')').replace('\\|', '|')
         mentions = []
         for e in es or []:
-            if type(e) == telethon.tl.types.MessageEntityMentionName:
+            if isinstance(e, telethon.tl.types.MessageEntityMentionName):
                 i, l, uid = e.offset, e.length, e.user_id
                 mentions.append((-i, i, l, uid))
         for k, i, l, uid in sorted(mentions):
@@ -70,7 +70,7 @@ async def from_message(msg_cur: telethon.tl.custom.message.Message) -> CommandMe
 
     local_time = datetime.datetime.now(datetime.timezone.utc)
 
-    return CommandMessage(arg, rep, media, reply_media, time, local_time, sender, reply_sender, int_cur, int_prev, client, id, reply_id, msg_cur, lang)
+    return CommandMessage(arg or '', rep or '', media, reply_media, time, local_time, sender, reply_sender, int_cur, int_prev, client, id, reply_id, msg_cur, lang)
 
 
 async def from_event(event: telethon.events.NewMessage) -> CommandMessage:

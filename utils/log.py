@@ -15,7 +15,7 @@ logging.basicConfig(
 )
 
 
-def get(name="unknown") -> logging.Logger:
+def get(name:str = "unknown") -> logging.Logger:
     """create log with given name"""
     log = logging.getLogger(name)
     log.setLevel(logging.INFO)

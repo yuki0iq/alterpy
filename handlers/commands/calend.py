@@ -3,7 +3,7 @@ import utils.ch
 import utils.log
 import utils.regex
 import utils.str
-import context
+import alterpy.context
 
 import aiohttp
 import json
@@ -11,9 +11,10 @@ import json
 handler_list = []
 
 
-async def calend_ru(cm: utils.cm.CommandMessage):
-    async with context.session.get('https://www.calend.ru/img/export/informer.png') as response:
-        await cm.int_cur.reply('Праздники сегодня', await response.read())
+async def calend_ru(cm: utils.cm.CommandMessage) -> None:
+    if isinstance(alterpy.context.session, aiohttp.ClientSession):
+        async with alterpy.context.session.get('https://www.calend.ru/img/export/informer.png') as response:
+            await cm.int_cur.reply('Праздники сегодня', await response.read())
 
 
 handler_list.append(

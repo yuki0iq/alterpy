@@ -1,10 +1,11 @@
-restarter.txt
-/telethon_config.toml
+.git/
+!*example
+config/
 log/
 user/
-.git/
+venv/
+__pycache__
+restarter.txt
 *.session
 *.session-journal
-/config.toml
-__pycache__
-venv*
+

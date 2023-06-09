@@ -1,14 +1,15 @@
 import utils.str
 import utils.lang.ru, utils.lang.en
+import typing
 
 
 class Localizator:
     __slots__ = ['d']
 
-    def __init__(self, d):
+    def __init__(self, d: dict[typing.Any, typing.Any]) -> None:
         self.d = d
 
-    def obj(self, s: str, lang: str):
+    def obj(self, s: typing.Any, lang: str) -> typing.Any:
         if s not in self.d:
             return None
         cur = self.d[s]
@@ -28,17 +29,19 @@ langs = {
 }
 
 
-def lang(lg: str):
+def lang(lg: str) -> typing.Any:
     return langs[lg]
 
 
-def detect(s: str):
+def detect(s: str) -> str:
     if not s: return 'en'
     if 'а' <= s[0].lower() <= 'я': return 'ru'
     if 'a' <= s[0].lower() <= 'z': return 'en'
     return 'en'  # lmao
 
 
-def try_verb_past(w: str, p: int):
-    return lang(detect(w)).try_verb_past(w, p)
+def try_verb_past(w: str, p: int) -> str:
+    ret = lang(detect(w)).try_verb_past(w, p)
+    assert isinstance(ret, str)
+    return ret
 

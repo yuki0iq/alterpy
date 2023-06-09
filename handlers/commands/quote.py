@@ -6,7 +6,7 @@ import utils.common
 import handlers.qdb
 
 
-async def on_quote(cm: utils.cm.CommandMessage):
+async def on_quote(cm: utils.cm.CommandMessage) -> None:
     if not cm.reply_sender:
         await cm.int_cur.reply("Команде необходим прикрепленный ответ")
     else:

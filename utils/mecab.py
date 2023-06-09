@@ -16,7 +16,7 @@ except RuntimeError:
 log.info("MeCab OK!")
 
 
-def reading(s):
+def reading(s: str) -> str:
     rea = []
     for word in tagger(s):
         if '空白' == word.feature.pos1:

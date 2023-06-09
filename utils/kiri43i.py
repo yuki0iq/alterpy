@@ -1,5 +1,6 @@
 # http://web.archive.org/web/20130617172843/https://ru.wikipedia.org/wiki/Участник:Tassadar/киричзи
 import re
+import typing
 import utils.mecab
 import utils.common
 import utils.str
@@ -23,7 +24,7 @@ kana_to_ru = {
     'ぁ': 'ъа', 'ぃ': 'ъи',  'ぅ': 'ъу',  'ぇ': 'ъэ', 'ぉ': 'ъо',
     'か': 'ка', 'き': 'ки',  'く': 'ку',  'け': 'ке', 'こ': 'ко',
     'が': 'га', 'ぎ': 'ги',  'ぐ': 'гу',  'げ': 'ге', 'ご': 'го',
-    'さ': 'са', 'し': 'щи',  'す': 'су',  'せ': 'сэ', 'そ': 'со',
+    'さ': 'са', 'し': 'си',  'す': 'су',  'せ': 'сэ', 'そ': 'со',
     'ざ': 'за', 'じ': 'джи', 'ず': 'зу',  'ぜ': 'зе', 'ぞ': 'зо',
     'た': 'та', 'ち': 'ти',  'つ': 'цу',  'て': 'тэ', 'と': 'то',
     'だ': 'да', 'ぢ': 'дзи', 'づ': 'дзу', 'で': 'дэ', 'ど': 'до',
@@ -63,32 +64,32 @@ fix_vowels = {
 }
 
 
-def re_sub(s, rule):
+def re_sub(s: str, rule: dict[re.Pattern[str], str]) -> str:
     for f, t in rule.items():
         s = re.sub(f, t, s)
     return s
 
 
-def replace(s, rule):
+def replace(s: str, rule: dict[str, str]) -> str:
     for f, t in rule.items():
         s = s.replace(f, t)
     return s
 
 
-def fast_replace(s, rule):
+def fast_replace(s: str, rule: dict[str, str]) -> str:
     res = []
     for c in s:
         res.append(rule[c] if c in rule else c)
     return ''.join(res)
 
 
-def fix_long_vowels(s):
+def fix_long_vowels(_s: str) -> str:
     """
     Replace long vowel marks
     a- -> aa, i- -> ii, u- -> uu, e- -> ee, o- -> ou, ya- -> yaa, yu- -> yuu, yo- -> you
     """
     next = {'а': 'あ', 'и': 'い', 'у': 'う', 'э': 'え', 'о': 'お', 'е': 'え', 'я': 'あ', 'ю': 'う', 'ё': 'う', '-': 'ー'}
-    s = list(s)
+    s = list(_s)
     last = '-'
     for i, c in enumerate(s):
         if c == 'ー':
@@ -99,12 +100,12 @@ def fix_long_vowels(s):
     return ''.join(s)
 
 
-def fix_double_consonants(s):
+def fix_double_consonants(_s: str) -> str:
     """
     Replace double cons. marks
     qki -> kki
     """
-    s = list(s)[::-1]
+    s = list(_s)[::-1]
     last = '-'
     for i, c in enumerate(s):
         if c == 'っ':
@@ -114,7 +115,7 @@ def fix_double_consonants(s):
     return ''.join(s[::-1])
 
 
-def fix_combined(s):
+def fix_combined(_s: str) -> str:
     """
     Replace combination marks
     bi#ya -> bya
@@ -128,7 +129,7 @@ def fix_combined(s):
     #! ?V#V -> SKIP
     """
     combined_need_replace = {'ву', 'сэ', 'тэ', 'дэ', 'цу', 'фу'}
-    s = list(s)
+    s = list(_s)
     n = len(s)
     for i in range(1, n):
         if s[i] == 'ъ' and s[i - 1] in vowels:
@@ -142,13 +143,13 @@ def fix_combined(s):
     return ''.join(s)
 
 
-def capitalize(s):
+def capitalize(_s: str) -> str:
     """
     Fix capitalization with name hints from mecab
     ##yuki -> Yuki
     """
 
-    s = list(s)
+    s = list(_s)
     n = len(s)
     for i in range(2, n):
         if s[i - 2] == s[i - 1] == '#':
@@ -157,7 +158,7 @@ def capitalize(s):
     return ''.join(s)
 
 
-def to(s):
+def to(s: str) -> str:
     s = fast_replace(s, K_to_H)
     s = fast_replace(s, normalize)
     s = fix_long_vowels(s)
@@ -174,7 +175,7 @@ def to(s):
     return s
 
 
-def parse(s):
+def parse(s: str) -> str:
     res = []
     for line in utils.common.split_by_func(s, utils.str.is_kanji):
         if utils.str.is_kanji(line):

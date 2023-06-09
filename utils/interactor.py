@@ -8,7 +8,7 @@ import traceback
 class MessageInteractor(typing.NamedTuple):
     message: telethon.tl.custom.message.Message
 
-    async def reply(self, text, file=None, link_preview=True):
+    async def reply(self, text: str, file: typing.Any = None, link_preview: bool = True) -> "typing.Optional[MessageInteractor]":
         """Reply to message"""
         try:
             return MessageInteractor(await self.message.reply(text, file=file, link_preview=link_preview))
@@ -18,8 +18,9 @@ class MessageInteractor(typing.NamedTuple):
             except:
                 pass
             utils.log.get("telethon").exception("Could not reply")
+        return None
 
-    async def respond(self, text, file=None, link_preview=True):
+    async def respond(self, text: str, file: typing.Any = None, link_preview: bool = True) -> "typing.Optional[MessageInteractor]":
         """Respond to message (without replying)"""
         try:
             return MessageInteractor(await self.message.respond(text, file=file, link_preview=link_preview))
@@ -29,8 +30,9 @@ class MessageInteractor(typing.NamedTuple):
             except:
                 pass
             utils.log.get("telethon").exception("Could not respond")
+        return None
 
-    async def send_file(self, file, as_reply=False, **kwargs):
+    async def send_file(self, file: typing.Any, as_reply: bool = False, **kwargs: typing.Any) -> "typing.Optional[MessageInteractor]":
         """Send file with special parameters (for example as voice note)"""
         try:
             return MessageInteractor(await self.message.client.send_file(
@@ -45,7 +47,8 @@ class MessageInteractor(typing.NamedTuple):
             except:
                 pass
             utils.log.get("telethon").exception("Could not send file")
+        return None
 
-    async def delete(self):
+    async def delete(self) -> None:
         """Delete the message"""
         await self.message.delete()

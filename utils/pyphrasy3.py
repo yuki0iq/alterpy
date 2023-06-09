@@ -4,6 +4,8 @@ from collections import defaultdict
 from operator import attrgetter
 import utils.log
 import utils.regex
+import pymorphy3
+import typing
 
 
 GRAM_CHOICES = ('nomn', 'gent', 'datv', 'accs', 'ablt', 'loct', 'voct', 'gen2', 'acc2', 'loc2', 'sing', 'plur')
@@ -20,21 +22,21 @@ class PhraseInflector(object):
         score = 0
         fixed_number_score = 0
 
-        def __init__(self, parsed):
+        def __init__(self, parsed: pymorphy3.analyzer.Parse) -> None:
             self.parsed = parsed
 
-    def __init__(self, morph, inf):
+    def __init__(self, morph: pymorphy3.MorphAnalyzer, inf: typing.Callable[[pymorphy3.analyzer.Parse, typing.Union[str, set[str], frozenset[str]]], pymorphy3.analyzer.Parse]) -> None:
         self.morph = morph
         self.inf = inf
 
-    def parse_first(self, word):
+    def parse_first(self, word: str) -> typing.Optional[pymorphy3.analyzer.Parse]:
         parse = self.morph.parse(word)
         if len(parse) > 0:
             return parse[0]
         else:
             return None
 
-    def select_master(self, phrase):
+    def select_master(self, phrase: list[str]) -> typing.Optional[ScoreHelper]:
         versions = []
         for i, word in enumerate(phrase):
             forms = defaultdict(list)
@@ -58,7 +60,7 @@ class PhraseInflector(object):
         else:
             return None
 
-    def inflect(self, phrase, form):
+    def inflect(self, phrase: str, form: typing.Union[str, set[str], frozenset[str]]) -> str:
         master_word = self.select_master(utils.regex.split_by_word_border(phrase))
         if master_word:
             return self._inflect_with_master(form, phrase, master_word.parsed)
@@ -66,7 +68,7 @@ class PhraseInflector(object):
             # logger.error('Can not find master word in: {0}'.format(phrase))
             return self._inflect_without_master(form, phrase)
 
-    def _inflect_with_master(self, form, phrase, master_word):
+    def _inflect_with_master(self, form: typing.Union[str, set[str], frozenset[str]], phrase: str, master_word: pymorphy3.analyzer.Parse) -> str:
         result = []
         if isinstance(form, str):
             form = {form}
@@ -123,7 +125,7 @@ class PhraseInflector(object):
 
         return ''.join(result)
 
-    def _inflect_without_master(self, form, phrase):
+    def _inflect_without_master(self, form: typing.Union[str, set[str], frozenset[str]], phrase: str) -> str:
         result = []
         if isinstance(form, str):
             form = {form}

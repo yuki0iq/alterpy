@@ -4,7 +4,7 @@ import utils.ch
 import handlers.cm
 
 
-async def on_repeat(cm: utils.cm.CommandMessage):
+async def on_repeat(cm: utils.cm.CommandMessage) -> None:
     if cm.int_prev:
         msg_prev = cm.int_prev.message
         cm_new = await utils.cm.from_message(msg_prev)

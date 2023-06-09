@@ -40,25 +40,25 @@ prefs_ru = [
 ]
 
 
-async def on_prob_ru(cm: utils.cm.CommandMessage):
+async def on_prob_ru(cm: utils.cm.CommandMessage) -> None:
     await cm.int_cur.reply(f"{random.choice(prefs_ru)} {random.randint(0, 100)}%")
 
 
-async def on_prob_en(cm: utils.cm.CommandMessage):
+async def on_prob_en(cm: utils.cm.CommandMessage) -> None:
     await cm.int_cur.reply(f"{random.choice(prefs_en)} {random.randint(0, 100)}%")
 
 
-async def on_choose_ru(cm: utils.cm.CommandMessage):
+async def on_choose_ru(cm: utils.cm.CommandMessage) -> None:
     opts = re.split('(?i)(^|\\s)(or|или)($|\\s)', cm.arg)[::4]
     await cm.int_cur.reply(f"{random.choice(prefs_ru)} {random.choice(opts).strip()}")
 
 
-async def on_choose_en(cm: utils.cm.CommandMessage):
+async def on_choose_en(cm: utils.cm.CommandMessage) -> None:
     opts = re.split('(?i)(^|\\s)(or|или)($|\\s)', cm.arg)[::4]
     await cm.int_cur.reply(f"{random.choice(prefs_en)} {random.choice(opts).strip()}")
 
 
-async def on_poll(cm: utils.cm.CommandMessage):
+async def on_poll(cm: utils.cm.CommandMessage) -> None:
     await cm.int_cur.reply(f"{random.choice(prefs_ru)} {utils.str.escape(random.choice(list(x.text for x in cm.media.poll().poll.answers)).strip())}")
 
 

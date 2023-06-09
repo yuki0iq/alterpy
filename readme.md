@@ -1,13 +1,24 @@
 # [alterpy](https://yuki0iq.github.io/alterpy)
 
-Launching:
+First launch:
 
 ```sh
 python3 -m venv venv
 source venv/bin/activate
+
+# TODO replace with init
 python3 -m pip install -r requirements.txt
-python3 main.py
+# <- config files
+python3 -m alterpy.init
 ```
 
-TODO: add init.py
+Start:
+
+```
+source venv/bin/activate
+python3 -m alterpy
+```
+
+[dev version](https://alterpy_dev_bot.t.me), [stable version](https://alterpy_bot.t.me), [alterpy test chat](https://alterpy.t.me)
+
 

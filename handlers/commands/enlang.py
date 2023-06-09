@@ -27,17 +27,17 @@ pos_names = {
 }
 
 
-async def define(cm: utils.cm.CommandMessage):
-    if cm.arg:
+async def define(cm: utils.cm.CommandMessage) -> None:
+    if cm.arg is not None:
+        _arg = utils.str.escape(cm.arg)
         res = dic.synsets(cm.arg)
         if not res:
             await cm.int_cur.reply('word not found')
             return
-        _arg = utils.str.escape(cm.arg)
         ss = [f"*{_arg}*"]
         for i, e in enumerate(res):
             _pos = utils.str.escape(pos_names[e.pos])
-            _def = utils.str.escape(e.definition()) 
+            _def = utils.str.escape(e.definition() or '<Unavailable>')
             ss.append(f"{i+1}. _{_pos}_, {_def}")
         await cm.int_cur.reply('\n'.join(ss))
 

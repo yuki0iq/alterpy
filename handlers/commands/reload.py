@@ -2,12 +2,14 @@ import utils.cm
 import utils.mod
 import utils.ch
 import utils.regex
+import utils.system
 import handlers.cm
-import os, sys
+import os
+import sys
 import PyGitUp.gitup
 
 
-async def on_reload(cm: utils.cm.CommandMessage):
+async def on_reload(cm: utils.cm.CommandMessage) -> None:
     res = await utils.mod.load_handlers(
         handlers.cm.initial_handlers,
         handlers.cm.ch_list,
@@ -17,13 +19,12 @@ async def on_reload(cm: utils.cm.CommandMessage):
     await cm.int_cur.reply(res)
 
 
-async def on_hard_reload(cm: utils.cm.CommandMessage):
+async def on_hard_reload(cm: utils.cm.CommandMessage) -> None:
     # TODO: other way/
-    with open('restarter.txt', 'w') as f:
-        print(cm.sender.chat_id, cm.id, file=f)
     PyGitUp.gitup.GitUp().run()
     await cm.int_cur.reply('→ Restarting...')
-    os.execv(sys.executable, [sys.executable] + sys.argv)
+    argv = utils.system.argv()
+    os.execve(sys.executable, argv, {'alterpy_prev': f'{cm.sender.chat_id} {cm.id}'})
 
 
 handler_list = [

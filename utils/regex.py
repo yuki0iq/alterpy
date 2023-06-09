@@ -1,4 +1,5 @@
 import re
+import typing
 
 
 def pat_starts_with(s: str) -> str:
@@ -8,7 +9,7 @@ def pat_starts_with(s: str) -> str:
     return f"^({s})($|\\s)"
 
 
-def ignore_case(pat: str) -> re.Pattern:
+def ignore_case(pat: str) -> re.Pattern[str]:
     return re.compile(f"(?i)({pat})")
 
 
@@ -22,11 +23,11 @@ def prefix() -> str:
     return optional(only_prefix())
 
 
-def union(a) -> str:
+def union(a: typing.Iterable[typing.Any]) -> str:
     return '(' + '|'.join(map(str, a)) + ')'
 
 
-def unite(*args) -> str:
+def unite(*args: typing.Any) -> str:
     return union(args)
 
 
@@ -34,27 +35,27 @@ def optional(a: str) -> str:
     return f"({a})?"
 
 
-def raw(a: str) -> re.Pattern:
+def raw(a: str) -> re.Pattern[str]:
     return ignore_case(pat_starts_with(a))
 
 
-def cmd(a: str) -> re.Pattern:
+def cmd(a: str) -> re.Pattern[str]:
     return raw(prefix() + a)
 
 
-def pre(a: str) -> re.Pattern:
+def pre(a: str) -> re.Pattern[str]:
     return raw(only_prefix() + a)
 
 
-def add(a: str) -> re.Pattern:
+def add(a: str) -> re.Pattern[str]:
     return raw(r'\+' + a)
 
 
-def sub(a: str) -> re.Pattern:
+def sub(a: str) -> re.Pattern[str]:
     return raw('-' + a)
 
 
-def ask(a: str) -> re.Pattern:
+def ask(a: str) -> re.Pattern[str]:
     return raw(r'\?' + a)
 
 
@@ -62,7 +63,7 @@ def word_border() -> str:
     return r'\b'
 
 
-def split_by_word_border(a: str) -> list:
+def split_by_word_border(a: str) -> list[str]:
     return re.split(word_border(), a)
 
 

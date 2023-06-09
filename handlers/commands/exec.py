@@ -1,17 +1,18 @@
 import utils.ch
 import utils.cm
 import utils.regex
+import typing
 import traceback  # TODO fix!
 
 
-async def on_exec(cm: utils.cm.CommandMessage):
+async def on_exec(cm: utils.cm.CommandMessage) -> None:
     shifted_arg = cm.arg.strip().strip('`').replace('\n', '\n    ')
     code = '\n'.join([
         f"async def func():",
         f"    {shifted_arg}",
     ])
     try:
-        code_locals = dict()
+        code_locals: dict[str, typing.Any] = dict()
         exec(code, globals() | locals(), code_locals)
         await code_locals['func']()
     except:

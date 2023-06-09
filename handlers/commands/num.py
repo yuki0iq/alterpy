@@ -5,18 +5,18 @@ import utils.regex
 handler_list = []
 
 
-async def on_bmi(cm: utils.cm.CommandMessage):
+async def on_bmi(cm: utils.cm.CommandMessage) -> None:
     try:
         h, m = map(float, cm.arg.split())
     except:
         await cm.int_cur.reply("Can't parse size")
         return
 
-    bmi = int((1000000 * m) / (h * h))
+    _bmi = int((1000000 * m) / (h * h))
 
-    text = ["underweight", "normal", "overweight", "obesity"][[bmi < 1850, bmi < 2500, bmi < 3000, True].index(True)]
+    text = ["underweight", "normal", "overweight", "obesity"][[_bmi < 1850, _bmi < 2500, _bmi < 3000, True].index(True)]
 
-    bmi = '000' + str(bmi)
+    bmi = '000' + str(_bmi)
     bmi = bmi[:-2].lstrip('0') + '.' + bmi[-2:]
     if bmi[0] == '.':
         bmi = '0' + bmi

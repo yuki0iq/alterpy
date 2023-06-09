@@ -11,7 +11,8 @@ import json
 handler_list = []
 
 
-async def advice(cm: utils.cm.CommandMessage):
+async def advice(cm: utils.cm.CommandMessage) -> None:
+    # TODO restrict command usage and return
     await cm.int_cur.reply(r"@yuki\_the\_girl temporarily disabled this")
     return
 

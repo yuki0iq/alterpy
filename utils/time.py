@@ -32,7 +32,7 @@ translations = {
 LOC = utils.locale.Localizator(translations)
 
 
-def timedelta_to_str(d: datetime.timedelta, is_short: bool = False, lang: str = 'en', form = None) -> str:
+def timedelta_to_str(d: datetime.timedelta, is_short: bool = False, lang: str = 'en', form: typing.Any = None) -> str:
     """
     15 weeks 4 days 10 hours 45 minutes 37 seconds 487.5 milliseconds, (is_short=False|default)
     15 недель 4 дня 10 часов 45 минут 37 секунд 487.5 миллисекунд
@@ -57,19 +57,21 @@ def timedelta_to_str(d: datetime.timedelta, is_short: bool = False, lang: str = 
         (ms, 'milliseconds')
     ]
 
-    def is_not_null(el: typing.Tuple[int, str]) -> bool:
+    def is_not_null(el: typing.Tuple[typing.Union[int, float], str]) -> bool:
         cnt, _ = el
-        return cnt != 0
+        if isinstance(cnt, int):
+            return cnt != 0
+        return abs(cnt) > 0.05
 
-    def short(val: int, name: str) -> str:
+    def short(val: typing.Union[int, float], name: str) -> str:
         word = LOC.obj(name, lang)[0]
         return f'{val}{word}'
 
-    def long(val: int, name: str) -> str:
+    def long(val: typing.Union[int, float], name: str) -> str:
         word = utils.locale.lang(lang).agree_with_number(LOC.obj(name, lang)[1], val, form)
         return f'{val} {word}'
 
-    def stringify(el: typing.Tuple[int, str]) -> str:
+    def stringify(el: typing.Tuple[typing.Union[int, float], str]) -> str:
         cnt, name = el
         return short(cnt, name) if is_short else long(cnt, name)
 
