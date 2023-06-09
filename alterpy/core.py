@@ -37,10 +37,9 @@ async def main(log: logging.Logger) -> None:
     del el
     log.info("loaded config")
 
+    alterpy_prev = os.getenv('alterpy_prev', '')
     try:
-        with open('restarter.txt') as f:
-            _chat, _reply = map(int, f.read().split())
-        os.remove('restarter.txt')
+        _chat, _reply = map(int, alterpy_prev.split())
     except:
         _chat, _reply = log_id, None
 

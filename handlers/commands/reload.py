@@ -21,12 +21,10 @@ async def on_reload(cm: utils.cm.CommandMessage) -> None:
 
 async def on_hard_reload(cm: utils.cm.CommandMessage) -> None:
     # TODO: other way/
-    with open('restarter.txt', 'w') as f:
-        print(cm.sender.chat_id, cm.id, file=f)
     PyGitUp.gitup.GitUp().run()
     await cm.int_cur.reply('→ Restarting...')
     argv = utils.system.argv()
-    os.execv(sys.executable, argv)
+    os.execve(sys.executable, argv, {'alterpy_prev': f'{cm.sender.chat_id} {cm.id}'})
 
 
 handler_list = [
