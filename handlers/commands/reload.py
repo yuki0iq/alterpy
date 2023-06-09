@@ -2,8 +2,10 @@ import utils.cm
 import utils.mod
 import utils.ch
 import utils.regex
+import utils.system
 import handlers.cm
-import os, sys
+import os
+import sys
 import PyGitUp.gitup
 
 
@@ -23,7 +25,8 @@ async def on_hard_reload(cm: utils.cm.CommandMessage) -> None:
         print(cm.sender.chat_id, cm.id, file=f)
     PyGitUp.gitup.GitUp().run()
     await cm.int_cur.reply('→ Restarting...')
-    os.execv(sys.executable, [sys.executable] + sys.argv)
+    argv = utils.system.argv()
+    os.execv(sys.executable, argv)
 
 
 handler_list = [
