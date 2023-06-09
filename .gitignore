@@ -7,5 +7,5 @@ venv/
 __pycache__
 restarter.txt
 *.session
-*.session-jonrnal
+*.session-journal
 
