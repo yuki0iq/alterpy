@@ -8,12 +8,12 @@ import re
 
 
 def entry(lang: str, path: str = '', name: str = '') -> str:
-    return utils.str.escape(f'https://yuki0iq.github.io/alterpy/{path}{lang}#{name}')
+    return (f'https://yuki0iq.github.io/alterpy/{path}{lang}#{name}').replace('\\', '\\\\').replace(')', '\\)')
 
 
 def link(lang: str, path: str = '', name: str = '') -> str:
     ent = entry(lang, path, name)
-    return f'[{name or "Help"}]({ent})'
+    return f'[{utils.str.escape(name or "Help")}]({ent})'
 
 
 def forward_handler(path: str) -> typing.Callable[[utils.cm.CommandMessage], typing.Awaitable[None]]:
