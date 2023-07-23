@@ -51,13 +51,19 @@ async def main(log: logging.Logger) -> None:
             async with client:
                 log.info("Started telethon instance")
                 if log_id:
-                    await client.send_message(_chat, "← alterpy is starting...", reply_to=_reply)
+                    try:
+                        await client.send_message(_chat, "← alterpy is starting...", reply_to=_reply)
+                    except:
+                        log.warning("Could not reply back 'is starting'")
 
                 context.the_bot_id = int(telethon_config['bot_token'].split(':')[0])
                 del telethon_config
 
                 res = await utils.mod.load_handlers([], context.message_handlers, "handlers", True)
-                await client.send_message(_chat, f"← alterpy start: {res}. Check logs for further info", reply_to=_reply)
+                try:
+                    await client.send_message(_chat, f"← alterpy start: {res}. Check logs for further info", reply_to=_reply)
+                except:
+                    log.warning("Could not reply back 'started'")
 
                 client.add_event_handler(event_handler, telethon.events.newmessage.NewMessage)
 
