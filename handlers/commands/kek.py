@@ -38,10 +38,10 @@ async def on_spok(cm: utils.cm.CommandMessage) -> None:
 handler_list = [
     utils.ch.CommandHandler(name=name, pattern=utils.regex.raw(pat), help_page="kek", handler_impl=handler)
     for name, pat, handler in [
-        ("да", "(?i)\\bда$", on_da),
-        ("нет", "(?i)\\bнет$", on_net),
-        ("дура", "(?i)\\bдура$", on_dura),
-        ("спокойной ночи", "(?i)^((всем ){0,1}спокойной ночи)", on_spok),
+        ("да", "\\bда$", on_da),
+        ("нет", "\\bнет$", on_net),
+        ("дура", "\\bдура$", on_dura),
+        ("спокойной ночи", "^((всем ){0,1}спокойной ночи)", on_spok),
     ]
 ]
 

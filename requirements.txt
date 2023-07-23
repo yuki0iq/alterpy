@@ -7,8 +7,6 @@ pymorphy3-dicts-ru
 gTTS
 iuliia
 DAWG-Python
-fugashi
-unidic
 sortedcollections
 rich
 requests

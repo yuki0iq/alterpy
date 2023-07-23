@@ -3,7 +3,6 @@ import utils.pyphrasy3
 import utils.str
 import utils.log
 import utils.transliterator
-import utils.kiri43i
 import os.path
 import typing
 
@@ -101,7 +100,7 @@ translit = utils.transliterator.Transliterator()
 
 
 def tr(s: str) -> str:
-    return translit.inverse_transliterate(utils.kiri43i.parse(s))
+    return translit.inverse_transliterate(s)
 
 
 def ander(arr: list[str]) -> str:

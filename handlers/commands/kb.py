@@ -4,7 +4,6 @@ import utils.cm
 import utils.ch
 import utils.locale
 import utils.common
-import utils.kiri43i
 
 handler_list = []
 
@@ -22,7 +21,7 @@ async def on_trl(cm: utils.cm.CommandMessage) -> None:
                 res.append(utils.locale.lang('ru').tr(part))
             else:
                 res.append(utils.locale.lang('en').tr(part))
-        await cm.int_cur.reply(utils.str.escape(utils.kiri43i.parse(''.join(res))))
+        await cm.int_cur.reply(utils.str.escape(''.join(res)))
 
 
 async def on_me(cm: utils.cm.CommandMessage) -> None:
