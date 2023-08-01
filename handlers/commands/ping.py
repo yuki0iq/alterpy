@@ -16,8 +16,6 @@ handler_list: list[utils.ch.CommandHandler] = []
 start_time = datetime.datetime.now(datetime.timezone.utc)
 
 tzMSK = zoneinfo.ZoneInfo("Europe/Moscow")
-tzMSK2 = zoneinfo.ZoneInfo("Asia/Yekaterinburg")
-tzMSK4 = zoneinfo.ZoneInfo("Asia/Krasnoyarsk")
 
 time_format = "(%Z) %Y-%m-%d, %H:%M:%S"
 
@@ -44,12 +42,8 @@ This chat ID is `{cm.sender.chat_id}`
 
 — Current time is —
 `{cur_time.astimezone(tzMSK).strftime(time_format)}`
-`{cur_time.astimezone(tzMSK2).strftime(time_format)}`
-`{cur_time.astimezone(tzMSK4).strftime(time_format)}`
 — Started at —
-`{start_time.astimezone(tzMSK).strftime(time_format)}`
-`{start_time.astimezone(tzMSK2).strftime(time_format)}`
-`{start_time.astimezone(tzMSK4).strftime(time_format)}`''',
+`{start_time.astimezone(tzMSK).strftime(time_format)}`''',
         'ru': '''——— АльтерПай ———
 Запущена на `{system_info}`
 Пинг — _{ping}_, обработка — _{handle}_
@@ -59,18 +53,14 @@ ID чата — `{cm.sender.chat_id}`
 
 — Текущее время —
 `{cur_time.astimezone(tzMSK).strftime(time_format)}`
-`{cur_time.astimezone(tzMSK2).strftime(time_format)}`
-`{cur_time.astimezone(tzMSK4).strftime(time_format)}`
 — Время запуска —
-`{start_time.astimezone(tzMSK).strftime(time_format)}`
-`{start_time.astimezone(tzMSK2).strftime(time_format)}`
-`{start_time.astimezone(tzMSK4).strftime(time_format)}`''',
+`{start_time.astimezone(tzMSK).strftime(time_format)}`'''
     }
 }
 LOC = utils.locale.Localizator(translations)
 
 
-def get_ping_times(cm: utils.cm.CommandMessage, lang: str) -> tuple[str, str, str]:
+def get_ping_times(cm: utils.cm.CommandMessage) -> tuple[str, str, str]:
     """return ping, handle and up formatted times"""
     cur_time = datetime.datetime.now(datetime.timezone.utc)
 
@@ -78,30 +68,33 @@ def get_ping_times(cm: utils.cm.CommandMessage, lang: str) -> tuple[str, str, st
     handle = cur_time - cm.local_time
     up = cur_time - start_time
 
-    ping_s = utils.time.timedelta_to_str(ping, is_short=True, lang=lang)
-    handle_s = utils.time.timedelta_to_str(handle, is_short=True, lang=lang)
-    up_s = utils.time.timedelta_to_str(up, lang=lang, form={"accs"})
+    ping_s = utils.time.timedelta_to_str(ping, is_short=True, lang=cm.lang)
+    handle_s = utils.time.timedelta_to_str(handle, is_short=True, lang=cm.lang)
+    up_s = utils.time.timedelta_to_str(up, lang=cm.lang, form={"accs"})
     return ping_s, handle_s, up_s
 
 
-def on_ping_wrapper(s: str, lang: str) -> typing.Callable[[utils.cm.CommandMessage], typing.Awaitable[None]]:
-    async def on_ping(cm: utils.cm.CommandMessage) -> None:
-        ping, handle, up = get_ping_times(cm, lang)
-        rep = eval(LOC.get(s + '_reply', lang))
-        msg = eval(LOC.get('ping_message', lang))
-        await cm.int_cur.reply(msg)
-    return on_ping
+async def on_ping(cm: utils.cm.CommandMessage) -> None:
+    ping, handle, up = get_ping_times(cm)
+    rep = eval(LOC.get('ping_reply', cm.lang))
+    msg = eval(LOC.get('ping_message', cm.lang))
+    await cm.int_cur.reply(msg)
 
 
-def on_stat_wrapper(lang: str) -> typing.Callable[[utils.cm.CommandMessage], typing.Awaitable[None]]:
-    async def on_stat(cm: utils.cm.CommandMessage) -> None:
-        cur_time = datetime.datetime.now(datetime.timezone.utc)
-        ping, handle, up = get_ping_times(cm, lang)
-        speed = utils.system.perf_test_compute()
-        system_info = utils.system.system_info()
-        msg = eval(LOC.get('stat_message', lang))
-        await cm.int_cur.reply(msg)
-    return on_stat
+async def on_test(cm: utils.cm.CommandMessage) -> None:
+    ping, handle, up = get_ping_times(cm)
+    rep = eval(LOC.get('test_reply', cm.lang))
+    msg = eval(LOC.get('ping_message', cm.lang))
+    await cm.int_cur.reply(msg)
+
+
+async def on_stat(cm: utils.cm.CommandMessage) -> None:
+    cur_time = datetime.datetime.now(datetime.timezone.utc)
+    ping, handle, up = get_ping_times(cm)
+    speed = utils.system.perf_test_compute()
+    system_info = utils.system.system_info()
+    msg = eval(LOC.get('stat_message', cm.lang))
+    await cm.int_cur.reply(msg)
 
 
 def replier(ans: str) -> typing.Callable[[utils.cm.CommandMessage], typing.Awaitable[None]]:
@@ -110,44 +103,22 @@ def replier(ans: str) -> typing.Callable[[utils.cm.CommandMessage], typing.Await
     return on_reply
 
 
-handler_list.extend(
-    utils.ch.CommandHandler(
-        name=msg,
-        pattern=utils.regex.cmd(msg + '$'),
-        help_page="ping",
-        handler_impl=on_ping_wrapper(s, lang)
-    ) for msg, s, lang in [
-        ("ping", "ping", 'en'),
-        ("пинг", "ping", 'ru'),
-        ("test", "test", 'en'),
-        ("тест", "test", 'ru')
-    ]
-)
+handler_list.append(utils.ch.CommandHandler(name="ping", pattern=utils.regex.cmd("(ping|пинг)$"), help_page="ping", handler_impl=on_ping))
+handler_list.append(utils.ch.CommandHandler(name="test", pattern=utils.regex.cmd("(test|тест)$"), help_page="test", handler_impl=on_test))
+handler_list.append(utils.ch.CommandHandler(name="stat", pattern=utils.regex.cmd("(stat|стат|инфо)$"), help_page="ping", handler_impl=on_stat)) 
 
 handler_list.extend(
     utils.ch.CommandHandler(
         name=msg,
-        pattern=utils.regex.cmd(msg + '$'),
-        help_page='ping',
-        handler_impl=on_stat_wrapper(lang)
-    ) for msg, lang in [
-        ("stat", 'en'),
-        ("стат", 'ru'),
-    ]
-)
-
-handler_list.extend(
-    utils.ch.CommandHandler(
-        name=msg,
-        pattern=utils.regex.ignore_case(pat),
+        pattern=utils.regex.ignore_case(utils.regex.pat_starts_with(pat)),
         help_page="ping",
         handler_impl=replier(ans)
     ) for msg, ans, pat in [
-        ("bot", "I'm here!", utils.regex.pat_starts_with("bot$")),
-        ("бот", "На месте!", utils.regex.pat_starts_with("бот$")),
-        ("ты где", "Я тут", utils.regex.pat_starts_with("(ты где)|(где ты)$")),
-        ("сдох", "Ты тоже.", utils.regex.pat_starts_with("сдох\\?$")),
-        ("слава партии", "Слава Партии!", utils.regex.pat_starts_with("слава партии[\\?!]*")),
-        ("кто здесь власть", "ПАРТИЯ!", utils.regex.pat_starts_with("кто здесь власть[\\?]*")),
+        ("bot", "I'm here!", "bot$"),
+        ("бот", "На месте!", "бот$"),
+        ("ты где", "Я тут", "(ты где)|(где ты)$"),
+        ("сдох", "Ты тоже.", "сдох\\?$"),
+        ("слава партии", "Слава Партии!", "слава партии[\\?!]*"),
+        ("кто здесь власть", "ПАРТИЯ!", "кто здесь власть[\\?]*"),
     ]
 )
