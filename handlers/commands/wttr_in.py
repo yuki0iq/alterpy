@@ -34,7 +34,11 @@ translations = {
     'wait': {
         'ru': 'Запрос обрабатывается, подождите...',
         'en': 'Please wait for weather report to generate...',
-    }
+    },
+    'off': {
+        'ru': 'wttr.in, кажется, упал',
+        'en': 'wttr.in is probably down',
+    },
 }
 LOC = utils.locale.Localizator(translations)
 
@@ -55,18 +59,21 @@ async def weather(cm: utils.cm.CommandMessage) -> None:
     arg = other_dic[True]
     argp = arg.strip().replace(' ', '+')
 
-    error_str = '>>>   404'
-    async with alterpy.context.session.get(f'https://v1.wttr.in/{argp}?T0') as v1:
-        data_v1 = await v1.read()
+    try:
+        error_str = '>>>   404'
+        async with alterpy.context.session.get(f'https://v1.wttr.in/{argp}?T0') as v1:
+            data_v1 = await v1.read()
 
-    if error_str in data_v1.decode():
-        await cm.int_cur.reply(LOC.obj('err', cm.lang))
-        return
+        if error_str in data_v1.decode():
+            await cm.int_cur.reply(LOC.obj('err', cm.lang))
+            return
 
-    async with alterpy.context.session.get(f'https://v2.wttr.in/{argp}_lang={cm.lang}.png') as v2:
-        data_v2 = await v2.read()
+        async with alterpy.context.session.get(f'https://v2.wttr.in/{argp}_lang={cm.lang}.png') as v2:
+            data_v2 = await v2.read()
 
-    await cm.int_cur.reply(' '.join([LOC.obj('weather', cm.lang), utils.str.escape(cm.arg)]), data_v2)
+        await cm.int_cur.reply(' '.join([LOC.obj('weather', cm.lang), utils.str.escape(cm.arg)]), data_v2)
+    except asyncio.TimeoutError:
+        await cm.int_cur.reply(LOC.obj('off', cm.lang))
 
 
 handler_list = [
