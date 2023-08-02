@@ -31,14 +31,6 @@ def inflect_mentions(mentions: list[str], form: str, lang: str = "ru") -> str:
     return anded
 
 
-class RP1Handler(typing.NamedTuple):
-    pattern: re.Pattern[str]
-    ans: list[typing.Callable[[], str]]
-
-    def invoke(self, user: str, pronouns: typing.Union[int, list[int]], comment: str) -> str:
-        return self.ans[utils.pronouns.to_int(pronouns)]().format(user, comment).strip()
-
-
 class RP2Handler(typing.NamedTuple):
     pattern: re.Pattern[str]
     ans: list[typing.Callable[[], str]]
@@ -50,20 +42,6 @@ class RP2Handler(typing.NamedTuple):
             user, inflect_mentions(list(m[1] for m in mention), self.form, self.lang), comment
         ).strip().replace('  ', ' ', 1)
 
-
-rp1handlers = [
-    RP1Handler(
-        utils.regex.cmd("задолбало"),
-        [
-            utils.rand.rand_or_null_fun("😭 | {0} успешно выпилился(ась) {1}", 1, 6, "🎉 | {0} не смог(ла) выпилиться {1}"),
-            utils.rand.rand_or_null_fun("😭 | {0} успешно выпилился {1}", 1, 6, "🎉 | {0} не смог выпилиться {1}"),
-            utils.rand.rand_or_null_fun("😭 | {0} успешно выпилилась {1}", 1, 6, "🎉 | {0} не смогла выпилиться {1}"),
-            utils.rand.rand_or_null_fun("😭 | {0} успешно выпилилось {1}", 1, 6, "🎉 | {0} не смогло выпилиться {1}"),
-            utils.rand.rand_or_null_fun("😭 | {0} успешно выпилилось {1}", 1, 6, "🎉 | {0} не смогло выпилиться {1}"),
-            utils.rand.rand_or_null_fun("😭 | {0} успешно выпилились {1}", 1, 6, "🎉 | {0} не смогли выпилиться {1}"),
-        ]
-    )
-]
 
 rp2handlers = [
     RP2Handler(
@@ -288,44 +266,41 @@ async def on_rp(cm: utils.cm.CommandMessage) -> None:
     res = []
     for line in cm.arg.split('\n')[:20]:  # technical limitation TODO fix!
         cur_pronoun_set = utils.pronouns.to_int(pronoun_set)
-        # try match to RP-1 as "RP-1 arg"
-        for rp1handler in rp1handlers:
-            match = re.search(rp1handler.pattern, line)
-            if match:
-                arg = line[len(match[0]):]
-                res.append(rp1handler.invoke(user, cur_pronoun_set, arg))
         # try match to RP-2 as "RP-2 [mention] arg"
         for handler in rp2handlers:
-            match = re.search(handler.pattern, line)
-            if match:
-                arg = line[len(match[0]):]
-                arg = arg.lstrip()
-                match = re.search(utils.user.mention_pattern, arg)
-                cur_mention = []
-                while match:
-                    # if matched 'username' then get name
-                    # if matched 'uid + len' then get name from text TODO
-                    vars = match.groupdict()
-                    if vars['username'] is not None:
-                        username, arg = match[0][1:], arg[len(match[0]):]
-                        cur_user = await utils.user.from_telethon(username, chat=cm.sender.chat_id, client=cm.client)
-                        mention = await cur_user.get_mention()
-                    else:
-                        uid = int(vars['uid'])
-                        l = int(vars['len'])
-                        arg = arg[len(match[0]):]
-                        name, arg = arg[:l], arg[l:]
-                        cur_user = await utils.user.from_telethon(uid, chat=cm.sender.chat_id, client=cm.client)
-                        mention = f"[{utils.str.escape(name)}](tg://user?id={uid})"
-                    cur_mention.append((cur_user, mention))
+            try:
+                match = re.search(handler.pattern, line)
+                if match:
+                    arg = line[len(match[0]):]
                     arg = arg.lstrip()
                     match = re.search(utils.user.mention_pattern, arg)
-                cur_mention = cur_mention or default_mention
+                    cur_mention = []
+                    while match:
+                        # if matched 'username' then get name
+                        # if matched 'uid + len' then get name from text TODO
+                        vars = match.groupdict()
+                        if vars['username'] is not None:
+                            username, arg = match[0][1:], arg[len(match[0]):]
+                            cur_user = await utils.user.from_telethon(username, chat=cm.sender.chat_id, client=cm.client)
+                            mention = await cur_user.get_mention()
+                        else:
+                            uid = int(vars['uid'])
+                            l = int(vars['len'])
+                            arg = arg[len(match[0]):]
+                            name, arg = arg[:l], arg[l:]
+                            cur_user = await utils.user.from_telethon(uid, chat=cm.sender.chat_id, client=cm.client)
+                            mention = f"[{utils.str.escape(name)}](tg://user?id={uid})"
+                        cur_mention.append((cur_user, mention))
+                        arg = arg.lstrip()
+                        match = re.search(utils.user.mention_pattern, arg)
+                    cur_mention = cur_mention or default_mention
 
-                if cur_mention or arg:
-                    res.append(handler.invoke(user, cur_pronoun_set, cur_mention, arg))
-                else:
-                    res.append("RP-2 commands can't be executed without second user mention")
+                    if cur_mention or arg:
+                        res.append(handler.invoke(user, cur_pronoun_set, cur_mention, arg))
+                    else:
+                        res.append("RP-2 commands can't be executed without second user mention")
+            except ValueError:
+                res.append("Could not parse mention")
     if res:
         await cm.int_cur.reply('\n'.join(res), link_preview=False)
 
