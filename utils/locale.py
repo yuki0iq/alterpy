@@ -17,7 +17,7 @@ class Localizator:
             return cur
         if not cur:
             return None
-        return cur[lang] if lang in cur else list(cur)[0]
+        return cur[lang] if lang in cur else list(cur.values())[0]
 
     def get(self, s: str, lang: str) -> str:
         return str(utils.str.FStr(self.obj(s, lang)))
