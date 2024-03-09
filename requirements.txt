@@ -16,3 +16,6 @@ aiodns
 Brotli
 lemminflect
 git-up
+pyte
+emoji
+grapheme
