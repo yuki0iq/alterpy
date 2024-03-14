@@ -4,9 +4,11 @@ import utils.log
 import utils.regex
 import utils.str
 import utils.locale
+import utils.wttrin_png
 import alterpy.context
 import typing
 import aiohttp
+import asyncio
 import json
 
 
@@ -54,22 +56,24 @@ async def weather(cm: utils.cm.CommandMessage) -> None:
     await cm.int_cur.reply(LOC.obj('wait', cm.lang))
 
     words = ' '.join(cm.arg.split()).lower()
-    other_dic = {True: cm.arg} | dict([(words.startswith(w), words[len(w):]) for w in LOC.obj('in', cm.lang)]) | dict([(words.startswith(w), '~' + words[len(w):]) for w in LOC.obj('near', cm.lang)])
+    other_dic = {True: cm.arg} | dict([(words.startswith(w), words[len(w):]) for w in LOC.obj('in', cm.lang)]) | dict([
+        (words.startswith(w), '~' + words[len(w):]) for w in LOC.obj('near', cm.lang)])
 
     arg = other_dic[True]
     argp = arg.strip().replace(' ', '+')
 
     try:
         error_str = '>>>   404'
-        async with alterpy.context.session.get(f'https://v1.wttr.in/{argp}?T0') as v1:
+        async with alterpy.context.session.get(f'https://v1.wttr.in/{argp}') as v1:
             data_v1 = await v1.read()
 
         if error_str in data_v1.decode():
             await cm.int_cur.reply(LOC.obj('err', cm.lang))
             return
 
-        async with alterpy.context.session.get(f'https://v2.wttr.in/{argp}_lang={cm.lang}.png') as v2:
-            data_v2 = await v2.read()
+        # async with alterpy.context.session.get(f'https://v2.wttr.in/{argp}_lang={cm.lang}') as v2:
+        #     data_v2 = await v2.read()
+        data_v2 = utils.wttrin_png.render_ansi(data_v1.decode('utf-8'))
 
         await cm.int_cur.reply(' '.join([LOC.obj('weather', cm.lang), utils.str.escape(cm.arg)]), data_v2)
     except asyncio.TimeoutError:

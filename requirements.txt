@@ -13,7 +13,9 @@ requests
 wn
 aiohttp
 aiodns
-cchardet
 Brotli
 lemminflect
 git-up
+pyte
+emoji
+grapheme
