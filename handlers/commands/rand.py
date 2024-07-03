@@ -61,7 +61,7 @@ async def on_choose(cm: utils.cm.CommandMessage) -> None:
 
 async def on_poll(cm: utils.cm.CommandMessage) -> None:
     pref = random.choice(LOC.obj('prefs', cm.lang))
-    choices = list(x.text for x in cm.media.poll().poll.answers)
+    choices = list(str(x.text) for x in cm.media.poll().poll.answers)
     val = random.choice(choices)
     await cm.int_cur.reply(f"{pref} {utils.str.escape(val)}")
 
