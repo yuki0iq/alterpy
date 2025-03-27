@@ -1,20 +1,23 @@
 import alterpy.context
 import dataclasses
+import datetime
 import io
 import PIL.Image
 import re
 import sqlite3
 import telethon.tl.types
 import telethon.utils
-import utils.str
+import utils.common
 import utils.log
+import utils.str
 import utils.regex
 
 
 con = sqlite3.connect("users.db", autocommit=True)
 cur = con.cursor()
 cur.execute("PRAGMA journal_mode=WAL")
-cur.execute("CREATE TABLE IF NOT EXISTS users(id PRIMARY KEY, name, pronoun_set, lang, replace_id)")
+cur.execute("CREATE TABLE IF NOT EXISTS users(id PRIMARY KEY, name, pronoun_set, lang, replace_id, stamp)")
+cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS users_id ON users(id)")
 
 
 @dataclasses.dataclass
@@ -25,7 +28,7 @@ class User:
 
     def __post_init__(self):
         if cur.execute("SELECT COUNT(*) FROM users WHERE id = ?", (self.sender.id,)).fetchone() == (0,):
-            cur.execute("INSERT INTO users VALUES (?, NULL, NULL, NULL, NULL)", (self.sender.id,))
+            cur.execute("INSERT INTO users VALUES (?, NULL, NULL, NULL, NULL, ?)", (self.sender.id, utils.common.stamp()))
 
     def is_admin(self) -> bool:  # check if in admins list
         return self.sender.id in alterpy.context.admins
@@ -72,25 +75,32 @@ class User:
         return list(map(int, pronouns))
 
     def set_pronouns(self, pronoun_set: None | list[int]):
-        cur.execute("UPDATE users SET pronoun_set = ? WHERE id = ?", (pronoun_set and ''.join(map(str, pronoun_set)), self.sender.id))
+        cur.execute(
+            "UPDATE users SET pronoun_set = ?, stamp = ? WHERE id = ?",
+            (
+                pronoun_set and ''.join(map(str, pronoun_set)),
+                utils.common.stamp(),
+                self.sender.id
+            )
+        )
 
     def get_name(self) -> str | None:
         return cur.execute("SELECT name FROM users WHERE id = ?", (self.sender.id,)).fetchone()[0]
 
     def set_name(self, name: None | str):
-        cur.execute("UPDATE users SET name = ? WHERE id = ?", (name, self.sender.id))
+        cur.execute("UPDATE users SET name = ?, stamp = ? WHERE id = ?", (name, utils.common.stamp(), self.sender.id))
 
     def get_redirect(self) -> int | None:
         return cur.execute("SELECT replace_id FROM users WHERE id = ?", (self.sender.id,)).fetchone()[0]
 
     def set_redirect(self, uid: int):
-        cur.execute("UPDATE users SET replace_id = ? WHERE id = ?", (uid, self.sender.id))
+        cur.execute("UPDATE users SET replace_id = ?, stamp = ? WHERE id = ?", (uid, utils.common.stamp(), self.sender.id))
 
     def get_lang(self) -> str:
         return cur.execute("SELECT lang FROM users WHERE id = ?", (self.sender.id,)).fetchone()[0]
 
     def set_lang(self, lang: str):
-        cur.execute("UPDATE users SET lang = ? WHERE id = ?", (lang, self.sender.id))
+        cur.execute("UPDATE users SET lang = ?, stamp = ? WHERE id = ?", (lang, utils.common.stamp(), self.sender.id))
 
 
 async def from_telethon(user: telethon.tl.types.User | telethon.tl.types.Channel | telethon.tl.types.Chat | str | int,

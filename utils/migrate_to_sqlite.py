@@ -1,13 +1,18 @@
+import os
 import pytomlpp
 import sqlite3
 import utils.file
 
-con = sqlite3.connect("users.db", autocommit=True)
+con = sqlite3.connect(os.environ["MIGRATED"], autocommit=True)
 cur = con.cursor()
-cur.execute("CREATE TABLE IF NOT EXISTS users(id PRIMARY KEY, name, pronoun_set, lang, replace_id)")
+cur.execute("PRAGMA journal_mode=WAL")
+cur.execute("CREATE TABLE IF NOT EXISTS users(id PRIMARY KEY, name, pronoun_set, lang, replace_id, stamp)")
+cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS users_id ON users(id)")
 
 for filename in utils.file.list_files("user/"):
     config = pytomlpp.load(f"user/{filename}")
+
+    stamp = os.stat(f"user/{filename}").st_mtime_ns // 1000
 
     user_id = int(filename[:-5])
 
@@ -32,5 +37,4 @@ for filename in utils.file.list_files("user/"):
         replace_id = None
 
     # print(user_id, repr(name), repr(pronoun_set), repr(lang), repr(replace_id))
-
-    cur.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?)", (user_id, name, pronoun_set, lang, replace_id,))
+    cur.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?)", (user_id, name, pronoun_set, lang, replace_id, stamp))

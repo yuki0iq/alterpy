@@ -1,3 +1,4 @@
+import datetime
 import typing
 
 
@@ -48,4 +49,9 @@ def split_by_func(s: str, f: typing.Callable[[str], bool]) -> list[str]:
         p = c
     res.append(''.join(cur))
     return res
+
+
+def stamp() -> int:
+    r = datetime.datetime.now(datetime.timezone.utc) - datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)
+    return r.total_seconds() * 1000000 + r.microseconds
 

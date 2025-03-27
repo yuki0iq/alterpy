@@ -18,3 +18,10 @@ source venv/bin/activate
 python3 -m alterpy
 ```
 
+Migrate from .toml-based user database:
+```sh
+source venv/bin/activate
+MIGRATED=migrated.db python3 -m utils.migrate_to_sqlite
+DATABASE=users.db REFERENCE=migrated.db python3 -m utils.merge_with_backup
+```
+
