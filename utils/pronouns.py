@@ -26,7 +26,6 @@ pronouns_regex = {
         'то' + utils.regex.negative_lookahead('т')
     )),
     5: utils.regex.ignore_case(utils.regex.union('5 the они их эти те'.split())),
-    6: utils.regex.ignore_case(utils.regex.union('6 mir cop зер отр'.split())),
 }
 
 pronouns_name = {
@@ -38,7 +37,6 @@ pronouns_name = {
     3: {'ru': 'оно/его', 'en': 'it/its'},
     4: {'ru': 'нейтральное оно', 'en': 'one/one\'s'},
     5: {'ru': 'они/их', 'en': 'singular they'},
-    6: {'ru': 'зеркальные', 'en': 'mirror'},
 }
 pronouns_name_getter = utils.locale.Localizator(pronouns_name)
 

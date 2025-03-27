@@ -10,7 +10,6 @@ DAWG-Python
 sortedcollections
 rich
 requests
-wn
 aiohttp
 aiodns
 Brotli
