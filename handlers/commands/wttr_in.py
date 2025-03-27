@@ -1,15 +1,16 @@
-import utils.cm
+import aiohttp
+import alterpy.context
+import asyncio
+import json
+import tempfile
+import typing
 import utils.ch
+import utils.cm
+import utils.locale
 import utils.log
 import utils.regex
 import utils.str
-import utils.locale
 import utils.wttrin_png
-import alterpy.context
-import typing
-import aiohttp
-import asyncio
-import json
 
 
 translations = {
@@ -32,6 +33,10 @@ translations = {
     'err': {
         'ru': 'Место не найдено',
         'en': 'Place not found',
+    },
+    'rate': {
+        'ru': 'Слишком много запросов',
+        'en': 'Ratelimited',
     },
     'wait': {
         'ru': 'Запрос обрабатывается, подождите...',
@@ -63,19 +68,23 @@ async def weather(cm: utils.cm.CommandMessage) -> None:
     argp = arg.strip().replace(' ', '+')
 
     try:
-        error_str = '>>>   404'
         async with alterpy.context.session.get(f'https://v1.wttr.in/{argp}') as v1:
             data_v1 = await v1.read()
 
-        if error_str in data_v1.decode():
+        if b'>>>   404' in data_v1:
             await cm.int_cur.reply(LOC.obj('err', cm.lang))
             return
 
-        # async with alterpy.context.session.get(f'https://v2.wttr.in/{argp}_lang={cm.lang}') as v2:
-        #     data_v2 = await v2.read()
-        data_v2 = utils.wttrin_png.render_ansi(data_v1.decode('utf-8'))
+        async with alterpy.context.session.get(f'https://v2.wttr.in/{argp}?lang={cm.lang}') as v2:
+            data_v2 = await v2.read()
 
-        await cm.int_cur.reply(' '.join([LOC.obj('weather', cm.lang), utils.str.escape(cm.arg)]), data_v2)
+        if b'Sorry, we are running out of queries' in data_v2:
+            data_v2 = data_v1
+
+        rendered = utils.wttrin_png.render_ansi(data_v2.decode('utf-8'))
+        with tempfile.NamedTemporaryFile(suffix='.png') as tf:
+            tf.write(rendered)
+            await cm.int_cur.reply(' '.join([LOC.obj('weather', cm.lang), utils.str.escape(cm.arg)]), tf.name)
     except asyncio.TimeoutError:
         await cm.int_cur.reply(LOC.obj('off', cm.lang))
 

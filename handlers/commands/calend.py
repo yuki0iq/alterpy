@@ -1,12 +1,11 @@
-import utils.cm
+import aiohttp
+import alterpy.context
+import tempfile
 import utils.ch
+import utils.cm
 import utils.log
 import utils.regex
 import utils.str
-import alterpy.context
-
-import aiohttp
-import json
 
 handler_list = []
 
@@ -14,7 +13,9 @@ handler_list = []
 async def calend_ru(cm: utils.cm.CommandMessage) -> None:
     if isinstance(alterpy.context.session, aiohttp.ClientSession):
         async with alterpy.context.session.get('https://www.calend.ru/img/export/informer.png') as response:
-            await cm.int_cur.reply('Праздники сегодня', await response.read())
+            with tempfile.NamedTemporaryFile(suffix='.png') as tf:
+                tf.write(await response.read())
+                await cm.int_cur.reply('Праздники сегодня', tf.name)
 
 
 handler_list.append(

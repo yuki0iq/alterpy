@@ -40,14 +40,14 @@ FONT_CAT = {
     'default':      "/usr/share/fonts/TTF/FantasqueSansMono-Regular.ttf",
     'Cyrillic':     "/usr/share/fonts/TTF/FantasqueSansMono-Regular.ttf",
     'Greek':        "/usr/share/fonts/TTF/FantasqueSansMono-Regular.ttf",
-    'Arabic':       "/usr/share/fonts/Unifont/Unifont_jp.ttf",
-    'Hebrew':       "/usr/share/fonts/Unifont/Unifont_jp.ttf",
-    'Han':          "/usr/share/fonts/Unifont/Unifont_jp.ttf",
-    'Hiragana':     "/usr/share/fonts/Unifont/Unifont_jp.ttf",
-    'Katakana':     "/usr/share/fonts/Unifont/Unifont_jp.ttf",
-    'Hangul':       "/usr/share/fonts/Unifont/Unifont_jp.ttf",
-    'Braille':      "/usr/share/fonts/Unifont/Unifont_jp.ttf",
-    'Emoji':        "/usr/share/fonts/Unifont/Unifont_jp.ttf",
+    'Arabic':       "/usr/share/fonts/Unifont/Unifont_jp.otf",
+    'Hebrew':       "/usr/share/fonts/Unifont/Unifont_jp.otf",
+    'Han':          "/usr/share/fonts/Unifont/Unifont_jp.otf",
+    'Hiragana':     "/usr/share/fonts/Unifont/Unifont_jp.otf",
+    'Katakana':     "/usr/share/fonts/Unifont/Unifont_jp.otf",
+    'Hangul':       "/usr/share/fonts/Unifont/Unifont_jp.otf",
+    'Braille':      "/usr/share/fonts/Unifont/Unifont_jp.otf",
+    'Emoji':        "/usr/share/fonts/Unifont/Unifont_jp.otf",
     # Why not "/usr/share/fonts/twemoji/twemoji.ttf"? Because fuck you, pillow
 }
 
