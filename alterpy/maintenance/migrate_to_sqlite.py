@@ -6,7 +6,7 @@ import utils.file
 con = sqlite3.connect(os.environ["MIGRATED"], autocommit=True)
 cur = con.cursor()
 cur.execute("PRAGMA journal_mode=WAL")
-cur.execute("CREATE TABLE IF NOT EXISTS users(id PRIMARY KEY, name, pronoun_set, lang, replace_id, stamp)")
+cur.execute("CREATE TABLE IF NOT EXISTS users(id INTEGER, name TEXT, pronoun_set TEXT, lang TEXT, replace_id INTEGER, stamp INTEGER)")
 cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS users_id ON users(id)")
 
 for filename in utils.file.list_files("user/"):

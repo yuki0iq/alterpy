@@ -16,7 +16,7 @@ import utils.regex
 con = sqlite3.connect("users.db", autocommit=True)
 cur = con.cursor()
 cur.execute("PRAGMA journal_mode=WAL")
-cur.execute("CREATE TABLE IF NOT EXISTS users(id PRIMARY KEY, name, pronoun_set, lang, replace_id, stamp)")
+cur.execute("CREATE TABLE IF NOT EXISTS users(id INTEGER, name TEXT, pronoun_set TEXT, lang TEXT, replace_id INTEGER, stamp INTEGER)")
 cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS users_id ON users(id)")
 
 
