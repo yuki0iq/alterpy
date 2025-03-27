@@ -20,11 +20,7 @@ def get(name:str = "unknown") -> logging.Logger:
     log = logging.getLogger(name)
     log.setLevel(logging.INFO)
 
-    # ti = time.ctime().replace(":", " ").replace("  ", " ")
-    # ti = ti.split(" ")
-    # ti = "_".join(ti[1:3])
-
-    h_file = logging.FileHandler(f"log/alterpy.log", encoding="utf-8")
+    h_file = logging.FileHandler("/dev/null", encoding="utf-8")
     h_file.setFormatter(logging_formatter)
     log.addHandler(h_file)
     # log.addHandler(logging_handler_stderr)

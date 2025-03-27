@@ -5,7 +5,6 @@ import utils.media
 
 import typing
 import re
-import traceback
 import inspect
 
 
@@ -23,8 +22,8 @@ class CommandHandler(typing.NamedTuple):
         if not self.is_elevated or cm.sender.is_admin():
             try:
                 await self.handler_impl(cm)
-            except:
-                await cm.int_cur.reply(f"Exception occurred.\n```{traceback.format_exc()}```")
+            except Exception as e:
+                await cm.int_cur.reply(f"Exception: {e}")
                 utils.log.get("handler").exception("invoke exception")
         else:
             await cm.int_cur.reply("Only bot admins can run elevated commands")
