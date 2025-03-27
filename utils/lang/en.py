@@ -6,7 +6,7 @@ import typing
 
 
 def try_verb_past(w: str, p: int) -> str:
-    return inflect(w, 'VBD')
+    return inflect(w, 'VBD') if w.isalpha() else w
 
 
 def inflect(s: str, form: str) -> str:

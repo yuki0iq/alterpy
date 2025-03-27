@@ -1,260 +1,84 @@
+import dataclasses
+import re
+import typing
+import utils.aiospeller
 import utils.ch
 import utils.cm
-import utils.regex
-import utils.rand
 import utils.common
 import utils.locale
-import utils.user
-import utils.str
+import utils.log
 import utils.pronouns
-import utils.aiospeller
-import typing
-import re
+import utils.rand
+import utils.regex
+import utils.str
+import utils.user
 
 
-def inflect_mention(mention: str, form: str, lang: str = "ru") -> str:
+log = utils.log.get("rp")
+
+
+def inflect_mention(mention: str, form: str, lt) -> str:
     if not mention:
         return mention
     le, ri = 1, mention.rindex(']')
-    lt = utils.locale.lang(lang)
     inflected = lt.inflect(lt.tr(mention[le:ri]), form)
     assert isinstance(inflected, str)
     return mention[:le] + inflected + mention[ri:]
 
 
-def inflect_mentions(mentions: list[str], form: str, lang: str = "ru") -> str:
+def inflect_mentions(mentions: list[str], form: str, lt) -> str:
     if not mentions:
         return ""
-    lt = utils.locale.lang(lang)
-    anded = lt.ander(inflect_mention(mention, form, lang) for mention in mentions)
+    anded = lt.ander(inflect_mention(mention, form, lt) for mention in mentions)
     assert isinstance(anded, str)
     return anded
 
 
-class RP2Handler(typing.NamedTuple):
+def to_role(words: list[str], p: int) -> str:
+    return ''.join(utils.locale.try_verb_past(w, p) for w in words if w)
+
+
+@dataclasses.dataclass
+class RP2Handler:
     pattern: re.Pattern[str]
-    ans: list[typing.Callable[[], str]]
+    verb: typing.Callable[[], str]
+    emoji: str
     lang: str = "ru"
     form: str = "accs"
 
-    def invoke(self, user: str, pronouns: typing.Union[int, list[int]], mention: list[tuple[utils.user.User, str]], comment: str) -> str:
-        return self.ans[utils.pronouns.to_int(pronouns)]().format(
-            user, inflect_mentions(list(m[1] for m in mention), self.form, self.lang), comment
+    def __post_init__(self):
+        self.lang = utils.locale.lang(self.lang)
+
+    def invoke(self, user: str, pronouns: None | int | list[int], mention: list[tuple[utils.user.User, str]], comment: str) -> str:
+        return "{e} | {s} {v} {m} {c}".format(
+            e=self.emoji,
+            s=user,
+            v=to_role(utils.regex.split_by_word_border(self.verb()), utils.pronouns.to_int(pronouns)),
+            m=inflect_mentions(list(m[1] for m in mention), self.form, self.lang),
+            c=comment,
         ).strip().replace('  ', ' ', 1)
 
 
 rp2handlers = [
-    RP2Handler(
-        utils.regex.cmd("обнять"),
-        [
-            utils.common.wrap("🤗 | {0} обнял(а) {1} {2}"),
-            utils.common.wrap("🤗 | {0} обнял {1} {2}"),
-            utils.common.wrap("🤗 | {0} обняла {1} {2}"),
-            utils.common.wrap("🤗 | {0} обняло {1} {2}"),
-            utils.common.wrap("🤗 | {0} обняло {1} {2}"),
-            utils.common.wrap("🤗 | {0} обняли {1} {2}"),
-        ]
-    ),
-    RP2Handler(
-        utils.regex.cmd("выебать"),
-        [
-            utils.common.wrap("😈 | {0} выебал(а) {1} {2}"),
-            utils.common.wrap("😈 | {0} выебал {1} {2}"),
-            utils.common.wrap("😈 | {0} выебала {1} {2}"),
-            utils.common.wrap("😈 | {0} выебало {1} {2}"),
-            utils.common.wrap("😈 | {0} выебало {1} {2}"),
-            utils.common.wrap("😈 | {0} выебали {1} {2}"),
-        ]
-    ),
-    RP2Handler(
-        utils.regex.cmd("дать"),
-        [
-            utils.common.wrap("🎁 | {0} дал(а) {1} {2}"),
-            utils.common.wrap("🎁 | {0} дал {1} {2}"),
-            utils.common.wrap("🎁 | {0} дала {1} {2}"),
-            utils.common.wrap("🎁 | {0} дало {1} {2}"),
-            utils.common.wrap("🎁 | {0} дало {1} {2}"),
-            utils.common.wrap("🎁 | {0} дали {1} {2}"),
-        ],
-        form="datv",
-    ),
-    RP2Handler(
-        utils.regex.cmd("сломать"),
-        [
-            utils.common.wrap("🔧 | {0} сломал(а) {1} {2}"),
-            utils.common.wrap("🔧 | {0} сломал {1} {2}"),
-            utils.common.wrap("🔧 | {0} сломала {1} {2}"),
-            utils.common.wrap("🔧 | {0} сломало {1} {2}"),
-            utils.common.wrap("🔧 | {0} сломало {1} {2}"),
-            utils.common.wrap("🔧 | {0} сломали {1} {2}"),
-        ]
-    ),
-    RP2Handler(
-        utils.regex.cmd("убить"),
-        [
-            utils.common.wrap("☠ | {0} убил(а) {1} {2}"),
-            utils.common.wrap("☠ | {0} убил {1} {2}"),
-            utils.common.wrap("☠ | {0} убила {1} {2}"),
-            utils.common.wrap("☠ | {0} убило {1} {2}"),
-            utils.common.wrap("☠ | {0} убило {1} {2}"),
-            utils.common.wrap("☠ | {0} убили {1} {2}"),
-        ]
-    ),
-    RP2Handler(
-        utils.regex.cmd("расстрелять"),
-        [
-            utils.common.wrap("🔫 | {0} расстрелял(а) {1} {2}"),
-            utils.common.wrap("🔫 | {0} расстрелял {1} {2}"),
-            utils.common.wrap("🔫 | {0} расстреляла {1} {2}"),
-            utils.common.wrap("🔫 | {0} расстреляло {1} {2}"),
-            utils.common.wrap("🔫 | {0} расстреляло {1} {2}"),
-            utils.common.wrap("🔫 | {0} расстреляли {1} {2}"),
-        ]
-    ),
-    RP2Handler(
-        utils.regex.cmd("поцеловать"),
-        [
-            utils.common.wrap("😘 | {0} поцеловал(а) {1} {2}"),
-            utils.common.wrap("😘 | {0} поцеловал {1} {2}"),
-            utils.common.wrap("😘 | {0} поцеловала {1} {2}"),
-            utils.common.wrap("😘 | {0} поцеловало {1} {2}"),
-            utils.common.wrap("😘 | {0} поцеловало {1} {2}"),
-            utils.common.wrap("😘 | {0} поцеловали {1} {2}"),
-        ]
-    ),
-    RP2Handler(
-        utils.regex.cmd("кусь(нуть){0,1}|укусить"),
-        [
-            utils.common.wrap("😬 | {0} кусьнул(а) {1} {2}"),
-            utils.common.wrap("😬 | {0} кусьнул {1} {2}"),
-            utils.common.wrap("😬 | {0} кусьнула {1} {2}"),
-            utils.common.wrap("😬 | {0} кусьнуло {1} {2}"),
-            utils.common.wrap("😬 | {0} кусьнуло {1} {2}"),
-            utils.common.wrap("😬 | {0} кусьнули {1} {2}"),
-        ]
-    ),
-    RP2Handler(
-        utils.regex.cmd("пнуть"),
-        [
-            utils.common.wrap("👞 | {0} пнул(а) {1} {2}"),
-            utils.common.wrap("👞 | {0} пнул {1} {2}"),
-            utils.common.wrap("👞 | {0} пнула {1} {2}"),
-            utils.common.wrap("👞 | {0} пнуло {1} {2}"),
-            utils.common.wrap("👞 | {0} пнуло {1} {2}"),
-            utils.common.wrap("👞 | {0} пнули {1} {2}"),
-        ]
-    ),
-    RP2Handler(
-        utils.regex.cmd("прижать"),
-        [
-            utils.common.wrap("🤲 | {0} прижал(а) {1} {2}"),
-            utils.common.wrap("🤲 | {0} прижал {1} {2}"),
-            utils.common.wrap("🤲 | {0} прижала {1} {2}"),
-            utils.common.wrap("🤲 | {0} прижало {1} {2}"),
-            utils.common.wrap("🤲 | {0} прижало {1} {2}"),
-            utils.common.wrap("🤲 | {0} прижали {1} {2}"),
-        ]
-    ),
-    RP2Handler(
-        utils.regex.cmd("погладить"),
-        [
-            utils.common.wrap("🤲 | {0} погладил(а) {1} {2}"),
-            utils.common.wrap("🤲 | {0} погладил {1} {2}"),
-            utils.common.wrap("🤲 | {0} погладила {1} {2}"),
-            utils.common.wrap("🤲 | {0} погладило {1} {2}"),
-            utils.common.wrap("🤲 | {0} погладило {1} {2}"),
-            utils.common.wrap("🤲 | {0} погладили {1} {2}"),
-        ]
-    ),
-    RP2Handler(
-        utils.regex.cmd("потрогать"),
-        [
-            utils.common.wrap("🙌 | {0} потрогал(а) {1} {2}"),
-            utils.common.wrap("🙌 | {0} потрогал {1} {2}"),
-            utils.common.wrap("🙌 | {0} потрогала {1} {2}"),
-            utils.common.wrap("🙌 | {0} потрогало {1} {2}"),
-            utils.common.wrap("🙌 | {0} потрогало {1} {2}"),
-            utils.common.wrap("🙌 | {0} потрогали {1} {2}"),
-        ]
-    ),
-    RP2Handler(
-        utils.regex.cmd("лизнуть"),
-        [
-            utils.common.wrap("👅 | {0} лизнул(а) {1} {2}"),
-            utils.common.wrap("👅 | {0} лизнул {1} {2}"),
-            utils.common.wrap("👅 | {0} лизнула {1} {2}"),
-            utils.common.wrap("👅 | {0} лизнуло {1} {2}"),
-            utils.common.wrap("👅 | {0} лизнуло {1} {2}"),
-            utils.common.wrap("👅 | {0} лизнули {1} {2}"),
-        ]
-    ),
-    RP2Handler(
-        utils.regex.cmd("понюхать"),
-        [
-            utils.common.wrap("👃 | {0} понюхал(а) {1} {2}"),
-            utils.common.wrap("👃 | {0} понюхал {1} {2}"),
-            utils.common.wrap("👃 | {0} понюхала {1} {2}"),
-            utils.common.wrap("👃 | {0} понюхало {1} {2}"),
-            utils.common.wrap("👃 | {0} понюхало {1} {2}"),
-            utils.common.wrap("👃 | {0} понюхали {1} {2}"),
-        ]
-    ),
-    RP2Handler(
-        utils.regex.cmd("ударить"),
-        [
-            utils.common.wrap("🤜😵 | {0} ударил(а) {1} {2}"),
-            utils.common.wrap("🤜😵 | {0} ударил {1} {2}"),
-            utils.common.wrap("🤜😵 | {0} ударила {1} {2}"),
-            utils.common.wrap("🤜😵 | {0} ударило {1} {2}"),
-            utils.common.wrap("🤜😵 | {0} ударило {1} {2}"),
-            utils.common.wrap("🤜😵 | {0} ударили {1} {2}"),
-        ]
-    ),
-    RP2Handler(
-        utils.regex.cmd("шлепнуть"),
-        [
-            utils.common.wrap("👏 | {0} шлепнул(а) {1} {2}"),
-            utils.common.wrap("👏 | {0} шлепнул {1} {2}"),
-            utils.common.wrap("👏 | {0} шлепнула {1} {2}"),
-            utils.common.wrap("👏 | {0} шлепнуло {1} {2}"),
-            utils.common.wrap("👏 | {0} шлепнуло {1} {2}"),
-            utils.common.wrap("👏 | {0} шлепнули {1} {2}"),
-        ]
-    ),
-    RP2Handler(
-        utils.regex.cmd("шлёпнуть"),
-        [
-            utils.common.wrap("👏 | {0} шлёпнул(а) {1} {2}"),
-            utils.common.wrap("👏 | {0} шлёпнул {1} {2}"),
-            utils.common.wrap("👏 | {0} шлёпнула {1} {2}"),
-            utils.common.wrap("👏 | {0} шлёпнуло {1} {2}"),
-            utils.common.wrap("👏 | {0} шлёпнуло {1} {2}"),
-            utils.common.wrap("👏 | {0} шлёпнули {1} {2}"),
-        ]
-    ),
-    RP2Handler(
-        utils.regex.cmd("предложить пива"),
-        [
-            utils.common.wrap("🍻 | {0} предложил(а) пива {1} {2}"),
-            utils.common.wrap("🍻 | {0} предложил пива {1} {2}"),
-            utils.common.wrap("🍻 | {0} предложила пива {1} {2}"),
-            utils.common.wrap("🍻 | {0} предложило пива {1} {2}"),
-            utils.common.wrap("🍻 | {0} предложило пива {1} {2}"),
-            utils.common.wrap("🍻 | {0} предложили пива {1} {2}"),
-        ],
-        form="datv"
-    ),
-    RP2Handler(
-        utils.regex.cmd("дефенестрировать"),
-        [
-            utils.rand.rand_or_null_fun("🏠 | {0} отправил(а) в свободное падение {1} {2}", 1, 2, "🪟 | {0} измучил(а) виндой {1} {2}"),
-            utils.rand.rand_or_null_fun("🏠 | {0} отправил в свободное падение {1} {2}", 1, 2, "🪟 | {0} измучил виндой {1} {2}"),
-            utils.rand.rand_or_null_fun("🏠 | {0} отправила в свободное падение {1} {2}", 1, 2, "🪟 | {0} измучила виндой {1} {2}"),
-            utils.rand.rand_or_null_fun("🏠 | {0} отправило в свободное падение {1} {2}", 1, 2, "🪟 | {0} измучило виндой {1} {2}"),
-            utils.rand.rand_or_null_fun("🏠 | {0} отправило в свободное падение {1} {2}", 1, 2, "🪟 | {0} измучило виндой {1} {2}"),
-            utils.rand.rand_or_null_fun("🏠 | {0} отправили в свободное падение {1} {2}", 1, 2, "🪟 | {0} измучили виндой {1} {2}"),
-        ]
-    ),
+    RP2Handler(utils.regex.cmd("обнять"), utils.common.wrap("обнять"), "🤗"),
+    RP2Handler(utils.regex.cmd("выебать"), utils.common.wrap("выебать"), "😈"),
+    RP2Handler(utils.regex.cmd("дать"), utils.common.wrap("дать"), "🎁", form="datv"),
+    RP2Handler(utils.regex.cmd("сломать"), utils.common.wrap("сломать"), "🔧"),
+    RP2Handler(utils.regex.cmd("убить"), utils.common.wrap("убить"), "☠"),
+    RP2Handler(utils.regex.cmd("расстрелять"), utils.common.wrap("расстрелять"), "🔫"),
+    RP2Handler(utils.regex.cmd("поцеловать"), utils.common.wrap("поцеловать"), "😘"),
+    RP2Handler(utils.regex.cmd("кусь(нуть){0,1}|укусить"), utils.common.wrap("кусьнуть"), "😬"),
+    RP2Handler(utils.regex.cmd("пнуть"), utils.common.wrap("пнуть"), "👞"),
+    RP2Handler(utils.regex.cmd("прижать"), utils.common.wrap("прижать"), "🤲"),
+    RP2Handler(utils.regex.cmd("погладить"), utils.common.wrap("погладить"), "🤲"),
+    RP2Handler(utils.regex.cmd("потрогать"), utils.common.wrap("потрогать"), "🙌"),
+    RP2Handler(utils.regex.cmd("лизнуть"), utils.common.wrap("лизнуть"), "👅"),
+    RP2Handler(utils.regex.cmd("понюхать"), utils.common.wrap("понюхать"), "👃"),
+    RP2Handler(utils.regex.cmd("ударить"), utils.common.wrap("ударить"), "🤜😵"),
+    RP2Handler(utils.regex.cmd("шлепнуть"), utils.common.wrap("шлепнуть"), "👏"),
+    RP2Handler(utils.regex.cmd("шлёпнуть"), utils.common.wrap("шлёпнуть"), "👏"),
+    RP2Handler(utils.regex.cmd("предложить пива"), utils.common.wrap("предложить пива"), "🍻", form="datv"),
+    RP2Handler(utils.regex.cmd("дефенестрировать"), utils.rand.rand_or_null_fun("отправить в свободное падение", 1, 2, "измучить виндой"), "🪟"),
 ]
 
 
@@ -297,20 +121,10 @@ async def on_rp(cm: utils.cm.CommandMessage) -> None:
 
                     if cur_mention or arg:
                         res.append(handler.invoke(user, cur_pronoun_set, cur_mention, arg))
-                    else:
-                        res.append("RP-2 commands can't be executed without second user mention")
             except ValueError:
                 res.append("Could not parse mention")
     if res:
         await cm.int_cur.reply('\n'.join(res), link_preview=False)
-
-
-handler_list = [utils.ch.CommandHandler("role", re.compile(""), "role", on_rp)]
-
-
-
-def to_role(words: list[str], p: int) -> str:
-    return ''.join(utils.locale.try_verb_past(w, p) for w in words)
 
 
 async def on_role(cm: utils.cm.CommandMessage) -> None:
@@ -321,7 +135,7 @@ async def on_role(cm: utils.cm.CommandMessage) -> None:
     client = cm.client
     res = []
     for line in cm.arg.split('\n'):
-        if line[0] != '~' or line[-1] == '~':
+        if not line or len(line) < 2 or line[0] != '~' or line[-1] == '~' or line[1].isdigit():
             continue
 
         line = f"MENTION0 {line[1:]}"
@@ -345,9 +159,7 @@ async def on_role(cm: utils.cm.CommandMessage) -> None:
             mentions.extend(default_mention)
             line = f"{line} MENTION1"
 
-        if need_second_mention and len(mentions) == 1:
-            res.append("newRP-2 commands can't be executed without second user mention")  # TODO lang
-        else:
+        if not need_second_mention or len(mentions) != 1:
             for i in range(len(mentions) - 1, -1, -1):
                 line = line.replace(f'MENTION{i}', mentions[i][1])
             res.append(line)
@@ -355,5 +167,8 @@ async def on_role(cm: utils.cm.CommandMessage) -> None:
         await cm.int_cur.reply('\n'.join(res), link_preview=False)
 
 
-handler_list.append(utils.ch.CommandHandler("role-new", utils.regex.ignore_case("(^|\n)~.*(?<!~)($|\n)"), "role", on_role))
+handler_list = [
+    utils.ch.CommandHandler("role", re.compile(""), "role", on_rp),
+    utils.ch.CommandHandler("role-new", utils.regex.ignore_case("(^|\n)~.*(?<!~)($|\n)"), "role", on_role),
+]
 
