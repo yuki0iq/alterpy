@@ -71,5 +71,7 @@ async def main(log: logging.Logger) -> None:
                 await client.run_until_disconnected()
     except sqlite3.OperationalError:
         log.error("Another instance of this bot is already running!")
+    except SystemExit:
+        raise
 
 

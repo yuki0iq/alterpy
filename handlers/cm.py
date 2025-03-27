@@ -1,15 +1,16 @@
-import utils.cm
-import utils.ch
-import utils.th
+import alterpy.context
+import asyncio
 import re
 import telethon.tl.custom.message
-import asyncio
-import utils.mod
-import utils.help
+import typing
 import utils.aiospeller
 import utils.ch
-import alterpy.context
-import typing
+import utils.ch
+import utils.cm
+import utils.help
+import utils.log
+import utils.mod
+import utils.th
 
 
 the_bot_id = alterpy.context.the_bot_id
@@ -17,6 +18,8 @@ ch_list: list[utils.ch.CommandHandler] = []
 
 initial_handlers = ch_list[:]
 handlers_dir = "handlers/commands"
+
+log = utils.log.get("cm")
 
 
 async def init() -> None:
@@ -28,10 +31,10 @@ async def process_command_message(cm: utils.cm.CommandMessage) -> None:
     # TODO fix prefix commands...
     # fixed_arg = await utils.aiospeller.correct(alterpy.context.session, cm.arg)
     fixed_arg = cm.arg  # FIXME
-    tasks = [
-        asyncio.create_task(handler.invoke(
+    await asyncio.gather(*[
+        handler.invoke(
             utils.ch.apply(cm, handler) if handler.is_prefix else cm
-        ))
+        )
         for handler in filter(
             lambda handler:
             bool(re.search(handler.pattern, fixed_arg))
@@ -39,10 +42,7 @@ async def process_command_message(cm: utils.cm.CommandMessage) -> None:
                      or not handler.required_media_type),
             ch_list
         )
-    ]
-    if tasks:
-        await asyncio.wait(tasks)
-        # TODO exception handle?
+    ])
 
 
 async def on_command_message(msg: telethon.tl.custom.message.Message) -> None:

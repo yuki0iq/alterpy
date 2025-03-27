@@ -1,6 +1,7 @@
+import asyncio
 import telethon.tl.custom.message
-import utils.log
 import typing
+import utils.log
 
 
 class TelethonHandler(typing.NamedTuple):
@@ -10,5 +11,5 @@ class TelethonHandler(typing.NamedTuple):
     async def invoke(self, msg: telethon.tl.custom.message.Message) -> None:
         try:
             await self.handler_impl(msg)
-        except:
+        except Exception:
             utils.log.get("telethon handler").exception("invoke exception")
