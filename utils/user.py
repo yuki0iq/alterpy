@@ -28,7 +28,7 @@ class User:
 
     def __post_init__(self):
         if cur.execute("SELECT COUNT(*) FROM users WHERE id = ?", (self.sender.id,)).fetchone() == (0,):
-            cur.execute("INSERT INTO users VALUES (?, NULL, NULL, NULL, NULL, ?)", (self.sender.id, utils.common.stamp()))
+            cur.execute("INSERT INTO users VALUES (?, NULL, NULL, NULL, NULL, ?)", (self.sender.id, 0))
 
     def is_admin(self) -> bool:  # check if in admins list
         return self.sender.id in alterpy.context.admins
