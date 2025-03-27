@@ -77,7 +77,7 @@ async def on_set_name(cm: utils.cm.CommandMessage) -> None:
 
 
 async def on_reset_name(cm: utils.cm.CommandMessage) -> None:
-    cm.sender.reset_name()
+    cm.sender.set_name(None)
     await cm.int_cur.reply(LOC.obj('reset_name', cm.lang))
 
 
@@ -94,7 +94,7 @@ async def on_set_pronouns(cm:utils.cm.CommandMessage) -> None:
 
 
 async def on_reset_pronouns(cm: utils.cm.CommandMessage) -> None:
-    cm.sender.reset_pronouns()
+    cm.sender.set_pronouns(None)
     await cm.int_cur.reply(LOC.obj('reset_pronouns', cm.lang))
 
 
@@ -110,7 +110,7 @@ async def on_set_redirect(cm: utils.cm.CommandMessage) -> None:
 
 
 async def on_reset_redirect(cm: utils.cm.CommandMessage) -> None:
-    cm.sender.reset_redirect()
+    cm.sender.set_redirect(None)
     await cm.int_cur.reply(LOC.obj('reset_redirect', cm.lang))
 
 
@@ -125,7 +125,7 @@ async def on_set_lang(cm: utils.cm.CommandMessage) -> None:
 
 
 async def on_reset_lang(cm: utils.cm.CommandMessage) -> None:
-    cm.sender.reset_lang()
+    cm.sender.set_lang(None)
     await cm.int_cur.reply(LOC.obj('reset_lang', cm.lang))
 
 

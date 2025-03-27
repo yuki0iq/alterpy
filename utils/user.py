@@ -1,28 +1,31 @@
 import alterpy.context
-import utils.config
+import dataclasses
+import io
+import PIL.Image
+import re
+import sqlite3
+import telethon.tl.types
+import telethon.utils
 import utils.str
 import utils.log
 import utils.regex
-import re
-import typing
-import telethon.tl.types
-import telethon.utils
-import PIL.Image
-import io
 
 
-default_user_config = {
-    'name': '',
-    'pronoun_set': 0,
-    'lang': 'en',
-    'replace_id': 0
-}
+con = sqlite3.connect("users.db", autocommit=True)
+cur = con.cursor()
+cur.execute("PRAGMA journal_mode=WAL")
+cur.execute("CREATE TABLE IF NOT EXISTS users(id PRIMARY KEY, name, pronoun_set, lang, replace_id)")
 
 
-class User(typing.NamedTuple):
-    sender: typing.Union[telethon.tl.types.User, telethon.tl.types.Channel, telethon.tl.types.Chat]
+@dataclasses.dataclass
+class User:
+    sender: telethon.tl.types.User | telethon.tl.types.Channel | telethon.tl.types.Chat
     chat_id: int
     client: telethon.client.telegramclient.TelegramClient
+
+    def __post_init__(self):
+        if cur.execute("SELECT COUNT(*) FROM users WHERE id = ?", (self.sender.id,)).fetchone() == (0,):
+            cur.execute("INSERT INTO users VALUES (?, NULL, NULL, NULL, NULL)", (self.sender.id,))
 
     def is_admin(self) -> bool:  # check if in admins list
         return self.sender.id in alterpy.context.admins
@@ -42,7 +45,7 @@ class User(typing.NamedTuple):
         # if config.replace_id is set then use id (as user!)
         # user -> tg://user?id=123456789
         # public channel, group -> t.me/username
-        rid = self.get('replace_id')
+        rid = self.get_redirect()
         uid = rid or self.sender.id
         username = ''
         if type(self.sender) != telethon.tl.types.User and not rid:
@@ -52,7 +55,7 @@ class User(typing.NamedTuple):
             return f"[{utils.str.escape(name)}](t.me/{username})"
         return f"[{utils.str.escape(name)}](tg://user?id={uid})"
 
-    async def userpic(self) -> typing.Optional[PIL.Image.Image]:
+    async def userpic(self) -> PIL.Image.Image | None:
         by = io.BytesIO()
         await self.client.download_profile_photo(self.sender, file=by)
         by.seek(0)
@@ -61,52 +64,37 @@ class User(typing.NamedTuple):
         except:
             return None
 
-    def config_name(self) -> str: return f"../user/{self.sender.id}"
+    def get_pronouns(self) -> list[int]:
+        (pronouns,) = cur.execute("SELECT pronoun_set FROM users WHERE id = ?", (self.sender.id,)).fetchone()
+        if pronouns is None:
+            return None
+        assert pronouns.isdigit()
+        return list(map(int, pronouns))
 
-    def load_user_config(self) -> dict[str, typing.Any]: return default_user_config | utils.config.load(self.config_name())
-    def save_user_config(self, conf: dict[str, typing.Any]) -> None: utils.config.save(self.config_name(), conf)
+    def set_pronouns(self, pronoun_set: None | list[int]):
+        cur.execute("UPDATE users SET pronoun_set = ? WHERE id = ?", (pronoun_set and ''.join(map(str, pronoun_set)), self.sender.id))
 
-    def get(self, param: str) -> typing.Any: return self.load_user_config()[param]
-    def set(self, param: str, val: typing.Any) -> None: self.save_user_config(self.load_user_config() | {param: val})
-    def reset(self, param: str) -> None: self.set(param, default_user_config[param])
+    def get_name(self) -> str | None:
+        return cur.execute("SELECT name FROM users WHERE id = ?", (self.sender.id,)).fetchone()[0]
 
-    def get_pronouns(self) -> typing.Union[int, list[int]]:
-        ret = self.get('pronoun_set')
-        if isinstance(ret, int):
-            return ret
-        elif isinstance(ret, list):
-            for el in ret:
-                assert isinstance(el, int)
-            return ret
-        else:
-            assert False
-    def set_pronouns(self, pronoun_set: typing.Union[int, list[int]]) -> None: self.set('pronoun_set', pronoun_set)
-    def reset_pronouns(self) -> None: self.reset('pronoun_set')
+    def set_name(self, name: None | str):
+        cur.execute("UPDATE users SET name = ? WHERE id = ?", (name, self.sender.id))
 
-    def get_name(self) -> str:
-        ret = self.get('name')
-        assert isinstance(ret, str)
-        return ret
-    def set_name(self, name: str) -> None: self.set('name', name)
-    def reset_name(self) -> None: self.reset('name')
+    def get_redirect(self) -> int | None:
+        return cur.execute("SELECT replace_id FROM users WHERE id = ?", (self.sender.id,)).fetchone()[0]
 
-    def get_redirect(self) -> int:
-        ret = self.get('replace_id')
-        assert isinstance(ret, int)
-        return ret
-    def set_redirect(self, uid: int) -> None: self.set('replace_id', uid)
-    def reset_redirect(self) -> None: self.reset('replace_id')
+    def set_redirect(self, uid: int):
+        cur.execute("UPDATE users SET replace_id = ? WHERE id = ?", (uid, self.sender.id))
 
     def get_lang(self) -> str:
-        ret = self.get('lang')
-        assert isinstance(ret, str)
-        return ret
-    def set_lang(self, lang: str) -> None: self.set('lang', lang)
-    def reset_lang(self) -> None: self.reset('lang')
+        return cur.execute("SELECT lang FROM users WHERE id = ?", (self.sender.id,)).fetchone()[0]
+
+    def set_lang(self, lang: str):
+        cur.execute("UPDATE users SET lang = ? WHERE id = ?", (lang, self.sender.id))
 
 
-async def from_telethon(user: typing.Union[telethon.tl.types.User, telethon.tl.types.Channel, telethon.tl.types.Chat, str, int],
-                        chat: typing.Union[telethon.tl.types.Chat, int, None],
+async def from_telethon(user: telethon.tl.types.User | telethon.tl.types.Channel | telethon.tl.types.Chat | str | int,
+                        chat: telethon.tl.types.Chat | int | None,
                         client: telethon.client.telegramclient.TelegramClient) -> User:
     if isinstance(user, (str, int)):
         return await from_telethon(await client.get_entity(await client.get_input_entity(user)), chat, client)
@@ -136,7 +124,7 @@ mention_pattern = utils.regex.ignore_case(
 )
 
 
-async def from_str(arg: str, chat_id: int, client: telethon.client.telegramclient.TelegramClient) -> tuple[str, typing.Optional[User], str, str]:
+async def from_str(arg: str, chat_id: int, client: telethon.client.telegramclient.TelegramClient) -> tuple[str, User | None, str, str]:
     match = re.search(utils.user.mention_pattern, arg)
     if not match:
         return arg, None, '', ''

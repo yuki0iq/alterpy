@@ -38,20 +38,18 @@ pronouns_name = {
     4: {'ru': 'нейтральное оно', 'en': 'one/one\'s'},
     5: {'ru': 'они/их', 'en': 'singular they'},
 }
+pronouns_name[None] = pronouns_name[0]
 pronouns_name_getter = utils.locale.Localizator(pronouns_name)
 
 
-def to_str(pns: typing.Union[int, list[int]], lang: str = "ru") -> str:
-    if isinstance(pns, int):
-        single = pronouns_name_getter.obj(pns, lang)
-        assert isinstance(single, str)
-        return single
-    mult = pronouns_name_getter.obj('list', lang)
-    assert isinstance(mult, str)
-    return mult + ' ' + ', '.join(to_str(pn, lang) for pn in pns)
+def to_str(pns: None | list[int], lang: str = "ru") -> str:
+    if pns is None or len(pns) == 1:
+        pns = pns and pns[0]
+        return pronouns_name_getter.obj(pns, lang)
+    return pronouns_name_getter.obj('list', lang) + ' ' + ', '.join(to_str(pn, lang) for pn in pns)
 
 
-def from_str(s: str) -> typing.Union[int, list[int]]:
+def from_str(s: str) -> None | list[int]:
     if re.search(any_pronouns_regex, s):
         return -1
     ans = []
@@ -59,17 +57,15 @@ def from_str(s: str) -> typing.Union[int, list[int]]:
         if re.search(pat, s):
             ans.append(pn)
     if not ans:
-        return 0
-    if len(ans) == 1:
-        return ans[0]
+        return None
     return ans
 
 
-def to_int(pns: typing.Union[int, list[int]]) -> int:
+def to_int(pns: None | int | list[int]) -> int:
+    if pns is None:
+        return 0
     if pns == -1:
-        return random.randint(0, 5)  # TODO 6
-    if pns == 6:
-        return 4  # TODO fix mirror!!
+        return random.randint(0, 5)
     if isinstance(pns, int):
         return pns
     return random.choice(pns)

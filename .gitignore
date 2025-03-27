@@ -6,6 +6,7 @@ user/
 venv/
 __pycache__
 *.db
+*.db-*
 *.session
 *.session-journal
 
