@@ -1,5 +1,3 @@
-import utils.common
-import utils.log
 import iuliia
 import lemminflect
 import typing
@@ -13,10 +11,6 @@ def inflect(s: str, form: str) -> str:
     ret = lemminflect.getInflection(s, form)[0]
     assert isinstance(ret, str)
     return ret
-
-
-def inflector(form: str) -> typing.Callable[[str], str]:
-    return lambda s: inflect(s, form)
 
 
 def agree_with_number(s: str, num: int, _: typing.Any) -> str:

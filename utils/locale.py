@@ -1,5 +1,7 @@
+import utils.lang.en
+import utils.lang.none
+import utils.lang.ru
 import utils.str
-import utils.lang.ru, utils.lang.en
 import typing
 
 
@@ -26,18 +28,25 @@ class Localizator:
 langs = {
     'ru': utils.lang.ru,
     'en': utils.lang.en,
+    None: utils.lang.none,
 }
 
 
-def lang(lg: str) -> typing.Any:
-    return langs[lg]
+def lang(lg: str | None) -> typing.Any:
+    return langs.get(lg)
 
 
 def detect(s: str) -> str:
-    if not s: return 'en'
+    if not s:
+        return None
+
+    i = 0
+    while i < len(s) and not s[i].isalpha():
+        i += 1
+
     if 'а' <= s[0].lower() <= 'я': return 'ru'
     if 'a' <= s[0].lower() <= 'z': return 'en'
-    return 'en'  # lmao
+    return 'en' # unknown
 
 
 def try_verb_past(w: str, p: int) -> str:

@@ -86,10 +86,6 @@ def inflect(s: str, form: typing.Union[str, set[str], frozenset[str]]) -> str:
         return word_inflect(s, form)
 
 
-def inflector(form: typing.Union[str, set[str], frozenset[str]]) -> typing.Callable[[str], str]:
-    return lambda s: inflect(s, form)
-
-
 def agree_with_number(s: str, num: int, form: typing.Union[str, set[str], frozenset[str]]) -> str:
     ret = word_inflect_parse(s, form).make_agree_with_number(num).word
     assert isinstance(ret, str)
