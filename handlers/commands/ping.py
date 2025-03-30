@@ -1,13 +1,14 @@
-import utils.cm
-import utils.time
-import utils.system
-import utils.ch
-import utils.regex
-import utils.locale
-import utils.lang.ru
-import utils.common
-import typing
 import datetime
+import typing
+import utils.ch
+import utils.cm
+import utils.common
+import utils.lang.ru
+import utils.locale
+import utils.regex
+import utils.system
+import utils.time
+import utils.user
 import zoneinfo
 
 
@@ -38,7 +39,8 @@ Running on `{system_info}`
 Ping is _{ping}_, handled in _{handle}_
 Up for _{up}_
 Compute speed is _{speed}M_ operations per second
-This chat ID is `{cm.sender.chat_id}`
+This chat ID is `{cm.sender.chat.id}`
+{user_count} known users from {chat_count} known chats
 
 — Current time is —
 `{cur_time.astimezone(tzMSK).strftime(time_format)}`
@@ -49,7 +51,8 @@ This chat ID is `{cm.sender.chat_id}`
 Пинг — _{ping}_, обработка — _{handle}_
 Не падает, работает _{up}_
 Скорость вычислений — _{speed}M_ операций в секунду
-ID чата — `{cm.sender.chat_id}`
+ID чата — `{cm.sender.chat.id}`
+{user_count} пользователей из {chat_count} чатов
 
 — Текущее время —
 `{cur_time.astimezone(tzMSK).strftime(time_format)}`
@@ -93,6 +96,8 @@ async def on_stat(cm: utils.cm.CommandMessage) -> None:
     ping, handle, up = get_ping_times(cm)
     speed = utils.system.perf_test_compute()
     system_info = utils.system.system_info()
+    user_count = utils.user.user_count()
+    chat_count = utils.user.chat_count()
     msg = eval(LOC.get('stat_message', cm.lang))
     await cm.int_cur.reply(msg)
 

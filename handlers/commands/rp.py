@@ -87,6 +87,8 @@ async def on_rp(cm: utils.cm.CommandMessage) -> None:
     user = await cm.sender.get_mention()
     pronoun_set = cm.sender.get_pronouns()
     default_mention = [(cm.reply_sender, await cm.reply_sender.get_mention())] if cm.reply_sender is not None else []
+    chat = cm.sender.chat
+    client = cm.client
     res = []
     for line in cm.arg.split('\n')[:20]:  # technical limitation TODO fix!
         cur_pronoun_set = utils.pronouns.to_int(pronoun_set)
@@ -105,14 +107,14 @@ async def on_rp(cm: utils.cm.CommandMessage) -> None:
                         vars = match.groupdict()
                         if vars['username'] is not None:
                             username, arg = match[0][1:], arg[len(match[0]):]
-                            cur_user = await utils.user.from_telethon(username, chat=cm.sender.chat_id, client=cm.client)
+                            cur_user = await utils.user.from_telethon(username, chat, client)
                             mention = await cur_user.get_mention()
                         else:
                             uid = int(vars['uid'])
                             l = int(vars['len'])
                             arg = arg[len(match[0]):]
                             name, arg = arg[:l], arg[l:]
-                            cur_user = await utils.user.from_telethon(uid, chat=cm.sender.chat_id, client=cm.client)
+                            cur_user = await utils.user.from_telethon(uid, chat, client)
                             mention = f"[{utils.str.escape(name)}](tg://user?id={uid})"
                         cur_mention.append((cur_user, mention))
                         arg = arg.lstrip()
@@ -131,7 +133,7 @@ async def on_role(cm: utils.cm.CommandMessage) -> None:
     self_mention = [(cm.sender, await cm.sender.get_mention())]
     pronoun_set = cm.sender.get_pronouns()
     default_mention = [(cm.reply_sender, await cm.reply_sender.get_mention())] if cm.reply_sender is not None else []
-    chat_id = cm.sender.chat_id
+    chat = cm.sender.chat
     client = cm.client
     res = []
     for line in cm.arg.split('\n'):
@@ -141,11 +143,11 @@ async def on_role(cm: utils.cm.CommandMessage) -> None:
         line = f"MENTION0 {line[1:]}"
         mentions = self_mention[:]
 
-        pre, user, mention, post = await utils.user.from_str(line, chat_id, client)
+        pre, user, mention, post = await utils.user.from_str(line, chat, client)
         while user:
             line = f"{pre}MENTION{len(mentions)}{post}"
             mentions.append((user, mention))
-            pre, user, mention, post = await utils.user.from_str(line, chat_id, client)
+            pre, user, mention, post = await utils.user.from_str(line, chat, client)
 
         words = utils.regex.split_by_word_border(line)
         line = to_role(words, utils.pronouns.to_int(pronoun_set))  # TODO inflect mentions!!

@@ -26,7 +26,7 @@ async def on_trl(cm: utils.cm.CommandMessage) -> None:
 
 async def on_me(cm: utils.cm.CommandMessage) -> None:
     if cm.arg:
-        msg = f"\* _{await cm.sender.get_display_name()} {utils.str.escape(cm.arg)}_"
+        msg = f"\* _{cm.sender.get_display_name()} {utils.str.escape(cm.arg)}_"
         if cm.int_prev:
             await cm.int_prev.reply(msg)
         else:

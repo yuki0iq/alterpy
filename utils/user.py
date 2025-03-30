@@ -18,33 +18,60 @@ cur = con.cursor()
 cur.execute("PRAGMA journal_mode=WAL")
 cur.execute("CREATE TABLE IF NOT EXISTS users(id INTEGER, name TEXT, pronoun_set TEXT, lang TEXT, replace_id INTEGER, stamp INTEGER)")
 cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS users_id ON users(id)")
+cur.execute("CREATE TABLE IF NOT EXISTS chats (id INTEGER, name TEXT, stamp INTEGER)")
+cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS chats_id ON chats(id)")
+cur.execute("CREATE TABLE IF NOT EXISTS encounters (chat_id INTEGER, user_id INTEGER, stamp INTEGER)")
+cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS encounters_chat_user_stamp on encounters(chat_id, user_id, stamp)")
+
+
+def user_count() -> int:
+    return cur.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+
+def chat_count() -> int:
+    return cur.execute("SELECT COUNT(*) FROM chats").fetchone()[0]
 
 
 @dataclasses.dataclass
 class User:
     sender: telethon.tl.types.User | telethon.tl.types.Channel | telethon.tl.types.Chat
-    chat_id: int
+    chat: telethon.tl.types.User | telethon.tl.types.Channel | telethon.tl.types.Chat
     client: telethon.client.telegramclient.TelegramClient
 
     def __post_init__(self):
-        if cur.execute("SELECT COUNT(*) FROM users WHERE id = ?", (self.sender.id,)).fetchone() == (0,):
-            cur.execute("INSERT INTO users VALUES (?, NULL, NULL, NULL, NULL, ?)", (self.sender.id, 0))
+        user_id = self.sender.id
+        chat_id = self.chat.id
+        stamp = utils.common.stamp()
+
+        if cur.execute("SELECT COUNT(*) FROM users WHERE id = ?", (user_id,)).fetchone() == (0,):
+            cur.execute("INSERT INTO users VALUES (?, NULL, NULL, NULL, NULL, 0)", (user_id,))
+
+        encountered_time, = cur.execute("SELECT MAX(stamp) FROM encounters WHERE chat_id = ? AND user_id = ?", (chat_id, user_id)).fetchone()
+        if not encountered_time or stamp - encountered_time > 7_200_000_000:
+            cur.execute("INSERT INTO encounters VALUES (?, ?, ?)", (chat_id, user_id, stamp))
+
+        chat_name = self.get_telethon_name(self.chat)
+        try:
+            cur.execute("INSERT INTO chats VALUES (?, ?, ?)", (chat_id, chat_name, stamp))
+        except sqlite3.IntegrityError:
+            cur.execute("UPDATE chats SET name = ?, stamp = ? WHERE id = ?", (chat_name, stamp, chat_id))
 
     def is_admin(self) -> bool:  # check if in admins list
         return self.sender.id in alterpy.context.admins
 
-    async def get_display_name(self) -> str:
-        display_name = self.get_name()
-        if display_name:
-            return display_name
-        if isinstance(self.sender, telethon.tl.types.Channel):
-            return str(self.sender.title)
-        if not isinstance(self.sender, telethon.tl.types.Chat):
-            return str(self.sender.first_name)
+    def get_telethon_name(self, whom=None) -> str:
+        if whom is None:
+            whom = self.sender
+        if isinstance(whom, telethon.tl.types.Channel):
+            return str(whom.title)
+        if not isinstance(whom, telethon.tl.types.Chat):
+            return str(whom.first_name)
         return 'null'
 
+    def get_display_name(self) -> str:
+        return self.get_name() or self.get_telethon_name()
+
     async def get_mention(self) -> str:
-        name = await self.get_display_name()
+        name = self.get_display_name()
         # if config.replace_id is set then use id (as user!)
         # user -> tg://user?id=123456789
         # public channel, group -> t.me/username
@@ -107,14 +134,12 @@ async def from_telethon(user: telethon.tl.types.User | telethon.tl.types.Channel
                         chat: telethon.tl.types.Chat | int | None,
                         client: telethon.client.telegramclient.TelegramClient) -> User:
     if isinstance(user, (str, int)):
-        return await from_telethon(await client.get_entity(await client.get_input_entity(user)), chat, client)
-    if not user:
-        return await from_telethon(chat, chat, client)
+        user = await client.get_entity(await client.get_input_entity(user))
     if isinstance(chat, int):
-        chat_id = chat
-    else:
-        chat_id = chat.id if chat else 0
-    return User(user, chat_id, client)
+        chat = await client.get_entity(await client.get_input_entity(user))
+    if not user:
+        user = chat
+    return User(user, chat, client)
 
 
 # mention:

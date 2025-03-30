@@ -99,7 +99,7 @@ async def on_reset_pronouns(cm: utils.cm.CommandMessage) -> None:
 
 
 async def on_set_redirect(cm: utils.cm.CommandMessage) -> None:
-    _, mentioned, _, _ = await utils.user.from_str(cm.arg, cm.sender.chat_id, cm.client)
+    _, mentioned, _, _ = await utils.user.from_str(cm.arg, cm.sender.chat, cm.client)
     user = mentioned or cm.reply_sender
     if not user:
         await cm.int_cur.reply(LOC.obj('set_redirect_empty', cm.lang))
@@ -130,9 +130,9 @@ async def on_reset_lang(cm: utils.cm.CommandMessage) -> None:
 
 
 async def on_get(cm: utils.cm.CommandMessage) -> None:
-    _, mentioned, _, _ = await utils.user.from_str(cm.arg, cm.sender.chat_id, cm.client)
+    _, mentioned, _, _ = await utils.user.from_str(cm.arg, cm.sender.chat, cm.client)
     user = mentioned or cm.reply_sender or cm.sender
-    name = utils.str.escape(await user.get_display_name())
+    name = utils.str.escape(user.get_display_name())
     has_name = bool(user.get_name())
     pns = utils.pronouns.to_str(user.get_pronouns(), cm.lang)
     rid = user.get_redirect() or 'NOT SET'
