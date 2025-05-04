@@ -18,9 +18,9 @@ cur = con.cursor()
 cur.execute("PRAGMA journal_mode=WAL")
 cur.execute("CREATE TABLE IF NOT EXISTS users(id INTEGER, name TEXT, pronoun_set TEXT, lang TEXT, replace_id INTEGER, stamp INTEGER)")
 cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS users_id ON users(id)")
-cur.execute("CREATE TABLE IF NOT EXISTS chats (id INTEGER, name TEXT, stamp INTEGER)")
+cur.execute("CREATE TABLE IF NOT EXISTS chats(id INTEGER, name TEXT, stamp INTEGER)")
 cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS chats_id ON chats(id)")
-cur.execute("CREATE TABLE IF NOT EXISTS encounters (chat_id INTEGER, user_id INTEGER, stamp INTEGER)")
+cur.execute("CREATE TABLE IF NOT EXISTS encounters(chat_id INTEGER, user_id INTEGER, stamp INTEGER)")
 cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS encounters_chat_user_stamp on encounters(chat_id, user_id, stamp)")
 
 
